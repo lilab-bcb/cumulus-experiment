@@ -1,4 +1,5 @@
 *~
+*.xlsx
 *.mtx
 *.npy
 *.txt
@@ -8,4 +9,4 @@
 *.pdf
 *.png
 *.log
-*/__pycache__/*
+__pycache__/

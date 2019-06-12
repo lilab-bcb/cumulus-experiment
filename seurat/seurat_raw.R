@@ -9,7 +9,7 @@ library(RANN)
 seed <- 0
 setOption('mc.cores', 12)
 
-adata <- Read10X_h5("../../raw_batch/tiny/MantonBM_tiny_10x.h5")
+adata <- Read10X_h5("../MantonBM_tiny_10x.h5")
 
 ## Create Seurat objects
 ica <- CreateSeuratObject(counts = adata, project = "ICA", min.cells = 138)

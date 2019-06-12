@@ -13,7 +13,7 @@ f = open("./scanpy_combat_local.log", "w")
 
 print("Reading ICA (bone marrow) dataset")
 start = time.time()
-adata = sc.read_10x_h5("MantonBM_nonmix_10x.h5", genome='GRCh38')
+adata = sc.read_10x_h5("../../MantonBM_nonmix_tiny_10x.h5", genome='GRCh38')
 adata.obs['channel'] = list(map(lambda s : s.split('-')[0], adata.obs.index.values))
 adata.var_names_make_unique()
 
@@ -31,6 +31,7 @@ print("Normalizing data")
 sc.pp.normalize_per_cell(adata, counts_per_cell_after=1e5)
 sc.pp.log1p(adata)
 
+# Use hvg from scCloud batch correction.
 print("Finding variable genes")
 sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=7, min_disp=0.5, inplace=True)
 adata_variable_genes = adata[:, adata.var['highly_variable']]
@@ -60,13 +61,6 @@ end_nn = time.time()
 print("Time spent for knn = " + str_time(end_nn - start_nn) + ".")
 f.write("Time spent for knn = " + str_time(end_nn - start_nn) + ".\n")
 
-#print("Computing neighborhood graph with batch correction")
-#start_nn = time.time()
-#bbknn(adata, batch_key = 'Channel')
-#end_nn = time.time()
-#print("Time spent for bbknn = " + str_time(end_nn - start_nn) + ".")
-#f.write("Time spent for bbknn = " + str_time(end_nn - start_nn) + ".\n")
-
 print("Finding Clusters")
 start_lv = time.time()
 sc.tl.louvain(adata, resolution = 1.3)
@@ -83,7 +77,7 @@ f.write("Time spent for leiden = " + str_time(end_ld - start_ld) + ".\n")
 
 print("Computing UMAP embedding")
 start_up = time.time()
-sc.tl.umap(adata, min_dist = 0.1, random_state = 100)
+sc.tl.umap(adata, min_dist = 0.1, random_state = rand_seed)
 end_up = time.time()
 print("Time spent for UMAP = " + str_time(end_up - start_up) + ".")
 f.write("Time spent for UMAP = " + str_time(end_up - start_up) + ".\n")
@@ -108,5 +102,5 @@ print("Total time = " + str_time(end - start) + ".")
 f.write("Total time = " + str_time(end - start) + ".\n")
 f.close()
 
-#sc.pl.tsne(adata, color = ['louvain'], save = '.png')
-#sc.pl.umap(adata, color = ['louvain'], save = '.png')
+sc.pl.tsne(adata, color = ['leiden'], save = '.png')
+sc.pl.umap(adata, color = ['leiden'], save = '.png')

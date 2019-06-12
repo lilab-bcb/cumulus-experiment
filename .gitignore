@@ -1,6 +1,9 @@
+*~
 *.mtx
 *.npy
 *.txt
 *.RData
 *.h5ad
 *.h5
+*.pdf
+*.png

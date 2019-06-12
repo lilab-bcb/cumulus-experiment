@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
+import pandas as pd
 import scanpy as sc
 import sys
 import time
@@ -9,11 +10,11 @@ from utils import str_time
 
 sc.settings.n_jobs = 8
 rand_seed = 0
-f = open("./scanpy_bbknn_local.log", "w")
+f = open("./scanpy_local.log", "w")
 
 print("Reading ICA (bone marrow) dataset")
 start = time.time()
-adata = sc.read_10x_h5("../../MantonBM_nonmix_tiny_10x.h5", genome='GRCh38')
+adata = sc.read_10x_h5("../MantonBM_nonmix_tiny_10x.h5", genome='GRCh38')
 adata.obs['channel'] = list(map(lambda s : s.split('-')[0], adata.obs.index.values))
 adata.var_names_make_unique()
 
@@ -33,7 +34,7 @@ sc.pp.log1p(adata)
 
 # Use hvg from scCloud batch correction.
 #print("Getting highly variable genes")
-#df_hvg = pd.read_csv("../../hvg.txt", header = None)
+#df_hvg = pd.read_csv("../hvg.txt", header = None)
 #df_hvg.set_index(0, inplace = True)
 #df_hvg['highly_variable'] = [True] * df_hvg.shape[0]
 #adata.var = adata.var.join(df_hvg)
@@ -44,6 +45,7 @@ sc.pp.log1p(adata)
 print("Finding variable genes")
 sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=7, min_disp=0.5, inplace=True)
 adata_variable_genes = adata[:, adata.var['highly_variable']]
+
 
 print("Scale expression matrix of variable genes")
 sc.pp.scale(adata_variable_genes, max_value=10)
@@ -56,14 +58,14 @@ adata.obsm = adata_variable_genes.obsm
 print("Time spent for PCA = " + str_time(end_pca - start_pca) + ".")
 f.write("Time spent for PCA = " + str_time(end_pca - start_pca) + ".\n")
 
-print("Computing neighborhood graph using BBKNN")
+print("Computing neighborhood graph")
 start_nn = time.time()
-bbknn(adata, batch_key = 'channel', metric = 'euclidean')
+sc.pp.neighbors(adata, n_neighbors=100)
 end_nn = time.time()
-print("Time spent for bbknn = " + str_time(end_nn - start_nn) + ".")
-f.write("Time spent for bbknn = " + str_time(end_nn - start_nn) + ".\n")
+print("Time spent for knn = " + str_time(end_nn - start_nn) + ".")
+f.write("Time spent for knn = " + str_time(end_nn - start_nn) + ".\n")
 
-print("Finding Clusters")
+print("Finding Clusters using Louvain algorithm")
 start_lv = time.time()
 sc.tl.louvain(adata, resolution = 1.3)
 end_lv = time.time()
@@ -98,11 +100,11 @@ end_df = time.time()
 print("Time spent for diffmap = " + str_time(end_df - start_df) + ".")
 f.write("Time spent for diffmap = " + str_time(end_df - start_df) + ".\n")
 
-adata.write("MantonBM_nonmix_tiny_scanpy_bbknn.h5ad")
+adata.write("MantonBM_nonmix_tiny_scanpy.h5ad")
 end = time.time()
 print("Total time = " + str_time(end - start) + ".")
 f.write("Total time = " + str_time(end - start) + ".\n")
 f.close()
 
-sc.pl.tsne(adata, color = ['leiden'], save = '.png')
-sc.pl.umap(adata, color = ['leiden'], save = '.png')
+sc.pl.tsne(adata, color = ['louvain'], save = '.png')
+sc.pl.umap(adata, color = ['louvain'], save = '.png')

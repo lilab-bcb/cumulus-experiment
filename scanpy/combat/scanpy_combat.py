@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
+import pandas as pd
 import scanpy as sc
 import sys
 import time
@@ -32,11 +33,20 @@ sc.pp.normalize_per_cell(adata, counts_per_cell_after=1e5)
 sc.pp.log1p(adata)
 
 # Use hvg from scCloud batch correction.
+#print("Getting highly variable genes")
+#df_hvg = pd.read_csv("../../hvg.txt", header = None)
+#df_hvg.set_index(0, inplace = True)
+#df_hvg['highly_variable'] = [True] * df_hvg.shape[0]
+#adata.var = adata.var.join(df_hvg)
+#adata.var['highly_variable'].fillna(False, inplace = True)
+#adata_variable_genes = adata[:, adata.var['highly_variable']]
+#print("Size of hvg: " + str(adata_variable_genes.shape[1]))
+
 print("Finding variable genes")
 sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=7, min_disp=0.5, inplace=True)
 adata_variable_genes = adata[:, adata.var['highly_variable']]
 
-print("Combat to correct batch effets")
+print("Combat to correct batch effects")
 start_combat = time.time()
 sc.pp.combat(adata_variable_genes, key = 'channel')
 end_combat = time.time()
@@ -96,7 +106,7 @@ end_df = time.time()
 print("Time spent for diffmap = " + str_time(end_df - start_df) + ".")
 f.write("Time spent for diffmap = " + str_time(end_df - start_df) + ".\n")
 
-adata.write("MantonBM_nonmix_scanpy_combat.h5ad")
+adata.write("MantonBM_nonmix_tiny_scanpy_combat.h5ad")
 end = time.time()
 print("Total time = " + str_time(end - start) + ".")
 f.write("Total time = " + str_time(end - start) + ".\n")

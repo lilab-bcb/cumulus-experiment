@@ -5,30 +5,37 @@ from scCloud.tools.nearest_neighbors import calculate_nearest_neighbors
 from distance_metric import get_kDistances
 from termcolor import cprint
 
-def run_exp(package, attr, n_jobs = 8):
-	print("Consider attribute " + attr + ":")
+def run_exp(method):
+	if method == 'scCloud':
+		attr = "Channel"
+	else:
+		attr = "channel"
 
 	# For dataset not batch corrected.
-	if package == 'scCloud':
+	if method == 'scCloud':
 		adata = scCloud.tools.read_input('MantonBM_nonmix.h5ad', mode = 'a')
 		fn_prefix = 'MantonBM_nonmix'
 	else:
-		adata = scCloud.tools.read_input('MantonBM_nonmix_scanpy.h5ad', mode = 'a')
+		adata = scCloud.tools.read_input('./scanpy/MantonBM_nonmix_tiny_scanpy.h5ad', mode = 'a')
 		adata.uns['knn_indices'] = adata.uns['neighbors']['indices'][:, 1:]
-		fn_prefix = 'MantonBM_nonmix_scanpy'
+		fn_prefix = 'MantonBM_nonmix_tiny_scanpy'
 
 	kbet1, pvalue1, kbjsd1 = get_kDistances(adata, fn_prefix, attr)
 
 	# For dataset batch corrected.
-	if package == 'scCloud':
+	if method == 'scCloud':
 		adata = scCloud.tools.read_input('MantonBM_nonmix_corrected.h5ad', mode = 'a')
 		fn_prefix = 'MantonBM_nonmix_corrected'
 	else:
-		adata = scCloud.tools.read_input('MantonBM_nonmix_scanpy_combat.h5ad', mode = 'a')
-		#indices, _ = calculate_nearest_neighbors(adata.obsm['X_pca'], num_threads = n_jobs)
-		#adata.uns['knn_indices'] = indices
+		if method == 'combat':
+			adata = scCloud.tools.read_input('./scanpy/combat/MantonBM_nonmix_tiny_scanpy_combat.h5ad', mode = 'a')
+			fn_prefix = 'MantonBM_nonmix_tiny_scanpy_combat'
+		else:
+			adata = scCloud.tools.read_input('./scanpy/bbknn/MantonBM_nonmix_tiny_scanpy_bbknn.h5ad', mode = 'a')
+			fn_prefix = 'MantonBM_nonmix_tiny_scanpy_bbknn'
+		
 		adata.uns['knn_indices'] = adata.uns['neighbors']['indices'][:, 1:]
-		fn_prefix = 'MantonBM_nonmix_scanpy_combat'
+		
 
 	kbet2, pvalue2, kbjsd2 = get_kDistances(adata, fn_prefix, attr)
 
@@ -38,7 +45,6 @@ def run_exp(package, attr, n_jobs = 8):
 
 
 if __name__ == '__main__':
-	package = sys.argv[1]
-	attr = sys.argv[2]
-	assert package == 'scCloud' or package == 'scanpy'
-	run_exp(package, attr)
+	method = sys.argv[1]
+	assert method in ["scCloud", "combat", "bbknn"]
+	run_exp(method)

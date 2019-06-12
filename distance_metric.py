@@ -33,16 +33,16 @@ def calc_kBJSD(data, attr, knn_keyword = 'knn', K = 25, n_jobs = 1, temp_folder 
 
 	return (kBJSD_arr.mean(), kBJSD_arr)
 
-def get_kDistances(adata, fn_prefix, attr, n_jobs = 8):
+def get_kDistances(adata, fn_prefix, attr, n_jobs = 1):
 	# kBET
 	kbet, pvalue = calc_kBET(adata, attr, n_jobs = n_jobs)
-	cprint("kBET static for {filename} is {static}, with p-value {pvalue}.".format(filename = fn_prefix, static = kbet, pvalue = pvalue), "yellow")
+	cprint("kBET statistic for {filename} is {stat:.4f}, with p-value {pvalue:.4f}.".format(filename = fn_prefix, stat = kbet, pvalue = pvalue), "yellow")
 
 	# kBJSD
 	kbjsd, kbjsd_arr = calc_kBJSD(adata, attr, n_jobs = n_jobs)
-	cprint("kBJSD for {filename} is {res}.".format(filename = fn_prefix, res = kbjsd), "yellow")
-	ax = sns.distplot(kbjsd_arr, hist = False, rug = True)
-	ax.get_figure().savefig("{prefix}_{attr}_kbjsd_dist.pdf".format(prefix = fn_prefix, attr = attr))
-	plt.close()
+	cprint("kBJSD for {filename} is {res:.4f}.".format(filename = fn_prefix, res = kbjsd), "yellow")
+	#ax = sns.distplot(kbjsd_arr, hist = False, rug = True)
+	#ax.get_figure().savefig("{prefix}_{attr}_kbjsd_dist.pdf".format(prefix = fn_prefix, attr = attr))
+	#plt.close()
 
 	return (kbet, pvalue, kbjsd)

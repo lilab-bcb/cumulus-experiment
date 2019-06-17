@@ -1,3 +1,0 @@
-scCloud cluster -p 8 --correct-batch-effect --diffmap-full-speed --run-louvain --run-leiden --run-tsne --run-umap --run-fle MantonBM_nonmix_tiny_10x.h5 MantonBM_nonmix_tiny_corrected
-#scCloud de_analysis -p 8 --labels leiden_labels --mwu --roc MantonBM_nonmix_tiny_corrected.h5ad MantonBM_nonmix_tiny_corrected.xlsx
-#scCloud annotate_cluster MantonBM_nonmix_tiny_corrected.h5ad MantonBM_nonmix_tiny_corrected.anno.txt

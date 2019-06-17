@@ -1,0 +1,2 @@
+scCloud cluster -p 8 --diffmap-full-speed --run-louvain --run-leiden --run-fitsne MantonBM_nonmix_10x.h5 MantonBM_nonmix
+#scCloud cluster -p 8 --correct-batch-effect --diffmap-full-speed --run-louvain --run-leiden --run-fitsne --run-umap --run-fle MantonBM_nonmix_10x.h5 MantonBM_nonmix_corrected

@@ -1,0 +1,2 @@
+scCloud plot scatter --basis tsne --attributes leiden,channel MantonBM_nonmix_tiny_scanpy_bbknn.h5ad tiny_scanpy_bbknn.fitsne.pdf
+scCloud plot scatter --basis umap --attributes leiden,channel MantonBM_nonmix_tiny_scanpy_bbknn.h5ad tiny_scanpy_bbknn.umap.pdf

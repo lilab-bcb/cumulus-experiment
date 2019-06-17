@@ -35,14 +35,14 @@ def calc_kBJSD(data, attr, knn_keyword = 'knn', K = 25, n_jobs = 1, temp_folder 
 
 def get_kDistances(adata, fn_prefix, attr, n_jobs = 1):
 	# kBET
-	kbet, pvalue = calc_kBET(adata, attr, n_jobs = n_jobs)
-	cprint("kBET statistic for {filename} is {stat:.4f}, with p-value {pvalue:.4f}.".format(filename = fn_prefix, stat = kbet, pvalue = pvalue), "yellow")
+	kbet, pvalue, ac_rate = calc_kBET(adata, attr, n_jobs = n_jobs)
+	cprint("kBET statistic for {filename} is {stat:.4f}, with p-value {pvalue:.4f} and accept rate {rate:.4f}.".format(filename = fn_prefix, stat = kbet, pvalue = pvalue, rate = ac_rate), "yellow")
 
 	# kBJSD
-	kbjsd, kbjsd_arr = calc_kBJSD(adata, attr, n_jobs = n_jobs)
-	cprint("kBJSD for {filename} is {res:.4f}.".format(filename = fn_prefix, res = kbjsd), "yellow")
+	#kbjsd, kbjsd_arr = calc_kBJSD(adata, attr, n_jobs = n_jobs)
+	#cprint("kBJSD for {filename} is {res:.4f}.".format(filename = fn_prefix, res = kbjsd), "yellow")
 	#ax = sns.distplot(kbjsd_arr, hist = False, rug = True)
 	#ax.get_figure().savefig("{prefix}_{attr}_kbjsd_dist.pdf".format(prefix = fn_prefix, attr = attr))
 	#plt.close()
 
-	return (kbet, pvalue, kbjsd)
+	return (kbet, pvalue, ac_rate)

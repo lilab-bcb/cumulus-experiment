@@ -10,6 +10,7 @@ from utils import str_time
 
 sc.settings.n_jobs = 8
 rand_seed = 0
+hvg_file = "../hvg.txt"
 f = open("./scanpy_local.log", "w")
 
 print("Reading ICA (bone marrow) dataset")
@@ -32,19 +33,22 @@ print("Normalizing data")
 sc.pp.normalize_per_cell(adata, counts_per_cell_after=1e5)
 sc.pp.log1p(adata)
 
-# Use hvg from scCloud batch correction.
-#print("Getting highly variable genes")
-#df_hvg = pd.read_csv("../hvg.txt", header = None)
-#df_hvg.set_index(0, inplace = True)
-#df_hvg['highly_variable'] = [True] * df_hvg.shape[0]
-#adata.var = adata.var.join(df_hvg)
-#adata.var['highly_variable'].fillna(False, inplace = True)
-#adata_variable_genes = adata[:, adata.var['highly_variable']]
-#print("Size of hvg: " + str(adata_variable_genes.shape[1]))
 
-print("Finding variable genes")
-sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=7, min_disp=0.5, inplace=True)
-adata_variable_genes = adata[:, adata.var['highly_variable']]
+print("Getting Highly Variable Genes from scCloud")
+df_hvg = pd.read_csv(hvg_file)
+print("Highly variable gene set of size " + str(df_hvg.shape[0]))
+df_hvg.rename(columns = {'index': 'name'}, inplace = True)
+df_hvg.set_index('gene_ids', inplace = True)
+df_hvg.drop(columns = ['name'], inplace = True)
+df_hvg['highly_variable_genes'] = [True] * df_hvg.shape[0]
+df_var = adata.var.reset_index().set_index('gene_ids').rename(columns = {'index': 'name'})
+df_join = df_var.join(df_hvg)
+df_join['highly_variable_genes'].fillna(False, inplace = True)
+adata_variable_genes = adata[:, df_join['highly_variable_genes']]
+
+#print("Finding variable genes")
+#sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=7, min_disp=0.5, inplace=True)
+#adata_variable_genes = adata[:, adata.var['highly_variable']]
 
 
 print("Scale expression matrix of variable genes")
@@ -81,7 +85,7 @@ f.write("Time spent for leiden = " + str_time(end_ld - start_ld) + ".\n")
 
 print("Computing UMAP embedding")
 start_up = time.time()
-sc.tl.umap(adata, min_dist = 0.1, random_state = rand_seed)
+sc.tl.umap(adata, random_state = rand_seed)
 end_up = time.time()
 print("Time spent for UMAP = " + str_time(end_up - start_up) + ".")
 f.write("Time spent for UMAP = " + str_time(end_up - start_up) + ".\n")
@@ -106,5 +110,5 @@ print("Total time = " + str_time(end - start) + ".")
 f.write("Total time = " + str_time(end - start) + ".\n")
 f.close()
 
-sc.pl.tsne(adata, color = ['louvain'], save = '.png')
-sc.pl.umap(adata, color = ['louvain'], save = '.png')
+sc.pl.tsne(adata, color = ['leiden'], save = '.png')
+sc.pl.umap(adata, color = ['leiden'], save = '.png')

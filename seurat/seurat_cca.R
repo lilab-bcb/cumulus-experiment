@@ -7,7 +7,7 @@ library(ggplot2)
 library(RANN)
 
 seed <- 0
-setOption('mc.cores', 12)
+setOption('mc.cores', 8)
 
 processed <- FALSE
 
@@ -52,6 +52,8 @@ if (!processed) {
 
 ## Read preset high variable features
 ##features <- as.character(unlist(read.table("hvg.txt")))
+    df.hvg <- read.csv(file = "../hvg.txt")
+    hvg.features <- as.character(unlist(df.hvg['index']))
 
 ## Create Seurat objects
     now <- Sys.time()
@@ -64,12 +66,14 @@ if (!processed) {
         percent.mito <- Matrix::colSums(GetAssayData(ica, slot = 'counts')[mito.features,]) / Matrix::colSums(GetAssayData(ica, slot = 'counts'))
         ica <- subset(ica, subset = nFeature_RNA >= 500 & nFeature_RNA < 6000 & percent.mito < 0.1)
         ica <- NormalizeData(ica, selection.method = "LogNormalize", scale.factor = 1e5)
-        ica <- FindVariableFeatures(ica, selection.method = "mean.var.plot", mean.cutoff = c(0.0125, 7), dispersion.cutoff = c(0.5, Inf))
-        ##ica[["RNA"]]@var.features <- features
+        #ica <- FindVariableFeatures(ica, selection.method = "mean.var.plot", mean.cutoff = c(0.0125, 7), dispersion.cutoff = c(0.5, Inf))
+        ica[["RNA"]]@var.features <- hvg.features
         seurat.obj.list[[name]] <- ica
     }
     print("Creating Seurat Objects:")
     print(Sys.time() - now)
+
+
 
     now <- Sys.time()
     ica.anchors <- FindIntegrationAnchors(object.list = seurat.obj.list)
@@ -77,6 +81,7 @@ if (!processed) {
     print(Sys.time() - now)
 
     now <- Sys.time()
+    ## Yiming: bug -- some features cannot find their indices.
     ica.combined <- IntegrateData(anchorset = ica.anchors)
     print("Data Integration:")
     print(Sys.time() - now)
@@ -91,7 +96,7 @@ if (!processed) {
 ##write.table(X@Dimnames[[2]], file = "cells.txt", quote = FALSE, row.names= FALSE, col.names = FALSE)
 ##print("Finished!")
 
-    save(ica.combined, file = "seurat_cca_result.RData")
+    save(ica.combined, file = "seurat_cca_processed.RData")
     print("Saved CCA result to file.")
 } else {
     load(file = "seurat_cca_result.RData")

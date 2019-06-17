@@ -9,4 +9,5 @@
 *.pdf
 *.png
 *.log
+*.net
 __pycache__/

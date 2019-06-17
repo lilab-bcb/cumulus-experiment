@@ -5,7 +5,9 @@ from scCloud.tools.nearest_neighbors import calculate_nearest_neighbors
 from distance_metric import get_kDistances
 from termcolor import cprint
 
-def run_exp(method):
+scanpy_methods = ["combat", "mnn"]
+
+def run_exp(method, dataset):
 	if method == 'scCloud':
 		attr = "Channel"
 	else:
@@ -13,38 +15,62 @@ def run_exp(method):
 
 	# For dataset not batch corrected.
 	if method == 'scCloud':
-		adata = scCloud.tools.read_input('MantonBM_nonmix.h5ad', mode = 'a')
-		fn_prefix = 'MantonBM_nonmix'
+		if dataset == "tiny":
+			src_file = './scCloud/MantonBM_nonmix_tiny_sccloud.h5ad'
+			fn_prefix = 'MantonBM_nonmix_tiny_sccloud'
+		else:
+			src_file = 'MantonBM_nonmix.h5ad'
+			fn_prefix = 'MantonBM_nonmix'
 	else:
-		adata = scCloud.tools.read_input('./scanpy/MantonBM_nonmix_tiny_scanpy.h5ad', mode = 'a')
-		adata.uns['knn_indices'] = adata.uns['neighbors']['indices'][:, 1:]
-		fn_prefix = 'MantonBM_nonmix_tiny_scanpy'
+		if dataset == "tiny":
+			src_file = './scanpy/MantonBM_nonmix_tiny_scanpy.h5ad'
+			fn_prefix = 'MantonBM_nonmix_tiny_scanpy'
+		else:
+			src_file = 'MantonBM_nonmix_scanpy.h5ad'
+			fn_prefix = 'MantonBM_nonmix_scanpy'
 
-	kbet1, pvalue1, kbjsd1 = get_kDistances(adata, fn_prefix, attr)
+	adata = scCloud.tools.read_input(src_file, mode = 'a')
+	if method in scanpy_methods:
+		adata.uns['knn_indices'] = adata.uns['neighbors']['indices'][:, 1:]
+
+	kbet1, pvalue1, ac_rate1 = get_kDistances(adata, fn_prefix, attr)
 
 	# For dataset batch corrected.
 	if method == 'scCloud':
-		adata = scCloud.tools.read_input('MantonBM_nonmix_corrected.h5ad', mode = 'a')
-		fn_prefix = 'MantonBM_nonmix_corrected'
-	else:
-		if method == 'combat':
-			adata = scCloud.tools.read_input('./scanpy/combat/MantonBM_nonmix_tiny_scanpy_combat.h5ad', mode = 'a')
-			fn_prefix = 'MantonBM_nonmix_tiny_scanpy_combat'
+		if dataset == "tiny":
+			src2_file = './scCloud/MantonBM_nonmix_tiny_sccloud_corrected.h5ad'
+			fn2_prefix = 'MantonBM_nonmix_tiny_sccloud_corrected'
 		else:
-			adata = scCloud.tools.read_input('./scanpy/bbknn/MantonBM_nonmix_tiny_scanpy_bbknn.h5ad', mode = 'a')
-			fn_prefix = 'MantonBM_nonmix_tiny_scanpy_bbknn'
+			src2_file = 'MantonBM_nonmix_corrected.h5ad'
+			fn2_prefix = 'MantonBM_nonmix_corrected'
+	elif method == 'combat':
+		if dataset == "tiny":
+			src2_file = './scanpy/combat/MantonBM_nonmix_tiny_scanpy_combat.h5ad'
+			fn2_prefix = 'MantonBM_nonmix_tiny_scanpy_combat'
+		else:
+			src2_file = 'MantonBM_nonmix_scanpy_combat.h5ad'
+			fn2_prefix = 'MantonBM_nonmix_scanpy_combat'
+	else:
+		if dataset == "tiny":
+			src2_file = './scanpy/mnn/MantonBM_nonmix_tiny_scanpy_mnn_processed.h5ad'
+			fn2_prefix = 'MantonBM_nonmix_tiny_scanpy_mnn'
+		else:
+			src2_file = 'MantonBM_nonmix_scanpy_mnn.h5ad'
+			fn2_prefix = 'MantonBM_nonmix_scanpy_mnn'
 		
-		adata.uns['knn_indices'] = adata.uns['neighbors']['indices'][:, 1:]
-		
+	adata = scCloud.tools.read_input(src2_file, mode = 'a')	
+	if method in scanpy_methods:
+		adata.uns['knn_indices'] = adata.uns['neighbors']['indices'][:, 1:]	
 
-	kbet2, pvalue2, kbjsd2 = get_kDistances(adata, fn_prefix, attr)
+	kbet2, pvalue2, ac_rate2 = get_kDistances(adata, fn_prefix, attr)
 
 	cprint("kBET is improved by {:.2%}.".format(np.abs(kbet1 - kbet2) / kbet1))
 	cprint("pvalue of kBET is improved by {:.2%}.".format(np.abs(pvalue1 - pvalue2) / pvalue1))
-	cprint("kBJSD is improved by {:.2%}.".format(np.abs(kbjsd1 - kbjsd2) / kbjsd1))
+	cprint("Accept rate is improved by {:.2%}".format(np.abs(ac_rate1 - ac_rate2) / ac_rate1))
 
 
 if __name__ == '__main__':
 	method = sys.argv[1]
-	assert method in ["scCloud", "combat", "bbknn"]
-	run_exp(method)
+	dataset = sys.argv[2]
+	assert method in (["scCloud"] + scanpy_methods) and dataset in ["tiny", "complete"]
+	run_exp(method, dataset)

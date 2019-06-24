@@ -4,7 +4,6 @@ import scanpy as sc
 import os, sys, re
 from termcolor import cprint
 from mnnpy import mnn_correct
-from utils import str_time
 
 sc.settings.n_jobs = 8
 rand_seed = 0

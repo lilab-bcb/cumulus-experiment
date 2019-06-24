@@ -2,6 +2,7 @@ import os, sys
 import numpy as np
 import pandas as pd
 from anndata import read_mtx
+from scipy import sparse
 import scCloud
 from scCloud.tools.diffusion_map import calculate_affinity_matrix
 from termcolor import cprint
@@ -49,6 +50,7 @@ def process_seurat():
 
 	cprint("Loading gene expression...", "green")
 	adata = read_mtx("./seurat/gene_expression.mtx")
+	adata.X = sparse.csr_matrix(adata.X)
 	
 	cprint("Loading feature names...", "green")
 	df_features = pd.read_csv("./seurat/feature_names.txt", header = None)

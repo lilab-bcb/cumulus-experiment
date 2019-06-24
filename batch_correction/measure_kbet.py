@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from anndata import read_mtx
 import scCloud
+from scCloud.tools.diffusion_map import calculate_affinity_matrix
 from termcolor import cprint
 from sklearn.metrics import silhouette_score
 
@@ -90,8 +91,6 @@ def process_bbknn():
 	adata.uns['knn_indices'] = adata.uns['neighbors']['knn_indices'][:, 1:]
 	adata.uns['knn_distances'] = adata.uns['neighbors']['knn_distances'][:, 1:]
 
-	from scCloud.tools.diffusion_map import calculate_affinity_matrix
-
 	W = calculate_affinity_matrix(adata.uns['knn_indices'], adata.uns['knn_distances'])
 	adata.uns['W'] = W
 	scCloud.tools.run_leiden(adata)
@@ -104,18 +103,20 @@ def process_bbknn():
 
 	scCloud.tools.write_output(adata, "./bbknn/scanpy_bbknn_result")
 
-def process_data(data, rep_key = 'X_pca', processed = False):
+def process_data(data, rep_key = 'X_pca', cell_type_label = 'leiden_labels', processed = False):
 
 	if not processed:
 		cprint("Calculating PCA and KNN...", "green")
 		scCloud.tools.run_pca(data)
 		scCloud.tools.get_kNN(data, rep_key, K = 100)
+		adata.uns['W'] = calculate_affinity_matrix(data.uns['knn_indices'], data.uns['knn_distances'])
+		scCloud.tools.run_leiden(data)
 
 	cprint("Calculating kBET measures...", "green")
 	stat, pvalue, acc_rate = scCloud.tools.calc_kBET(data, 'Channel', rep_key)
 	cprint("Mean statistics is {stat:.4f}; Mean p-value is {pvalue:.4f}; Mean accept rate is {rate:.4f}.".format(stat = stat, pvalue = pvalue, rate = acc_rate), "yellow")
 
-	sil_score = silhouette_score(data.obsm[rep_key], data.obs['Channel'])
+	sil_score = silhouette_score(data.obsm[rep_key], data.obs[cell_type_label])
 	cprint("Silhouette Score = {:.4f}.".format(sil_score))
 
 

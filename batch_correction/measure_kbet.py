@@ -6,6 +6,8 @@ import scCloud
 from termcolor import cprint
 from sklearn.metrics import silhouette_score
 
+method_list = ["scCloud", "seurat", "mnn", "combat", "bbknn"]
+
 def process_sccloud():
 	cprint("For scCloud:", "red")
 	f_list = [f for f in os.listdir("./scCloud") if f in ["tiny_sccloud_corrected.h5ad"]]
@@ -116,12 +118,22 @@ def process_data(data, rep_key = 'X_pca', processed = False):
 	sil_score = silhouette_score(data.obsm[rep_key], data.obs['Channel'])
 	cprint("Silhouette Score = {:.4f}.".format(sil_score))
 
-def main():
-	process_sccloud()
-	#process_mnn()
-	#process_seurat()
-	#process_combat()
-	#process_bbknn()
 
 if __name__ == "__main__":
-	main()
+	method = sys.argv[1]
+	assert method in method_list or method == 'all'
+
+	if method == 'scCloud' or method == 'all':
+		process_sccloud()
+
+	if method == 'seurat' or method == 'all':
+		process_seurat()
+
+	if method == 'mnn' or method == 'all':
+		process_mnn()
+
+	if method == 'combat' or method == 'all':
+		process_combat()
+
+	if method == 'bbknn' or method == 'all':
+		process_bbknn()

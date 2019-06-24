@@ -113,15 +113,15 @@ def process_data(data, rep_key = 'X_pca', processed = False):
 	stat, pvalue, acc_rate = scCloud.tools.calc_kBET(data, 'Channel', rep_key)
 	cprint("Mean statistics is {stat:.4f}; Mean p-value is {pvalue:.4f}; Mean accept rate is {rate:.4f}.".format(stat = stat, pvalue = pvalue, rate = acc_rate), "yellow")
 
-	sil_score = silhouette_score(data.obsm[rep_key], 'Channel')
+	sil_score = silhouette_score(data.obsm[rep_key], data.obs['Channel'])
 	cprint("Silhouette Score = {:.4f}.".format(sil_score))
 
 def main():
 	process_sccloud()
-	process_mnn()
-	process_seurat()
-	process_combat()
-	process_bbknn()
+	#process_mnn()
+	#process_seurat()
+	#process_combat()
+	#process_bbknn()
 
 if __name__ == "__main__":
 	main()

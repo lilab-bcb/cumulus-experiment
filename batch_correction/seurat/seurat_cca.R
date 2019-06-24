@@ -9,8 +9,7 @@ library(RANN)
 seed <- 0
 setOption('mc.cores', 8)
 
-##src.obj <- ReadH5AD("../MantonBM_nonmix_tiny_10x_filter_norm.h5ad")
-src.obj <- ReadH5AD("../MantonBM_nonmix_10x_filter_norm.h5ad")
+src.obj <- ReadH5AD("../MantonBM_nonmix_tiny_10x_filter_norm.h5ad")
 adata <- GetAssayData(src.obj)
 
 n.tags <- adata@Dim[2]
@@ -47,7 +46,7 @@ for (i in 1:length(dsets)) {
     name <- names(dsets)[i]
     print(paste(i, ". Processing", name))
     ica <- CreateSeuratObject(counts = dsets[[i]], project = name)
-    ##ica[["RNA"]]@var.features <- hvg.features
+    ica[["RNA"]]@var.features <- hvg.features
     seurat.obj.list[[name]] <- ica
 }
 print("Creating Seurat Objects:")

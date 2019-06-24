@@ -7,7 +7,6 @@ from bbknn import bbknn
 src_file = "../MantonBM_nonmix_tiny_10x_filter_norm_pca.h5ad"
 
 print("Reading ICA (bone marrow) dataset")
-start = time.time()
 adata = sc.read_h5ad(src_file)
 
 print("Computing neighborhood graph using BBKNN...")

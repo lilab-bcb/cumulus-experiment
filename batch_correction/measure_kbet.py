@@ -110,7 +110,7 @@ def process_data(data, output, rep_key = 'X_pca', cell_type_label = 'leiden_labe
 		scCloud.tools.run_pca(data)
 		scCloud.tools.get_kNN(data, rep_key, K = 100)
 		cprint("Clustering...", "green")
-		adata.uns['W'] = calculate_affinity_matrix(data.uns['knn_indices'], data.uns['knn_distances'])
+		data.uns['W'] = calculate_affinity_matrix(data.uns['knn_indices'], data.uns['knn_distances'])
 		scCloud.tools.run_leiden(data)
 		cprint("Computing FIt-SNE...", "green")
 		scCloud.tools.run_fitsne(data, rep_key, n_jobs = 8)

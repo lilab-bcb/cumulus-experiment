@@ -3,7 +3,6 @@ import pandas as pd
 import scanpy as sc
 import sys
 from bbknn import bbknn
-from utils import str_time
 
 sc.settings.n_jobs = 8
 rand_seed = 0

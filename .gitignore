@@ -1,6 +1,7 @@
 *~
 .DS_Store
 *.xlsx
+*.pptx
 *.mtx
 *.npy
 *.txt

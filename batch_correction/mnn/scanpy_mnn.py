@@ -1,10 +1,7 @@
-#!/usr/bin/env python
-
 import numpy as np
 import pandas as pd
 import scanpy as sc
 import os, sys, re
-import time
 from termcolor import cprint
 from mnnpy import mnn_correct
 from utils import str_time
@@ -14,12 +11,9 @@ rand_seed = 0
 
 src_file = "../MantonBM_nonmix_tiny_10x_filter_norm.h5ad"
 hvg_file = "../hvg.txt"
-log_file = "./scanpy_mnn.log"
 
 
 def calc_mnn():
-
-	f = open(log_file, "w")	
 
 	adata = sc.read_h5ad(src_file)
 
@@ -63,18 +57,12 @@ def calc_mnn():
 
 
 	print("Batch Correction Using MNN:")
-	start_mnn = time.time()
 	corrected = mnn_correct(*list(ad_dict.values()), n_jobs = sc.settings.n_jobs, batch_key = 'Channel')
-	end_mnn = time.time()
-	print("Time spent = " + str_time(end_mnn - start_mnn))
-	f.write("Time spent for MNN = " + str_time(end_mnn - start_mnn) + '\n')	
 
 	adata = corrected[0]
 	adata.write("scanpy_mnn_corrected.h5ad")
 
 	print("Corrected data are saved.")
-	f.write("Corrected data are saved." + "\n")
-	f.close()
 
 
 def main():

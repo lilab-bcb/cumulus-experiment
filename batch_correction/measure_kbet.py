@@ -4,6 +4,7 @@ import pandas as pd
 from anndata import read_mtx
 import scCloud
 from termcolor import cprint
+from sklearn.metrics import silhouette_score
 
 def process_sccloud():
 	cprint("For scCloud:", "red")
@@ -16,7 +17,11 @@ def process_sccloud():
 	cprint("Loading corrected data...", "green")
 	adata = scCloud.tools.read_input('./scCloud/tiny_sccloud_corrected.h5ad', mode = 'a')
 
+	cprint("For PCA coordinates:", "green")
 	process_data(adata, processed = True)
+
+	cprint("For UMAP coordinates:", "green")
+	process_data(adata, rep_key = 'X_umap', processed = True)
 
 def process_mnn():
 	cprint("For MNN:", "red")
@@ -68,22 +73,55 @@ def process_combat():
 
 	process_data(adata)
 
-def process_data(data, processed = False):
+def process_bbknn():
+	cprint("For BBKNN:", "red")
+	f_list = [f for f in os.listdir("./bbknn") if f in ["scanpy_bbknn_corrected.h5ad"]]
+	if len(f_list) != 1:
+		cprint("No corredted data are found! Correcting data using BBKNN...", "green")
+		if os.system("cd ./combat/ && conda activate scanpy && python scanpy_bbknn.py && conda deactivate && cd .."):
+			sys.exit(1)
+
+	cprint("loading corrected data...", "green")
+	adata = scCloud.tools.read_input("./bbknn/scanpy_bbknn_corrected.h5ad", mode = 'a')
+
+	cprint("Clustering...", "green")
+	adata.uns['knn_indices'] = adata.uns['neighbors']['knn_indices'][:, 1:]
+	adata.uns['knn_distances'] = adata.uns['neighbors']['knn_distances'][:, 1:]
+
+	from scCloud.tools.diffusion_map import calculate_affinity_matrix
+
+	W = calculate_affinity_matrix(adata.uns['knn_indices'], adata.uns['knn_distances'])
+	adata.uns['W'] = W
+	scCloud.tools.run_leiden(adata)
+
+	cprint("Computing UMAP...", "green")
+	scCloud.tools.run_umap(adata, 'X_pca', min_dist = 0.5)
+
+	cprint("For UMAP coordinates:", "yellow")
+	process_data(adata, rep_key = 'X_umap', processed = True)
+
+	scCloud.tools.write_output(adata, "./bbknn/scanpy_bbknn_result")
+
+def process_data(data, rep_key = 'X_pca', processed = False):
 
 	if not processed:
 		cprint("Calculating PCA and KNN...", "green")
 		scCloud.tools.run_pca(data)
-		scCloud.tools.get_kNN(data, 'X_pca', K = 100)
+		scCloud.tools.get_kNN(data, rep_key, K = 100)
 
 	cprint("Calculating kBET measures...", "green")
-	stat, pvalue, acc_rate = scCloud.tools.calc_kBET(data, 'Channel')
+	stat, pvalue, acc_rate = scCloud.tools.calc_kBET(data, 'Channel', rep_key)
 	cprint("Mean statistics is {stat:.4f}; Mean p-value is {pvalue:.4f}; Mean accept rate is {rate:.4f}.".format(stat = stat, pvalue = pvalue, rate = acc_rate), "yellow")
 
+	sil_score = silhouette_score(data.obsm[rep_key], 'Channel')
+	cprint("Silhouette Score = {:.4f}.".format(sil_score))
+
 def main():
-	#process_sccloud()
-	#process_mnn()
+	process_sccloud()
+	process_mnn()
 	process_seurat()
-	#process_combat()
+	process_combat()
+	process_bbknn()
 
 if __name__ == "__main__":
 	main()

@@ -24,7 +24,7 @@ def process_sccloud():
 	process_data(adata, processed = True)
 
 	cprint("For UMAP coordinates:", "green")
-	process_data(adata, rep_key = 'X_umap', processed = True)
+	process_data(adata, "./scCloud/tiny_sccloud_result", rep_key = 'X_umap', processed = True)
 
 def process_mnn():
 	cprint("For MNN:", "red")
@@ -37,7 +37,7 @@ def process_mnn():
 	cprint("Loading corrected data...", "green")
 	adata = scCloud.tools.read_input('./mnn/scanpy_mnn_corrected.h5ad', mode = 'a')
 
-	process_data(adata)
+	process_data(adata, "./mnn/scanpy_mnn_result")
 
 def process_seurat():
 	cprint("For Seurat:", "red")
@@ -61,7 +61,7 @@ def process_seurat():
 	adata.obs.set_index('index', inplace = True)
 	adata.obs['Channel'] = pd.Categorical(adata.obs.index.map(lambda s: s.split('-')[0]).values)
 
-	process_data(adata)
+	process_data(adata, "./seurat/seurat_result")
 
 def process_combat():
 	cprint("For ComBat:", "red")
@@ -74,7 +74,7 @@ def process_combat():
 	cprint("Loading corrected data...", "green")
 	adata = scCloud.tools.read_input('./combat/scanpy_combat_corrected.h5ad', mode = 'a')
 
-	process_data(adata)
+	process_data(adata, "./combat/scanpy_combat_result")
 
 def process_bbknn():
 	cprint("For BBKNN:", "red")
@@ -96,21 +96,29 @@ def process_bbknn():
 	scCloud.tools.run_leiden(adata)
 
 	cprint("Computing UMAP...", "green")
-	scCloud.tools.run_umap(adata, 'X_pca', min_dist = 0.5)
+	scCloud.tools.run_umap(adata, 'X_pca')
 
 	cprint("For UMAP coordinates:", "yellow")
-	process_data(adata, rep_key = 'X_umap', processed = True)
+	process_data(adata, "./bbknn/scanpy_bbknn_result", rep_key = 'X_umap', processed = True)
 
 	scCloud.tools.write_output(adata, "./bbknn/scanpy_bbknn_result")
 
-def process_data(data, rep_key = 'X_pca', cell_type_label = 'leiden_labels', processed = False):
+def process_data(data, output, rep_key = 'X_pca', cell_type_label = 'leiden_labels', processed = False):
 
 	if not processed:
 		cprint("Calculating PCA and KNN...", "green")
 		scCloud.tools.run_pca(data)
 		scCloud.tools.get_kNN(data, rep_key, K = 100)
+		cprint("Clustering...", "green")
 		adata.uns['W'] = calculate_affinity_matrix(data.uns['knn_indices'], data.uns['knn_distances'])
 		scCloud.tools.run_leiden(data)
+		cprint("Computing FIt-SNE...", "green")
+		scCloud.tools.run_fitsne(data, rep_key, n_jobs = 8)
+		cprint("Computing UMAP...", "green")
+		scCloud.tools.run_umap(data, rep_key)
+
+		scCloud.tools.write_output(data, output)
+
 
 	cprint("Calculating kBET measures...", "green")
 	stat, pvalue, acc_rate = scCloud.tools.calc_kBET(data, 'Channel', rep_key)

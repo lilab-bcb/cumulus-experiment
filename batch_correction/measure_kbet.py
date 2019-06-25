@@ -67,7 +67,8 @@ def process_seurat():
 	cprint("Enforce count matrix to be sparse...", "green")
 	adata.X = sparse.csr_matrix(adata.X)
 
-	process_data(adata, "./seurat/seurat_result")
+	scCloud.tools.write_output(adata, "./seurat/seurat_corrected")
+	#process_data(adata, "./seurat/seurat_result")
 
 def process_combat():
 	cprint("For ComBat:", "red")

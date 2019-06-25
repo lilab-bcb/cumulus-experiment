@@ -50,6 +50,8 @@ def process_seurat():
 
 	cprint("Loading gene expression...", "green")
 	adata = read_mtx("./seurat/gene_expression.mtx")
+	
+	cprint("Enforce count matrix to be sparse...", "green")
 	adata.X = sparse.csr_matrix(adata.X)
 	
 	cprint("Loading feature names...", "green")

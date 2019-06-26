@@ -66,8 +66,7 @@ def process_seurat():
 	adata.uns['genome'] = 'GRCh38'
 
 
-	scCloud.tools.write_output(adata, "./seurat/seurat_corrected")
-	#process_data(adata, "./seurat/seurat_result")
+	process_data(adata, "./seurat/seurat_result")
 
 def process_combat():
 	cprint("For ComBat:", "red")

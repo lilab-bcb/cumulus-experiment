@@ -50,6 +50,8 @@ def process_seurat():
 
 	cprint("Loading gene expression...", "green")
 	adata = read_mtx("./seurat/gene_expression.mtx")
+	cprint("Enforce count matrix to be sparse...", "green")
+	adata.X = sparse.csr_matrix(adata.X)
 	
 	cprint("Loading feature names...", "green")
 	df_features = pd.read_csv("./seurat/feature_names.txt", header = None)
@@ -63,9 +65,6 @@ def process_seurat():
 	adata.obs['Channel'] = pd.Categorical(adata.obs.index.map(lambda s: s.split('-')[0]).values)
 	adata.uns['genome'] = 'GRCh38'
 
-
-	cprint("Enforce count matrix to be sparse...", "green")
-	adata.X = sparse.csr_matrix(adata.X)
 
 	scCloud.tools.write_output(adata, "./seurat/seurat_corrected")
 	#process_data(adata, "./seurat/seurat_result")
@@ -114,9 +113,11 @@ def process_data(data, output, rep_key = 'X_pca', cell_type_label = 'leiden_labe
 
 	if not processed:
 		cprint("Calculating PCA and KNN...", "green")
-		scCloud.tools.run_pca(data)
+		data.var['highly_variable_genes'] = [True] * data.shape[1]
+		data_c = scCloud.tools.collect_highly_variable_gene_matrix(data)
+		scCloud.tools.run_pca(data_c)
+		data.obsm['X_pca'] = data_c.obsm['X_pca']
 		scCloud.tools.run_diffmap(data, rep_key, n_jobs = 8, K = 100)
-		#scCloud.tools.get_kNN(data, rep_key, K = 100)
 		scCloud.tools.get_kNN(data, 'X_diffmap', 100, n_jobs = 8)
 		data.obsm['X_diffmap_pca'] = scCloud.tools.reduce_diffmap_to_3d(data.obsm['X_diffmap'])
 		cprint("Clustering...", "green")

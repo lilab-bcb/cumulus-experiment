@@ -37,8 +37,12 @@ def process_mnn():
 	cprint("Loading corrected data...", "green")
 	adata = scCloud.tools.read_input('./mnn/scanpy_mnn_corrected.h5ad', mode = 'a')
 
-	cprint("Enforce count matrix to be sparse...", "green")
+	cprint("Enforcing count matrix to be sparse...", "green")
 	adata.X = sparse.csr_matrix(adata.X)
+
+	cprint("Correcting cell names...", "green")
+	adata.obs['cell_id'] = adata.obs.index.map(lambda s: s[:s.rfind('-')]).values
+	adata.obs.set_index('cell_id', inplace = True)
 
 	process_data(adata, "./mnn/scanpy_mnn_result", method = 'mnn')
 
@@ -52,7 +56,7 @@ def process_seurat():
 
 	cprint("Loading gene expression...", "green")
 	adata = read_mtx("./seurat/gene_expression.mtx")
-	
+
 	cprint("Enforce count matrix to be sparse...", "green")
 	adata.X = sparse.csr_matrix(adata.X)
 	

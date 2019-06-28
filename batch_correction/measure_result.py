@@ -21,11 +21,10 @@ def process_sccloud():
 	cprint("Loading corrected data...", "green")
 	adata = scCloud.tools.read_input('./scCloud/tiny_sccloud_corrected.h5ad', mode = 'a')
 
-	cprint("For PCA coordinates:", "green")
-	process_data(adata, processed = True)
+	process_data(adata, "./scCloud/tiny_sccloud_result", method = 'scCloud', processed = True)
 
-	cprint("For UMAP coordinates:", "green")
-	process_data(adata, "./scCloud/tiny_sccloud_result", rep_key = 'X_umap', processed = True)
+	#cprint("For UMAP coordinates:", "green")
+	#process_data(adata, "./scCloud/tiny_sccloud_result", method = 'scCloud', rep_key = 'X_umap', processed = True)
 
 def process_mnn():
 	cprint("For MNN:", "red")
@@ -38,7 +37,7 @@ def process_mnn():
 	cprint("Loading corrected data...", "green")
 	adata = scCloud.tools.read_input('./mnn/scanpy_mnn_corrected.h5ad', mode = 'a')
 
-	process_data(adata, "./mnn/scanpy_mnn_result")
+	process_data(adata, "./mnn/scanpy_mnn_result", method = 'mnn')
 
 def process_seurat():
 	cprint("For Seurat:", "red")
@@ -66,7 +65,7 @@ def process_seurat():
 	adata.uns['genome'] = 'GRCh38'
 
 
-	process_data(adata, "./seurat/seurat_result")
+	process_data(adata, "./seurat/seurat_result", method = 'seurat')
 
 def process_combat():
 	cprint("For ComBat:", "red")
@@ -79,7 +78,7 @@ def process_combat():
 	cprint("Loading corrected data...", "green")
 	adata = scCloud.tools.read_input('./combat/scanpy_combat_corrected.h5ad', mode = 'a')
 
-	process_data(adata, "./combat/scanpy_combat_result")
+	process_data(adata, "./combat/scanpy_combat_result", method = 'combat')
 
 def process_bbknn():
 	cprint("For BBKNN:", "red")
@@ -104,11 +103,11 @@ def process_bbknn():
 	scCloud.tools.run_umap(adata, 'X_pca')
 
 	cprint("For UMAP coordinates:", "yellow")
-	process_data(adata, "./bbknn/scanpy_bbknn_result", rep_key = 'X_umap', processed = True)
+	process_data(adata, "./bbknn/scanpy_bbknn_result", method = 'bbknn', rep_key = 'X_umap', processed = True)
 
 	scCloud.tools.write_output(adata, "./bbknn/scanpy_bbknn_result")
 
-def process_data(data, output, rep_key = 'X_pca', cell_type_label = 'leiden_labels', processed = False):
+def process_data(data, method, output, rep_key = 'X_pca', cell_type_label = 'leiden_labels', processed = False):
 
 	if not processed:
 		cprint("Calculating PCA and KNN...", "green")
@@ -130,12 +129,30 @@ def process_data(data, output, rep_key = 'X_pca', cell_type_label = 'leiden_labe
 		scCloud.tools.write_output(data, output)
 
 
-	cprint("Calculating kBET measures...", "green")
+	cprint("Calculating kBET measures on {} coordinates...".format(rep_key), "green")
 	stat, pvalue, acc_rate = scCloud.tools.calc_kBET(data, 'Channel', rep_key)
 	cprint("Mean statistics is {stat:.4f}; Mean p-value is {pvalue:.4f}; Mean accept rate is {rate:.4f}.".format(stat = stat, pvalue = pvalue, rate = acc_rate), "yellow")
 
-	sil_score = silhouette_score(data.obsm[rep_key], data.obs[cell_type_label])
-	cprint("Silhouette Score = {:.4f}.".format(sil_score))
+	cprint("Loading ground truth cell types...", "green")
+	df_celltype = pd.read_csv("ground_cell_type.txt")
+	assert np.sum(df_celltype['cell_id'] != data.obs.index.values) == 0
+	data.obs['cell_types'] = df_celltype['cell_types']
+	subset_data = data.obs.loc[data.obs['cell_types'] != 10]
+
+	cprint("Calculating Mean Silhouette Score on UMAP coordinates...", "green")
+	sil_score = silhouette_score(subset_data.obsm['X_umap'], subset_data.obs[cell_type_label])
+	cprint("Mean Silhouette Score = {:.4f}.".format(sil_score), "yellow")
+
+	cprint("Calculating kSIM...", "green")
+	ksim_mean, ksim_ac_rate = scCloud.tools.calc_kSIM(subset_data, 'cell_types', rep_key = 'X_umap')
+	cprint("Mean kSIM = {mean:.4f}, with accept rate {rate:.4f}".format(mean = ksim_mean, rate = ksim_ac_rate), "yellow")
+
+	cprint("Plotting UMAP for cells with known cell types...", "green")
+	scCloud.tools.write_output(subset_data, "temp")
+	if os.system("scCloud plot scatter --basis umap --attributes leiden_labels,Channel temp.h5ad {}.celltypes.umap.pdf".format(method)):
+		sys.exit(1)
+	if os.system("rm temp.h5ad"):
+		sys.exit(1)
 
 
 if __name__ == "__main__":

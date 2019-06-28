@@ -107,7 +107,7 @@ def process_bbknn():
 
 	scCloud.tools.write_output(adata, "./bbknn/scanpy_bbknn_result")
 
-def process_data(data, output, method, rep_key = 'X_pca', cell_type_label = 'leiden_labels', processed = False):
+def process_data(data, output, method, rep_key = 'X_pca', processed = False):
 
 	if not processed:
 		cprint("Calculating PCA and KNN...", "green")
@@ -140,10 +140,10 @@ def process_data(data, output, method, rep_key = 'X_pca', cell_type_label = 'lei
 	subset_data = data[data.obs['cell_types'] != 10, :].copy()
 
 	cprint("Calculating Mean Silhouette Score on UMAP coordinates...", "green")
-	sil_score = silhouette_score(subset_data.obsm['X_umap'], subset_data.obs[cell_type_label])
+	sil_score = silhouette_score(subset_data.obsm['X_umap'], subset_data.obs['cell_types'])
 	cprint("Mean Silhouette Score = {:.4f}.".format(sil_score), "yellow")
 
-	cprint("Calculating kSIM...", "green")
+	cprint("Calculating kSIM on UMAP coordinates...", "green")
 	ksim_mean, ksim_ac_rate = scCloud.tools.calc_kSIM(subset_data, 'cell_types', rep_key = 'X_umap')
 	cprint("Mean kSIM = {mean:.4f}, with accept rate {rate:.4f}".format(mean = ksim_mean, rate = ksim_ac_rate), "yellow")
 

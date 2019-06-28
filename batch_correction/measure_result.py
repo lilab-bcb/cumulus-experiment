@@ -107,7 +107,7 @@ def process_bbknn():
 
 	scCloud.tools.write_output(adata, "./bbknn/scanpy_bbknn_result")
 
-def process_data(data, method, output, rep_key = 'X_pca', cell_type_label = 'leiden_labels', processed = False):
+def process_data(data, output, method, rep_key = 'X_pca', cell_type_label = 'leiden_labels', processed = False):
 
 	if not processed:
 		cprint("Calculating PCA and KNN...", "green")

@@ -102,6 +102,9 @@ def process_bbknn():
 	cprint("loading corrected data...", "green")
 	adata = scCloud.tools.read_input("./bbknn/scanpy_bbknn_corrected.h5ad", mode = 'a')
 
+	cprint("Enforce count matrix to be sparse...", "green")
+	adata.X = sparse.csr_matrix(adata.X)
+
 	cprint("Clustering...", "green")
 	adata.uns['knn_indices'] = adata.uns['neighbors']['knn_indices'][:, 1:]
 	adata.uns['knn_distances'] = adata.uns['neighbors']['knn_distances'][:, 1:]

@@ -115,6 +115,7 @@ def process_bbknn():
 
 	scCloud.tools.write_output(adata, "./bbknn/scanpy_bbknn_result")
 
+
 def process_data(data, output, method, processed = False):
 
 	if not processed:
@@ -136,15 +137,9 @@ def process_data(data, output, method, processed = False):
 
 		scCloud.tools.write_output(data, output)
 
-	if method != 'bbknn':
-		cprint("Calculating kBET measures on PCA coordinates...", "green")
-		stat, pvalue, acc_rate = scCloud.tools.calc_kBET(data, 'Channel', 'X_pca')
-		cprint("Mean statistics is {stat:.4f}; Mean p-value is {pvalue:.4f}; Mean accept rate is {rate:.4f}.".format(stat = stat, pvalue = pvalue, rate = acc_rate), "yellow")
-
-	if method in ['scCloud', 'bbknn']:
-		cprint("Calculating kBET measures on UMAP coordinates...", "green")
-		stat_umap, pvalue_umap, acc_rate_umap = scCloud.tools.calc_kBET(data, 'Channel', 'X_umap')
-		cprint("Mean statistics is {stat:.4f}; Mean p-value is {pvalue:.4f}; Mean accept rate is {rate:.4f}.".format(stat = stat_umap, pvalue = pvalue_umap, rate = acc_rate_umap), "yellow")
+	cprint("Calculating kBET measures on UMAP coordinates...", "green")
+	stat_umap, pvalue_umap, acc_rate_umap = scCloud.tools.calc_kBET(data, 'Channel', 'X_umap')
+	cprint("Mean statistics is {stat:.4f}; Mean p-value is {pvalue:.4f}; Mean accept rate is {rate:.4f}.".format(stat = stat_umap, pvalue = pvalue_umap, rate = acc_rate_umap), "yellow")
 
 	cprint("Loading ground truth cell types...", "green")
 	df_celltype = pd.read_csv("ground_cell_type.txt")

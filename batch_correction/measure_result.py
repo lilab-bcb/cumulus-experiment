@@ -137,7 +137,7 @@ def process_data(data, output, method, rep_key = 'X_pca', cell_type_label = 'lei
 	df_celltype = pd.read_csv("ground_cell_type.txt")
 	assert np.sum(df_celltype['cell_id'] != data.obs.index.values) == 0
 	data.obs['cell_types'] = df_celltype['cell_types'].values
-	subset_data = data.obs.loc[data.obs['cell_types'] != 10]
+	subset_data = data[data.obs['cell_types'] != 10, :].copy()
 
 	cprint("Calculating Mean Silhouette Score on UMAP coordinates...", "green")
 	sil_score = silhouette_score(subset_data.obsm['X_umap'], subset_data.obs[cell_type_label])

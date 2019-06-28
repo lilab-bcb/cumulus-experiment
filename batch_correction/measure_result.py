@@ -86,6 +86,9 @@ def process_combat():
 	cprint("Loading corrected data...", "green")
 	adata = scCloud.tools.read_input('./combat/scanpy_combat_corrected.h5ad', mode = 'a')
 
+	cprint("Enforce count matrix to be sparse...", "green")
+	adata.X = sparse.csr_matrix(adata.X)
+
 	process_data(adata, "./combat/scanpy_combat_result", method = 'combat')
 
 def process_bbknn():
@@ -149,11 +152,11 @@ def process_data(data, output, method, rep_key = 'X_pca', processed = False):
 
 	cprint("Calculating Mean Silhouette Score on UMAP coordinates...", "green")
 	sil_score = silhouette_score(subset_data.obsm['X_umap'], subset_data.obs['cell_types'])
-	cprint("Mean Silhouette Score = {:.4f}.".format(sil_score), "yellow")
+	cprint("Mean Silhouette Score on UMAP = {:.4f}.".format(sil_score), "yellow")
 
 	cprint("Calculating kSIM on UMAP coordinates...", "green")
 	ksim_mean, ksim_ac_rate = scCloud.tools.calc_kSIM(subset_data, 'cell_types', rep_key = 'X_umap')
-	cprint("Mean kSIM = {mean:.4f}, with accept rate {rate:.4f}".format(mean = ksim_mean, rate = ksim_ac_rate), "yellow")
+	cprint("Mean kSIM = {mean:.4f}, with accept rate {rate:.4f}.".format(mean = ksim_mean, rate = ksim_ac_rate), "yellow")
 
 	cprint("Plotting UMAP for cells with known cell types...", "green")
 	scCloud.tools.write_output(subset_data, "temp")

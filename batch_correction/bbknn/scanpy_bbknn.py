@@ -5,7 +5,6 @@ import scanpy as sc
 from bbknn import bbknn
 
 src_file = "../MantonBM_nonmix_tiny_10x_filter_norm_pca.h5ad"
-hvg_file = "../hvg.txt"
 
 print("Reading ICA (bone marrow) dataset")
 adata = sc.read_h5ad(src_file)

@@ -23,9 +23,6 @@ def process_sccloud():
 
 	process_data(adata, "./scCloud/tiny_sccloud_result", method = 'scCloud', processed = True)
 
-	#cprint("For UMAP coordinates:", "green")
-	#process_data(adata, "./scCloud/tiny_sccloud_result", method = 'scCloud', rep_key = 'X_umap', processed = True)
-
 def process_mnn():
 	cprint("For MNN:", "red")
 	f_list = [f for f in os.listdir("./mnn") if f in ["scanpy_mnn_corrected.h5ad"]]
@@ -102,9 +99,6 @@ def process_bbknn():
 	cprint("loading corrected data...", "green")
 	adata = scCloud.tools.read_input("./bbknn/scanpy_bbknn_corrected.h5ad", mode = 'a')
 
-	cprint("Enforce count matrix to be sparse...", "green")
-	adata.X = sparse.csr_matrix(adata.X)
-
 	cprint("Clustering...", "green")
 	adata.uns['knn_indices'] = adata.uns['neighbors']['knn_indices'][:, 1:]
 	adata.uns['knn_distances'] = adata.uns['neighbors']['knn_distances'][:, 1:]
@@ -117,11 +111,11 @@ def process_bbknn():
 	scCloud.tools.run_umap(adata, 'X_pca')
 
 	cprint("For UMAP coordinates:", "yellow")
-	process_data(adata, "./bbknn/scanpy_bbknn_result", method = 'bbknn', rep_key = 'X_umap', processed = True)
+	process_data(adata, "./bbknn/scanpy_bbknn_result", method = 'bbknn', processed = True)
 
 	scCloud.tools.write_output(adata, "./bbknn/scanpy_bbknn_result")
 
-def process_data(data, output, method, rep_key = 'X_pca', processed = False):
+def process_data(data, output, method, processed = False):
 
 	if not processed:
 		cprint("Calculating PCA and KNN...", "green")
@@ -129,23 +123,28 @@ def process_data(data, output, method, rep_key = 'X_pca', processed = False):
 		data_c = scCloud.tools.collect_highly_variable_gene_matrix(data)
 		scCloud.tools.run_pca(data_c)
 		data.obsm['X_pca'] = data_c.obsm['X_pca']
-		scCloud.tools.run_diffmap(data, rep_key, n_jobs = 8, K = 100)
+		scCloud.tools.run_diffmap(data, 'X_pca', n_jobs = 8, K = 100)
 		scCloud.tools.get_kNN(data, 'X_diffmap', 100, n_jobs = 8)
 		data.obsm['X_diffmap_pca'] = scCloud.tools.reduce_diffmap_to_3d(data.obsm['X_diffmap'])
 		cprint("Clustering...", "green")
 		data.uns['W'] = calculate_affinity_matrix(data.uns['knn_indices'], data.uns['knn_distances'])
 		scCloud.tools.run_leiden(data)
 		cprint("Computing FIt-SNE...", "green")
-		scCloud.tools.run_fitsne(data, rep_key, n_jobs = 8)
+		scCloud.tools.run_fitsne(data, 'X_pca', n_jobs = 8)
 		cprint("Computing UMAP...", "green")
-		scCloud.tools.run_umap(data, rep_key)
+		scCloud.tools.run_umap(data, 'X_pca')
 
 		scCloud.tools.write_output(data, output)
 
+	if method != 'bbknn':
+		cprint("Calculating kBET measures on PCA coordinates...", "green")
+		stat, pvalue, acc_rate = scCloud.tools.calc_kBET(data, 'Channel', 'X_pca')
+		cprint("Mean statistics is {stat:.4f}; Mean p-value is {pvalue:.4f}; Mean accept rate is {rate:.4f}.".format(stat = stat, pvalue = pvalue, rate = acc_rate), "yellow")
 
-	cprint("Calculating kBET measures on {} coordinates...".format(rep_key), "green")
-	stat, pvalue, acc_rate = scCloud.tools.calc_kBET(data, 'Channel', rep_key)
-	cprint("Mean statistics is {stat:.4f}; Mean p-value is {pvalue:.4f}; Mean accept rate is {rate:.4f}.".format(stat = stat, pvalue = pvalue, rate = acc_rate), "yellow")
+	if method in ['scCloud', 'bbknn']:
+		cprint("Calculating kBET measures on UMAP coordinates...", "green")
+		stat_umap, pvalue_umap, acc_rate_umap = scCloud.tools.calc_kBET(data, 'Channel', 'X_umap')
+		cprint("Mean statistics is {stat:.4f}; Mean p-value is {pvalue:.4f}; Mean accept rate is {rate:.4f}.".format(stat = stat_umap, pvalue = pvalue_umap, rate = acc_rate_umap), "yellow")
 
 	cprint("Loading ground truth cell types...", "green")
 	df_celltype = pd.read_csv("ground_cell_type.txt")
@@ -158,7 +157,12 @@ def process_data(data, output, method, rep_key = 'X_pca', processed = False):
 	cprint("Mean Silhouette Score on UMAP = {:.4f}.".format(sil_score), "yellow")
 
 	cprint("Calculating kSIM on UMAP coordinates...", "green")
+	if 'umap_knn_indices' in subset_data.uns:
+		del subset_data.uns['umap_knn_indices']
+	if 'umap_knn_distances' in subset_data.uns:
+		del subset_data.uns['umap_knn_distances']
 	ksim_mean, ksim_ac_rate = scCloud.tools.calc_kSIM(subset_data, 'cell_types', rep_key = 'X_umap')
+
 	cprint("Mean kSIM = {mean:.4f}, with accept rate {rate:.4f}.".format(mean = ksim_mean, rate = ksim_ac_rate), "yellow")
 
 	cprint("Plotting UMAP for cells with known cell types...", "green")

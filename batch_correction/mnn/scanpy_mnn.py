@@ -1,11 +1,10 @@
 import numpy as np
 import pandas as pd
 import scanpy as sc
-import os, sys, re
+import os, sys, re, time
 from termcolor import cprint
 from mnnpy import mnn_correct
 
-sc.settings.n_jobs = 8
 rand_seed = 0
 
 src_file = "../MantonBM_nonmix_tiny_10x_filter_norm.h5ad"
@@ -56,7 +55,10 @@ def calc_mnn():
 
 
 	print("Batch Correction Using MNN:")
-	corrected = mnn_correct(*list(ad_dict.values()), n_jobs = sc.settings.n_jobs, batch_key = 'Channel')
+	start_correction = time.time()
+	corrected = mnn_correct(*list(ad_dict.values()), n_jobs = os.cpu_count(), batch_key = 'Channel')
+	end_correction = time.time()
+	print("MNN time = {:.4f} s.".format(end_correction - start_correction))
 
 	adata = corrected[0]
 	adata.write("scanpy_mnn_corrected.h5ad")

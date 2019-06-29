@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import scanpy as sc
-import sys
+import sys, time
 from bbknn import bbknn
 
 sc.settings.n_jobs = 8
@@ -26,7 +26,10 @@ adata_variable_genes = adata[:, df_join['highly_variable_genes']].copy()
 
 
 print("Combat to correct batch effects")
+start_correction = time.time()
 sc.pp.combat(adata_variable_genes, key = 'Channel')
+end_correction = time.time()
+print("ComBat Time = {:.4f} s.".format(end_correction - start_correction))
 
 print("Save corrected data...")
 adata_variable_genes.write("scanpy_combat_corrected.h5ad")

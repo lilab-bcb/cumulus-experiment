@@ -16,9 +16,10 @@ measure_result = []
 
 def process_baseline():
 	cprint("For scCloud with no batch correction:", "red")
-	f_list = [f for f in os.listdir("./ground") if f in ["ground.h5ad"]]
-	if len(f_list) != 1:
+	f_list = [f for f in os.listdir("./ground") if f in ["ground.h5ad", "ground_cell_types.h5ad"]]
+	if len(f_list) != 2:
 		cprint("No processed data are found! Processing data using scCloud...", "green")
+
 		if os.system("cd ./ground/ && python gen_celltype.py && cd .."):
 			sys.exit(1)
 
@@ -149,7 +150,7 @@ def process_data(data, output, method, processed = False):
 		cprint("Clustering...", "green")
 		data.uns['W'] = calculate_affinity_matrix(data.uns['knn_indices'], data.uns['knn_distances'])
 		scCloud.tools.run_approximated_leiden(data)
-		
+
 		cprint("Computing FIt-SNE...", "green")
 		scCloud.tools.run_fitsne(data, 'X_pca', n_jobs = 8)
 		cprint("Computing UMAP...", "green")

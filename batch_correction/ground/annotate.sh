@@ -1,1 +1,0 @@
-scCloud annotate_cluster --annotation "anno:1. T helper cells;2. Naive B cells;3. CD14+ Monocytes;4. T helper cells;5. Cytotoxic T cells;6. Cytotoxic T cells;7. NK cells;8. Cytotoxic T cells;9. Erythrocytes;10. ;11. CD14+ Monocytes;12. HSCs;13. CD14+ Monocytes;14. Pre B cells;15. cDCs;16. CD16+ Monocytes;17. Pro B cells;18. pDCs;19. Plasma cells" ground.h5ad

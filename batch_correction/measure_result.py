@@ -32,7 +32,7 @@ def process_sccloud():
 	f_list = [f for f in os.listdir("./scCloud") if f in ["tiny_sccloud_corrected.h5ad"]]
 	if len(f_list) != 1:
 		cprint("No corrected data are found! Correcting data using scCloud...", "green")
-		if os.system("cd ./scCloud/ && ./run_sccloud_batch_correct.sh && cd .."):
+		if os.system("cd ./scCloud/ && python run_sccloud_batch_correct.py && cd .."):
 			sys.exit(1)
 
 	cprint("Loading corrected data...", "green")

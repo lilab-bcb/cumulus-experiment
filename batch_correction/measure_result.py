@@ -161,7 +161,13 @@ def process_data(data, output, method, processed = False):
 	cprint("Loading ground truth cell types...", "green")
 	df_celltype = pd.read_csv("ground_cell_type.txt")
 	assert np.sum(df_celltype['cell_id'] != data.obs.index.values) == 0
-	data.obs['cell_types'] = df_celltype['cell_types'].values
+	data.obs['cell_types'] = pd.Categorical(df_celltype['cell_types'].values)
+
+	# Set Individual
+	if method == 'MNN':
+		data.obs['Individual'] = pd.Categorical(data.obs.index.map(lambda s: s.split('_')[0][8:]))
+	else:
+		data.obs['Individual'] = pd.Categorical(data.obs['Channel'].apply(lambda s: s.split('_')[0][8:]))
 
 	cprint("Calculating Mean Silhouette Score on UMAP coordinates...", "green")
 	sil_score = silhouette_score(data.obsm['X_umap'], data.obs['cell_types'])
@@ -175,10 +181,8 @@ def process_data(data, output, method, processed = False):
 	measure_result.append((method, ksim_ac_rate, kbet_ac_rate))
 
 	cprint("Plotting UMAP for cells with known cell types...", "green")
-	scCloud.tools.write_output(data, "temp")
-	if os.system("scCloud plot scatter --basis umap --attributes leiden_labels,Channel temp.h5ad {}.celltypes.umap.pdf".format(method)):
-		sys.exit(1)
-	if os.system("rm temp.h5ad"):
+	scCloud.tools.write_output(data, "{}_compare".format(method))
+	if os.system("scCloud plot scatter --basis umap --attributes cell_types,Individual {name}_compare.h5ad {name}.celltypes.umap.pdf".format(name = method)):
 		sys.exit(1)
 
 def plot_scatter(precomputed = False):

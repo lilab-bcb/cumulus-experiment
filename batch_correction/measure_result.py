@@ -164,7 +164,7 @@ def process_data(data, output, method, processed = False):
 	data.obs['cell_types'] = pd.Categorical(df_celltype['cell_types'].values)
 
 	# Set Individual
-	if method == 'MNN':
+	if method == 'mnn':
 		data.obs['Individual'] = pd.Categorical(data.obs.index.map(lambda s: s.split('_')[0][8:]))
 	else:
 		data.obs['Individual'] = pd.Categorical(data.obs['Channel'].apply(lambda s: s.split('_')[0][8:]))

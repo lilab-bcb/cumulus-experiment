@@ -144,9 +144,12 @@ def process_data(data, output, method, processed = False):
 		scCloud.tools.run_diffmap(data, 'X_pca', n_jobs = 8, K = 100)
 		scCloud.tools.get_kNN(data, 'X_diffmap', 100, n_jobs = 8)
 		data.obsm['X_diffmap_pca'] = scCloud.tools.reduce_diffmap_to_3d(data.obsm['X_diffmap'])
+		
+		# Approximated Leiden Clustering
 		cprint("Clustering...", "green")
 		data.uns['W'] = calculate_affinity_matrix(data.uns['knn_indices'], data.uns['knn_distances'])
-		scCloud.tools.run_leiden(data)
+		scCloud.tools.run_approximated_leiden(data)
+		
 		cprint("Computing FIt-SNE...", "green")
 		scCloud.tools.run_fitsne(data, 'X_pca', n_jobs = 8)
 		cprint("Computing UMAP...", "green")

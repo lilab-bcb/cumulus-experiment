@@ -187,7 +187,7 @@ def process_data(data, output, method, processed = False):
 
 def plot_scatter(precomputed = False):
 	if precomputed:
-		measure_result = [('Baseline', 0.8568, 0.1118), ('scCloud', 0.7532, 0.3540), ('seurat', 0.6955, 0.6094), ('MNN', 0.8232, 0.2678), ('ComBat', 0.7513, 0.3277), ('BBKNN', 0.8269, 0.2681)]
+		measure_result = [('Baseline', 0.8586, 0.1073), ('scCloud', 0.7518, 0.3540), ('seurat', 0.6951, 0.6094), ('MNN', 0.8218, 0.2678), ('ComBat', 0.7494, 0.3277), ('BBKNN', 0.8255, 0.2681)]
 
 	method_l = []
 	ksim_l = []

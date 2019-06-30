@@ -4,6 +4,9 @@ import os, sys, time
 import scanpy as sc
 from bbknn import bbknn
 
+sc.settings.n_jobs = os.cpu_count()
+print("Using {} cores if possible.".format(sc.settings.n_jobs))
+
 src_file = "../MantonBM_nonmix_tiny_10x_filter_norm_pca.h5ad"
 
 print("Reading ICA (bone marrow) dataset")

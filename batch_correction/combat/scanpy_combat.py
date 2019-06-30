@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
 import scanpy as sc
-import sys, time
+import sys, time, os
 from bbknn import bbknn
 
-sc.settings.n_jobs = 8
+sc.settings.n_jobs = os.cpu_count()
+print("Using {} cores if possible.".format(sc.settings.n_jobs))
 rand_seed = 0
 
 src_file = "../MantonBM_nonmix_tiny_10x_filter_norm.h5ad"

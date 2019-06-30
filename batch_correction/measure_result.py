@@ -16,14 +16,14 @@ measure_result = []
 
 def process_baseline():
 	cprint("For scCloud with no batch correction:", "red")
-	f_list = [f for f in os.listdir("./ground") if f in ["ground_cell_types.h5ad"]]
+	f_list = [f for f in os.listdir("./ground") if f in ["ground.h5ad"]]
 	if len(f_list) != 1:
 		cprint("No processed data are found! Processing data using scCloud...", "green")
 		if os.system("cd ./ground/ && python gen_celltype.py && cd .."):
 			sys.exit(1)
 
 	cprint("Loading processed data...", "green")
-	adata = scCloud.tools.read_input('./ground/ground_cell_types.h5ad', mode = 'a')
+	adata = scCloud.tools.read_input('./ground/ground.h5ad', mode = 'a')
 
 	process_data(adata, './ground/ground_cell_types_result', method = 'baseline', processed = True)
 

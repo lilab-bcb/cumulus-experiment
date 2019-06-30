@@ -8,7 +8,20 @@ from scCloud.tools.diffusion_map import calculate_affinity_matrix
 from termcolor import cprint
 from sklearn.metrics import silhouette_score
 
-method_list = ["scCloud", "seurat", "mnn", "combat", "bbknn"]
+method_list = ["origin", "scCloud", "seurat", "mnn", "combat", "bbknn"]
+
+def process_no_batch_correction():
+	cprint("For scCloud with no batch correction:", "red")
+	f_list = [f for f in os.listdir("./no_correction") if f in ["tiny_sccloud_no_correction.h5ad"]]
+	if len(f_list) != 1:
+		cprint("No processed data are found! Processing data using scCloud...", "green")
+		if os.system("cd ./no_correction/ && ./run_sccloud.sh && cd .."):
+			sys.exit(1)
+
+	cprint("Loading processed data...", "green")
+	adata = scCloud.tools.read_input('./no_correction/tiny_sccloud_no_correction.h5ad', mode = 'a')
+
+	process_data(adata, './no_correction/tiny_sccloud_no_correction_result', method = 'scCloud', processed = True)
 
 def process_sccloud():
 	cprint("For scCloud:", "red")
@@ -145,23 +158,18 @@ def process_data(data, output, method, processed = False):
 	df_celltype = pd.read_csv("ground_cell_type.txt")
 	assert np.sum(df_celltype['cell_id'] != data.obs.index.values) == 0
 	data.obs['cell_types'] = df_celltype['cell_types'].values
-	subset_data = data[data.obs['cell_types'] != 10, :].copy()
 
 	cprint("Calculating Mean Silhouette Score on UMAP coordinates...", "green")
-	sil_score = silhouette_score(subset_data.obsm['X_umap'], subset_data.obs['cell_types'])
+	sil_score = silhouette_score(data.obsm['X_umap'], data.obs['cell_types'])
 	cprint("Mean Silhouette Score on UMAP = {:.4f}.".format(sil_score), "yellow")
 
 	cprint("Calculating kSIM on UMAP coordinates...", "green")
-	if 'umap_knn_indices' in subset_data.uns:
-		del subset_data.uns['umap_knn_indices']
-	if 'umap_knn_distances' in subset_data.uns:
-		del subset_data.uns['umap_knn_distances']
-	ksim_mean, ksim_ac_rate = scCloud.tools.calc_kSIM(subset_data, 'cell_types', rep_key = 'X_umap')
+	ksim_mean, ksim_ac_rate = scCloud.tools.calc_kSIM(data, 'cell_types', rep_key = 'X_umap')
 
 	cprint("Mean kSIM = {mean:.4f}, with accept rate {rate:.4f}.".format(mean = ksim_mean, rate = ksim_ac_rate), "yellow")
 
 	cprint("Plotting UMAP for cells with known cell types...", "green")
-	scCloud.tools.write_output(subset_data, "temp")
+	scCloud.tools.write_output(data, "temp")
 	if os.system("scCloud plot scatter --basis umap --attributes leiden_labels,Channel temp.h5ad {}.celltypes.umap.pdf".format(method)):
 		sys.exit(1)
 	if os.system("rm temp.h5ad"):
@@ -171,6 +179,9 @@ def process_data(data, output, method, processed = False):
 if __name__ == "__main__":
 	method = sys.argv[1]
 	assert method in method_list or method == 'all'
+
+	if method == 'origin' or method == 'all':
+		process_no_batch_correction()
 
 	if method == 'scCloud' or method == 'all':
 		process_sccloud()

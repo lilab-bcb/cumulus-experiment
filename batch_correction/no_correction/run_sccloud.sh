@@ -1,0 +1,1 @@
+scCloud cluster -p 8 --diffmap-full-speed --run-louvain --run-leiden --run-approximated-louvain --run-approximated-leiden --run-fitsne --run-umap ../../MantonBM_nonmix_tiny_10x.h5 tiny_sccloud_no_correction

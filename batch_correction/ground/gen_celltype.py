@@ -21,6 +21,8 @@ adata.obs.loc[idx10, 'new_labels'] = res
 adata.obs['new_labels'] = pd.Categorical(adata.obs['new_labels'], categories = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '11', '12', '13', '14', '15', '16', '17', '18', '19'])
 
 adata.obs['cell_types'] = adata.obs['new_labels'].apply(lambda s: '3' if s == '13' else s)
+scCloud.tools.write_output(adata, "ground_cell_types")
+
 df_celltype = adata.obs[['cell_types']]
 df_celltype.reset_index(inplace = True)
 df_celltype.rename(columns = {'index': 'cell_id'}, inplace = True)

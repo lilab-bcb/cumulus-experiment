@@ -1,6 +1,8 @@
 import os, sys
 import numpy as np
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 from anndata import read_mtx
 from scipy import sparse
 import scCloud
@@ -9,6 +11,8 @@ from termcolor import cprint
 from sklearn.metrics import silhouette_score
 
 method_list = ["origin", "scCloud", "seurat", "mnn", "combat", "bbknn"]
+
+measure_result = []
 
 def process_no_batch_correction():
 	cprint("For scCloud with no batch correction:", "red")
@@ -21,7 +25,7 @@ def process_no_batch_correction():
 	cprint("Loading processed data...", "green")
 	adata = scCloud.tools.read_input('./no_correction/tiny_sccloud_no_correction.h5ad', mode = 'a')
 
-	process_data(adata, './no_correction/tiny_sccloud_no_correction_result', method = 'scCloud', processed = True)
+	process_data(adata, './no_correction/tiny_sccloud_no_correction_result', method = 'Baseline', processed = True)
 
 def process_sccloud():
 	cprint("For scCloud:", "red")
@@ -151,8 +155,8 @@ def process_data(data, output, method, processed = False):
 		scCloud.tools.write_output(data, output)
 
 	cprint("Calculating kBET measures on UMAP coordinates...", "green")
-	stat_umap, pvalue_umap, acc_rate_umap = scCloud.tools.calc_kBET(data, 'Channel', 'X_umap')
-	cprint("Mean statistics is {stat:.4f}; Mean p-value is {pvalue:.4f}; Mean accept rate is {rate:.4f}.".format(stat = stat_umap, pvalue = pvalue_umap, rate = acc_rate_umap), "yellow")
+	kbet_stat, kbet_pvalue, kbet_ac_rate = scCloud.tools.calc_kBET(data, 'Channel', 'X_umap')
+	cprint("Mean statistics is {stat:.4f}; Mean p-value is {pvalue:.4f}; Mean accept rate is {rate:.4f}.".format(stat = kbet_stat, pvalue = kbet_pvalue, rate = kbet_ac_rate), "yellow")
 
 	cprint("Loading ground truth cell types...", "green")
 	df_celltype = pd.read_csv("ground_cell_type.txt")
@@ -168,6 +172,8 @@ def process_data(data, output, method, processed = False):
 
 	cprint("Mean kSIM = {mean:.4f}, with accept rate {rate:.4f}.".format(mean = ksim_mean, rate = ksim_ac_rate), "yellow")
 
+	measure_result.append((method, ksim_ac_rate, kbet_ac_rate))
+
 	cprint("Plotting UMAP for cells with known cell types...", "green")
 	scCloud.tools.write_output(data, "temp")
 	if os.system("scCloud plot scatter --basis umap --attributes leiden_labels,Channel temp.h5ad {}.celltypes.umap.pdf".format(method)):
@@ -175,10 +181,49 @@ def process_data(data, output, method, processed = False):
 	if os.system("rm temp.h5ad"):
 		sys.exit(1)
 
+def plot_scatter(precomputed = False):
+	if precomputed:
+		measure_result = [('Baseline', 0.8568, 0.1118), ('scCloud', 0.7532, 0.3540), ('seurat', 0.6955, 0.6094), ('MNN', 0.8232, 0.2678), ('ComBat', 0.7513, 0.3277), ('BBKNN', 0.8269, 0.2681)]
+
+	method_l = []
+	ksim_l = []
+	kbet_l = []
+	df_measure = pd.DataFrame({'method':[], 'kSIM':[], 'kBET':[]})
+	for (method, ksim, kbet) in measure_result:
+		method_l.append(method)
+		ksim_l.append(ksim)
+		kbet_l.append(kbet)
+	
+	df_measure['method'] = method_l
+	df_measure['kSIM'] = ksim_l
+	df_measure['kBET'] = kbet_l
+
+	ax = sns.scatterplot(x = 'kSIM', y = 'kBET', hue = 'method', data = df_measure, legend = False)
+	for line in range(0, df_measure.shape[0]):
+		x_pos = df_measure.kSIM[line]
+		y_pos = df_measure.kBET[line]
+		if df_measure.method[line] == 'MNN':
+			x_pos -= 0.018
+			y_pos += 0.003
+		elif df_measure.method[line] == 'BBKNN':
+			x_pos += 0.003
+			y_pos -= 0.003
+		else:
+			x_pos += 0.003
+		ax.text(x_pos, y_pos, df_measure.method[line], horizontalalignment = 'left', size = 'medium', color = 'black')
+	plt.xlabel('kSIM accept rate')
+	plt.ylabel('kBET accept rate')
+	plt.xlim(0.68, 0.91)
+
+
+	plt.savefig("Figure_2C.pdf")
+	plt.close()
+
+
 
 if __name__ == "__main__":
 	method = sys.argv[1]
-	assert method in method_list or method == 'all'
+	assert method in method_list or method == 'all' or method == 'plot'
 
 	if method == 'origin' or method == 'all':
 		process_no_batch_correction()
@@ -197,3 +242,7 @@ if __name__ == "__main__":
 
 	if method == 'bbknn' or method == 'all':
 		process_bbknn()
+
+	if method == 'all' or method == 'plot':
+		precomputed = True if method == 'plot' else False
+		plot_scatter(precomputed)

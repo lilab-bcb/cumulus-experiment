@@ -1,13 +1,14 @@
 library(Seurat)
+library(parallel)
 library(R.utils)
 library(Matrix)
 library(hash)
 library(stringi)
-library(ggplot2)
-library(RANN)
 
 seed <- 0
-setOption('mc.cores', 8)
+n.cores <- detectCores()
+setOption('mc.cores', n.cores)
+print(paste("Use", n.cores, "cores."))
 
 src.obj <- ReadH5AD("../MantonBM_nonmix_tiny_10x_filter_norm.h5ad")
 adata <- GetAssayData(src.obj)

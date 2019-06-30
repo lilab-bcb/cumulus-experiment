@@ -16,11 +16,12 @@ lgb.fit(X_train, y_train, eval_set = [(X_train, y_train), (X_test, y_test)], ear
 idx10 = np.isin(adata.obs['leiden_labels'], '10')
 res = lgb.predict(adata.X[idx10])
 
-adata.obs['new_labels'] = adata.obs['leiden_labels'].astype('object')
-adata.obs.loc[idx10, 'new_labels'] = res
-adata.obs['new_labels'] = pd.Categorical(adata.obs['new_labels'], categories = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '11', '12', '13', '14', '15', '16', '17', '18', '19'])
-
-adata.obs['cell_types'] = adata.obs['new_labels'].apply(lambda s: '3' if s == '13' else s)
+adata.obs['cell_types'] = adata.obs['leiden_labels'].astype('object')
+adata.obs.loc[idx10, 'cell_types'] = res
+adata.obs['cell_types'] = pd.Categorical(adata.obs['cell_types'], categories = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '11', '12', '13', '14', '15', '16', '17', '18', '19'])
+adata.obs['cell_types'] = adata.obs['cell_types'].apply(lambda s: '3' if s == '13' else s)
+print(adata.obs['cell_types'].value_counts())
+adata.obs['cell_types'] = pd.Categorical(adata.obs['cell_types']).rename_categories({'11':'10', '12':'11', '14':'12', '15':'13', '16':'14', '17':'15', '18':'16', '19':'17'})
 scCloud.tools.write_output(adata, "ground_cell_types")
 
 df_celltype = adata.obs[['cell_types']]

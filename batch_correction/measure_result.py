@@ -10,11 +10,11 @@ from scCloud.tools.diffusion_map import calculate_affinity_matrix
 from termcolor import cprint
 from sklearn.metrics import silhouette_score
 
-method_list = ["origin", "scCloud", "seurat", "mnn", "combat", "bbknn"]
+method_list = ["baseline", "scCloud", "seurat", "mnn", "combat", "bbknn"]
 
 measure_result = []
 
-def process_no_batch_correction():
+def process_baseline():
 	cprint("For scCloud with no batch correction:", "red")
 	f_list = [f for f in os.listdir("./ground") if f in ["ground_cell_types.h5ad"]]
 	if len(f_list) != 1:
@@ -23,9 +23,9 @@ def process_no_batch_correction():
 			sys.exit(1)
 
 	cprint("Loading processed data...", "green")
-	adata = scCloud.tools.read_input('./ground_cell_types', mode = 'a')
+	adata = scCloud.tools.read_input('./ground/ground_cell_types.h5ad', mode = 'a')
 
-	process_data(adata, './ground/ground_cell_types_result', method = 'Baseline', processed = True)
+	process_data(adata, './ground/ground_cell_types_result', method = 'baseline', processed = True)
 
 def process_sccloud():
 	cprint("For scCloud:", "red")
@@ -229,8 +229,8 @@ if __name__ == "__main__":
 	method = sys.argv[1]
 	assert method in method_list or method == 'all' or method == 'plot'
 
-	if method == 'origin' or method == 'all':
-		process_no_batch_correction()
+	if method == 'baseline' or method == 'all':
+		process_baseline()
 
 	if method == 'scCloud' or method == 'all':
 		process_sccloud()

@@ -19,7 +19,8 @@ def process_baseline():
 	f_list = [f for f in os.listdir("./ground") if f in ["ground.h5ad", "ground_cell_types.h5ad"]]
 	if len(f_list) != 2:
 		cprint("No processed data are found! Processing data using scCloud...", "green")
-
+		if os.system("cd ./ground/ && ./run_sccloud.sh && cd .."):
+			sys.exit(1)
 		if os.system("cd ./ground/ && python gen_celltype.py && cd .."):
 			sys.exit(1)
 

@@ -83,16 +83,16 @@ def get_mutual_info():
 	cprint("AMI = {:.4f}".format(mis))
 
 def plot_figures(file_name):
-	if os.system("scCloud plot scatter --basis tsne --attributes leiden_labels,Individual {name}.h5ad {name}.tsne.pdf".format(name = file_name)):
+	if os.system("scCloud plot scatter --basis tsne --attributes approx_leiden_labels,Individual {name}.h5ad {name}.tsne.pdf".format(name = file_name)):
 		sys.exit(1)
 
-	if os.system("scCloud plot scatter --basis fitsne --attributes leiden_labels,Individual {name}.h5ad {name}.fitsne.pdf".format(name = file_name)):
+	if os.system("scCloud plot scatter --basis fitsne --attributes approx_leiden_labels,Individual {name}.h5ad {name}.fitsne.pdf".format(name = file_name)):
 		sys.exit(1)
 
-	if os.system("scCloud plot scatter --basis umap --attributes leiden_labels,Individual {name}.h5ad {name}.umap.pdf".format(name = file_name)):
+	if os.system("scCloud plot scatter --basis umap --attributes approx_leiden_labels,Individual {name}.h5ad {name}.umap.pdf".format(name = file_name)):
 		sys.exit(1)
 
-	if os.system("scCloud plot scatter --basis fle --attributes leiden_labels,Individual {name}.h5ad {name}.fle.pdf".format(name = file_name)):
+	if os.system("scCloud plot scatter --basis fle --attributes approx_leiden_labels,Individual {name}.h5ad {name}.fle.pdf".format(name = file_name)):
 		sys.exit(1)
 
 

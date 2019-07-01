@@ -143,6 +143,11 @@ def process_data(data, output, method, processed = False):
 		scCloud.tools.get_kNN(data, 'X_diffmap', 100, n_jobs = 8)
 		data.obsm['X_diffmap_pca'] = scCloud.tools.reduce_diffmap_to_3d(data.obsm['X_diffmap'])
 
+		# Approximated Leiden Clustering
+		cprint("Clustering...", "green")
+		data.uns['W'] = calculate_affinity_matrix(data.uns['knn_indices'], data.uns['knn_distances'])
+		scCloud.tools.run_approximated_leiden(data, 'X_diffmap')
+
 		cprint("Computing FIt-SNE...", "green")
 		scCloud.tools.run_fitsne(data, 'X_pca', n_jobs = 8)
 
@@ -184,7 +189,7 @@ def process_data(data, output, method, processed = False):
 
 def plot_scatter(precomputed = False):
 	if precomputed:
-		measure_result = [('Baseline', 0.8586, 0.1073), ('scCloud', 0.7518, 0.3540), ('seurat', 0.6951, 0.6094), ('MNN', 0.8218, 0.2678), ('ComBat', 0.7494, 0.3277), ('BBKNN', 0.8255, 0.2681)]
+		measure_result = [('Baseline', 0.8813, 0.1073), ('scCloud', 0.8137, 0.3540), ('seurat', 0.7412, 0.6070), ('MNN', 0.8553, 0.2678), ('ComBat', 0.8155, 0.3301), ('BBKNN', 0.8636, 0.2681)]
 
 	method_l = []
 	ksim_l = []
@@ -214,7 +219,7 @@ def plot_scatter(precomputed = False):
 		ax.text(x_pos, y_pos, df_measure.method[line], horizontalalignment = 'left', size = 'medium', color = 'black')
 	plt.xlabel('kSIM accept rate')
 	plt.ylabel('kBET accept rate')
-	plt.xlim(0.68, 0.91)
+	plt.xlim(0.73, 0.91)
 
 
 	plt.savefig("Figure_2C.pdf")

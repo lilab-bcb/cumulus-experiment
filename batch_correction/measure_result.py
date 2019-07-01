@@ -146,8 +146,8 @@ def process_data(data, output, method, processed = False):
 		# Approximated Leiden Clustering
 		cprint("Clustering...", "green")
 		data.uns['W'] = calculate_affinity_matrix(data.uns['knn_indices'], data.uns['knn_distances'])
-		#scCloud.tools.run_approximated_leiden(data, 'X_diffmap')
-		scCloud.tools.run_leiden(data)
+		scCloud.tools.run_approximated_leiden(data, 'X_diffmap')
+		#scCloud.tools.run_leiden(data)
 
 		cprint("Computing FIt-SNE...", "green")
 		scCloud.tools.run_fitsne(data, 'X_pca', n_jobs = 8)

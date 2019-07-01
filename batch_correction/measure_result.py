@@ -149,8 +149,8 @@ def process_data(data, output, method, processed = False):
 		scCloud.tools.run_approximated_leiden(data, 'X_diffmap')
 		#scCloud.tools.run_leiden(data)
 
-		cprint("Computing FIt-SNE...", "green")
-		scCloud.tools.run_fitsne(data, 'X_pca', n_jobs = 8)
+		#cprint("Computing FIt-SNE...", "green")
+		#scCloud.tools.run_fitsne(data, 'X_pca', n_jobs = 8)
 
 		cprint("Computing UMAP...", "green")
 		scCloud.tools.run_umap(data, 'X_pca')

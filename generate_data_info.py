@@ -54,6 +54,6 @@ def preprocess_data(in_file):
 	scCloud.tools.write_output(adata, output_name2)
 
 if __name__ == '__main__':
-	#extract_hvg()
+	extract_hvg()
 	preprocess_data(full_data_source)
 	preprocess_data(tiny_data_source)

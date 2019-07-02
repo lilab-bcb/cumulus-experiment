@@ -134,23 +134,13 @@ def process_bbknn():
 def process_data(data, output, method, processed = False):
 
 	if not processed:
+
 		cprint("Calculating PCA and KNN...", "green")
-		data.var['highly_variable_genes'] = [True] * data.shape[1]
-		data_c = scCloud.tools.collect_highly_variable_gene_matrix(data)
+		data_c = data.copy()
+		data_c.X = data_c.X.toarray()
 		scCloud.tools.run_pca(data_c)
 		data.obsm['X_pca'] = data_c.obsm['X_pca']
-		scCloud.tools.run_diffmap(data, 'X_pca', n_jobs = 8, K = 100)
-		scCloud.tools.get_kNN(data, 'X_diffmap', 100, n_jobs = 8)
-		data.obsm['X_diffmap_pca'] = scCloud.tools.reduce_diffmap_to_3d(data.obsm['X_diffmap'])
-
-		# Approximated Leiden Clustering
-		cprint("Clustering...", "green")
-		data.uns['W'] = calculate_affinity_matrix(data.uns['knn_indices'], data.uns['knn_distances'])
-		scCloud.tools.run_approximated_leiden(data, 'X_diffmap')
-		#scCloud.tools.run_leiden(data)
-
-		#cprint("Computing FIt-SNE...", "green")
-		#scCloud.tools.run_fitsne(data, 'X_pca', n_jobs = 8)
+		scCloud.tools.get_kNN(data, 'X_pca', K = 100, n_jobs = 8)
 
 		cprint("Computing UMAP...", "green")
 		scCloud.tools.run_umap(data, 'X_pca')

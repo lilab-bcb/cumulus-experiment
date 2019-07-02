@@ -16,6 +16,8 @@ celltypes_plot_dir = "celltypes_plot"
 
 measure_result = []
 
+measure_precomputed_file = "correction_benchmark.txt"
+
 def process_baseline():
 	cprint("For scCloud with no batch correction:", "red")
 	f_list = [f for f in os.listdir("./baseline") if f in ["baseline_result.h5ad"]]
@@ -181,27 +183,27 @@ def process_data(data, method, output = None, processed = False):
 
 def plot_scatter(precomputed = False):
 	if precomputed:
-		measure_result = [('Baseline', 0.8813, 0.1073), ('scCloud', 0.8137, 0.3540), ('seurat', 0.7412, 0.6070), ('MNN', 0.8553, 0.2678), ('ComBat', 0.8155, 0.3301), ('BBKNN', 0.8636, 0.2681)]
-
-	method_l = []
-	ksim_l = []
-	kbet_l = []
-	df_measure = pd.DataFrame({'method':[], 'kSIM':[], 'kBET':[]})
-	for (method, ksim, kbet) in measure_result:
-		method_l.append(method)
-		ksim_l.append(ksim)
-		kbet_l.append(kbet)
+		df_measure = pd.read_csv(measure_precomputed_file)
+	else:
+		method_l = []
+		ksim_l = []
+		kbet_l = []
+		df_measure = pd.DataFrame({'method':[], 'kSIM':[], 'kBET':[]})
+		for (method, ksim, kbet) in measure_result:
+			method_l.append(method)
+			ksim_l.append(ksim)
+			kbet_l.append(kbet)
 	
-	df_measure['method'] = method_l
-	df_measure['kSIM'] = ksim_l
-	df_measure['kBET'] = kbet_l
+		df_measure['method'] = method_l
+		df_measure['kSIM'] = ksim_l
+		df_measure['kBET'] = kbet_l
 
 	ax = sns.scatterplot(x = 'kSIM', y = 'kBET', hue = 'method', data = df_measure, legend = False)
 	for line in range(0, df_measure.shape[0]):
 		x_pos = df_measure.kSIM[line]
 		y_pos = df_measure.kBET[line]
 		if df_measure.method[line] == 'MNN':
-			x_pos -= 0.018
+			x_pos -= 0.015
 			y_pos += 0.003
 		elif df_measure.method[line] == 'BBKNN':
 			x_pos += 0.003

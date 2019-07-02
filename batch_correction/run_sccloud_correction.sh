@@ -1,1 +1,0 @@
-scCloud cluster -p 8 --correct-batch-effect ../MantonBM_nonmix_10x.h5 MantonBM_nonmix_corrected

@@ -4,7 +4,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from anndata import read_mtx
-from scipy import sparse
+from scipy.sparse import issparse
 import scCloud
 from scCloud.tools.diffusion_map import calculate_affinity_matrix
 from termcolor import cprint
@@ -53,8 +53,8 @@ def process_mnn():
 	cprint("Loading corrected data...", "green")
 	adata = scCloud.tools.read_input('./mnn/scanpy_mnn_corrected.h5ad', mode = 'a')
 
-	cprint("Enforcing count matrix to be sparse...", "green")
-	adata.X = sparse.csr_matrix(adata.X)
+	#cprint("Enforcing count matrix to be sparse...", "green")
+	#adata.X = sparse.csr_matrix(adata.X)
 
 	cprint("Correcting cell names...", "green")
 	adata.obs['cell_id'] = adata.obs.index.map(lambda s: s[:s.rfind('-')]).values
@@ -73,8 +73,8 @@ def process_seurat():
 	cprint("Loading gene expression...", "green")
 	adata = read_mtx("./seurat/gene_expression.mtx")
 
-	cprint("Enforce count matrix to be sparse...", "green")
-	adata.X = sparse.csr_matrix(adata.X)
+	#cprint("Enforce count matrix to be sparse...", "green")
+	#adata.X = sparse.csr_matrix(adata.X)
 	
 	cprint("Loading feature names...", "green")
 	df_features = pd.read_csv("./seurat/feature_names.txt", header = None)
@@ -102,8 +102,8 @@ def process_combat():
 	cprint("Loading corrected data...", "green")
 	adata = scCloud.tools.read_input('./combat/scanpy_combat_corrected.h5ad', mode = 'a')
 
-	cprint("Enforce count matrix to be sparse...", "green")
-	adata.X = sparse.csr_matrix(adata.X)
+	#cprint("Enforce count matrix to be sparse...", "green")
+	#adata.X = sparse.csr_matrix(adata.X)
 
 	process_data(adata, "./combat/scanpy_combat_result", method = 'combat')
 
@@ -137,7 +137,8 @@ def process_data(data, output, method, processed = False):
 
 		cprint("Calculating PCA and KNN...", "green")
 		data_c = data.copy()
-		data_c.X = data_c.X.toarray()
+		if issparse(data_c.X):
+			data_c.X = data_c.X.toarray()
 		scCloud.tools.run_pca(data_c)
 		data.obsm['X_pca'] = data_c.obsm['X_pca']
 		scCloud.tools.get_kNN(data, 'X_pca', K = 100, n_jobs = 8)

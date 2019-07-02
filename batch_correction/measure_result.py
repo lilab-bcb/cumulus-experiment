@@ -12,22 +12,22 @@ from sklearn.metrics import silhouette_score
 
 method_list = ["baseline", "scCloud", "seurat", "mnn", "combat", "bbknn"]
 
+celltypes_plot_dir = "celltypes_plot"
+
 measure_result = []
 
 def process_baseline():
 	cprint("For scCloud with no batch correction:", "red")
-	f_list = [f for f in os.listdir("./ground") if f in ["ground.h5ad", "ground_cell_types.h5ad"]]
-	if len(f_list) != 2:
-		cprint("No processed data are found! Processing data using scCloud...", "green")
-		if os.system("cd ./ground/ && ./run_sccloud.sh && cd .."):
-			sys.exit(1)
-		if os.system("cd ./ground/ && python gen_celltype.py && cd .."):
+	f_list = [f for f in os.listdir("./baseline") if f in ["baseline_result.h5ad"]]
+	if len(f_list) != 1:
+		cprint("No processed data are found! Processing data using scCloud without batch correction...", "green")
+		if os.system("cd ./baseline/ && python run_baseline.py && cd .."):
 			sys.exit(1)
 
 	cprint("Loading processed data...", "green")
-	adata = scCloud.tools.read_input('./ground/ground.h5ad', mode = 'a')
+	adata = scCloud.tools.read_input('./baseline/baseline_result.h5ad', mode = 'a')
 
-	process_data(adata, './ground/ground_cell_types_result', method = 'baseline', processed = True)
+	process_data(adata, method = 'baseline', processed = True)
 
 def process_sccloud():
 	cprint("For scCloud:", "red")
@@ -40,7 +40,7 @@ def process_sccloud():
 	cprint("Loading corrected data...", "green")
 	adata = scCloud.tools.read_input('./scCloud/tiny_sccloud_corrected.h5ad', mode = 'a')
 
-	process_data(adata, "./scCloud/tiny_sccloud_result", method = 'scCloud', processed = True)
+	process_data(adata, method = 'scCloud', processed = True)
 
 def process_mnn():
 	cprint("For MNN:", "red")
@@ -60,7 +60,7 @@ def process_mnn():
 	adata.obs['cell_id'] = adata.obs.index.map(lambda s: s[:s.rfind('-')]).values
 	adata.obs.set_index('cell_id', inplace = True)
 
-	process_data(adata, "./mnn/scanpy_mnn_result", method = 'mnn')
+	process_data(adata, method = 'mnn', output = "./mnn/scanpy_mnn_result")
 
 def process_seurat():
 	cprint("For Seurat:", "red")
@@ -89,7 +89,7 @@ def process_seurat():
 	adata.uns['genome'] = 'GRCh38'
 
 
-	process_data(adata, "./seurat/seurat_result", method = 'seurat')
+	process_data(adata, method = 'seurat', output = "./seurat/seurat_result")
 
 def process_combat():
 	cprint("For ComBat:", "red")
@@ -105,7 +105,7 @@ def process_combat():
 	#cprint("Enforce count matrix to be sparse...", "green")
 	#adata.X = sparse.csr_matrix(adata.X)
 
-	process_data(adata, "./combat/scanpy_combat_result", method = 'combat')
+	process_data(adata, method = 'combat', output = "./combat/scanpy_combat_result")
 
 def process_bbknn():
 	cprint("For BBKNN:", "red")
@@ -126,12 +126,12 @@ def process_bbknn():
 	scCloud.tools.run_umap(adata, 'X_pca')
 
 	cprint("For UMAP coordinates:", "yellow")
-	process_data(adata, "./bbknn/scanpy_bbknn_result", method = 'bbknn', processed = True)
+	process_data(adata, method = 'bbknn', processed = True)
 
 	scCloud.tools.write_output(adata, "./bbknn/scanpy_bbknn_result")
 
 
-def process_data(data, output, method, processed = False):
+def process_data(data, method, output = None, processed = False):
 
 	if not processed:
 
@@ -175,8 +175,8 @@ def process_data(data, output, method, processed = False):
 	measure_result.append((method, ksim_ac_rate, kbet_ac_rate))
 
 	cprint("Plotting UMAP for cells with cell types...", "green")
-	scCloud.tools.write_output(data, "{}_compare".format(method))
-	if os.system("scCloud plot scatter --basis umap --attributes cell_types,Individual {name}_compare.h5ad {name}.celltypes.umap.pdf".format(name = method)):
+	scCloud.tools.write_output(data, "{}_compare".format(celltypes_plot_dir + "/" + method))
+	if os.system("scCloud plot scatter --basis umap --attributes cell_types,Individual {name}_compare.h5ad {name}.celltypes.umap.pdf".format(name = celltypes_plot_dir + "/" + method)):
 		sys.exit(1)
 
 def plot_scatter(precomputed = False):
@@ -220,6 +220,9 @@ def plot_scatter(precomputed = False):
 
 
 if __name__ == "__main__":
+	if not os.path.exists(celltypes_plot_dir):
+		os.mkdir(celltypes_plot_dir)
+
 	method = sys.argv[1]
 	assert method in method_list or method == 'all' or method == 'plot'
 

@@ -9,6 +9,8 @@ from utils import str_time
 
 data_source = "../MantonBM_nonmix_corrected.h5ad"
 
+time_stats_file = "time_stats.txt"
+
 
 def get_NN_brute(data, num_threads = 8, K = 100):
 	f_list = [f for f in os.listdir('.') if f == 'baseline_indices.npy']
@@ -133,7 +135,7 @@ def plot_result(df_list):
 	cprint("Plotting...", "yellow")
 	df = pd.concat(df_list).reset_index()
 
-	# violin plot
+	# violin plot for accuracy
 	ax = sns.violinplot(x = "method", y = "accuracy", data = df, order = ["scCloud", "scanpy", "Seurat V3"], cut = 0)
 	ax.set(ylabel = 'Accuracy', xlabel = '')
 	vals = ax.get_yticks()
@@ -142,14 +144,24 @@ def plot_result(df_list):
 	cprint("Violin plot is generated!", "yellow")
 	plt.close()
 
-	# boxplot
-	ax = sns.boxplot(x = "method", y = "accuracy", data = df, order = ["scCloud", "scanpy", "Seurat V3"])
-	ax.set(ylabel = 'Accuracy', xlabel = '')
-	vals = ax.get_yticks()
-	ax.set_yticklabels(['{0:.0%}'.format(x) for x in vals])
-	ax.get_figure().savefig("knn_accuracy_boxplot.pdf")
-	cprint("Boxplot is generated!", "yellow")
+	# barplot for total time
+	df_time = pd.read_csv(time_stats_file)
+	df_time['seconds'] = [0] * df_time.shape[0]
+
+	unit_convert = {'s': 1, 'min': 60, 'h': 3600}
+	for (unit, scaler) in unit_convert.items():
+		idx_unit = df_time.loc[df_time['unit'] == unit].index
+		df_time.loc[idx_unit, 'seconds'] = df_time.loc[idx_unit, 'time'] * scaler
+
+	df_time['log_seconds'] = df_time['seconds'].apply(np.log)
+	df_time = df_time.loc[df_time['method'] != 'baseline']
+
+	ax = sns.barplot(x = 'method', y = 'log_seconds', data = df_time, order = ['scCloud', 'scanpy', 'Seurat V3'])
+	ax.set(ylabel = 'Log of Total Time in seconds', xlabel = '')
+	ax.get_figure().savefig("knn_time.pdf")
+	cprint("Barplot of total time is generated!", "yellow")
 	plt.close()
+
 
 
 if __name__ == '__main__':

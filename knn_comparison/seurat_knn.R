@@ -14,4 +14,3 @@ print("Time used for Seurat:")
 print(end_seurat - start_seurat)
 
 write.table(my.knn$nn.idx, "seurat_indices.txt", row.names = FALSE, col.names = FALSE)
-write.table(my.knn$nn.dists, "seurat_distances.txt", row.names = FALSE, col.names = FALSE)

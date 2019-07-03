@@ -94,11 +94,10 @@ def get_NN_Seurat(data):
 			sys.exit(1)
 		cprint("Finished!", "yellow")
 	
-	else:
-		cprint("Loading calculated seurat results...", "yellow")
-		knn_indices = np.loadtxt('seurat_indices.txt')
-		knn_indices -= 1
-		cprint("Finished!", "yellow")
+	cprint("Loading calculated seurat results...", "yellow")
+	knn_indices = np.loadtxt('seurat_indices.txt')
+	knn_indices -= 1
+	cprint("Finished!", "yellow")
 	
 	return knn_indices
 

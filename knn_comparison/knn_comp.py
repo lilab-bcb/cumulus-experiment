@@ -134,7 +134,7 @@ def plot_result(df_list):
 	df = pd.concat(df_list).reset_index()
 
 	# violin plot
-	ax = sns.violinplot(x = "method", y = "accuracy", data = df, order = ["scCloud", "scanpy", "Seurat V3"])
+	ax = sns.violinplot(x = "method", y = "accuracy", data = df, order = ["scCloud", "scanpy", "Seurat V3"], cut = 0)
 	ax.set(ylabel = 'Accuracy', xlabel = '')
 	vals = ax.get_yticks()
 	ax.set_yticklabels(['{0:.0%}'.format(x) for x in vals])

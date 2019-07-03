@@ -48,9 +48,7 @@ def process_mnn():
 	cprint("For MNN:", "red")
 	f_list = [f for f in os.listdir("./mnn") if f in ["scanpy_mnn_corrected.h5ad"]]
 	if len(f_list) != 1:
-		cprint("No corrected data are found! Correcting data using MNN...", "green")
-		if os.system("cd ./mnn/ && conda activate scanpy && python scanpy_mnn.py && conda deactivate && cd .."):
-			sys.exit(1)
+		cprint("No corrected data are found!", "red")
 
 	cprint("Loading corrected data...", "green")
 	adata = scCloud.tools.read_input('./mnn/scanpy_mnn_corrected.h5ad', mode = 'a')
@@ -68,9 +66,7 @@ def process_seurat():
 	cprint("For Seurat:", "red")
 	f_list = [f for f in os.listdir("./seurat") if f in ["gene_expression.mtx", "feature_names.txt", "sample_names.txt"]]
 	if len(f_list) != 3:
-		cprint("No corrected data are found! Correcting data using CCA...", "green")
-		if os.system("cd ./seurat/ && Rscript seurat_cca.R && cd .."):
-			sys.exit(1)
+		cprint("No corrected data are found!", "red")
 
 	cprint("Loading gene expression...", "green")
 	adata = read_mtx("./seurat/gene_expression.mtx")
@@ -97,9 +93,7 @@ def process_combat():
 	cprint("For ComBat:", "red")
 	f_list = [f for f in os.listdir("./combat") if f in ["scanpy_combat_corrected.h5ad"]]
 	if len(f_list) != 1:
-		cprint("No corrected data are found! Correcting data using ComBat...", "green")
-		if os.system("cd ./combat/ && conda activate scanpy && python scanpy_combat.py && conda deactivate && cd .."):
-			sys.exit(1)
+		cprint("No corrected data are found!", "red")
 
 	cprint("Loading corrected data...", "green")
 	adata = scCloud.tools.read_input('./combat/scanpy_combat_corrected.h5ad', mode = 'a')
@@ -113,9 +107,7 @@ def process_bbknn():
 	cprint("For BBKNN:", "red")
 	f_list = [f for f in os.listdir("./bbknn") if f in ["scanpy_bbknn_corrected.h5ad"]]
 	if len(f_list) != 1:
-		cprint("No corredted data are found! Correcting data using BBKNN...", "green")
-		if os.system("cd ./combat/ && conda activate scanpy && python scanpy_bbknn.py && conda deactivate && cd .."):
-			sys.exit(1)
+		cprint("No corredted data are found!", "red")
 
 	cprint("loading corrected data...", "green")
 	adata = scCloud.tools.read_input("./bbknn/scanpy_bbknn_corrected.h5ad", mode = 'a')

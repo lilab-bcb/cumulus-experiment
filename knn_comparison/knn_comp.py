@@ -7,7 +7,7 @@ from termcolor import cprint
 from joblib import Parallel, delayed
 from utils import str_time
 
-folder = "../batch_correct_exp"
+data_source = "../MantonBM_nonmix_corrected.h5ad"
 
 
 def get_NN_brute(data, num_threads = 8, K = 100, use_cache = False):
@@ -154,13 +154,14 @@ def main():
 	adata = None
 	conda_env = os.environ['CONDA_DEFAULT_ENV']
 	if (not cache_baseline) or (not cache_sccloud) or (not cache_scanpy):
+
 		# Pick up appropriate h5ad reader function.
 		if conda_env == 'scCloud':
 			import scCloud
-			adata = scCloud.tools.read_input('{folder}/MantonBM_nonmix.h5ad'.format(folder = folder), mode = 'a')
+			adata = scCloud.tools.read_input(data_source, mode = 'a')
 		elif conda_env == 'scanpy-benchmark':
 			import scanpy as sc
-			adata = sc.read_h5ad('{folder}/MantonBM_nonmix.h5ad'.format(folder = folder))
+			adata = sc.read_h5ad(data_source)
 		else:
 			raise ValueError("conda environment must be either \'scCloud\' or \'scanpy\'!")
 

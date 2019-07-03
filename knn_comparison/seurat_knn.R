@@ -1,7 +1,10 @@
 library(RANN)
+library(parallel)
 library(R.utils)
 
-setOption('mc.cores', 8)
+n.cores <- detectCores()
+setOption('mc.cores', n.cores)
+print(paste("Use", n.cores, "cores if possible."))
 
 X <- read.table("x_pca.txt", header = FALSE)
 start_seurat <- Sys.time()

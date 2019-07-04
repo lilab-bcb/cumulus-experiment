@@ -3,9 +3,11 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib.cbook import boxplot_stats
 from termcolor import cprint
 from joblib import Parallel, delayed
 from utils import str_time
+
 
 data_source = "../MantonBM_nonmix_corrected.h5ad"
 
@@ -26,12 +28,15 @@ def get_NN_brute(data, num_threads = 8, K = 100):
 		end_brute = time.time()
 		cprint("Finished with {alg} method!".format(alg = neighbors._fit_method), "yellow")
 		cprint("Time used for brute force: " + str_time(end_brute - start_brute) + ".", "yellow")
+
+		# Add self points.
+		n_sample = knn_indices.shape[0]
+		knn_indices = np.concatenate((np.arange(n_sample).reshape(-1, 1), knn_indices), axis = 1)
 		np.save('baseline_indices.npy', knn_indices)
 		cprint("Results are saved!", "yellow")
 	else:
 		cprint("Loading pre-calculated brute force results...", "yellow")
 		knn_indices = np.load('baseline_indices.npy')
-		cprint("Finished!", "yellow")
 
 	return knn_indices
 
@@ -47,12 +52,15 @@ def get_NN_sccloud(data, num_threads = 8, K = 100):
 		end_sccloud = time.time()
 		cprint("Finished!", "yellow")
 		cprint("Time used for scCloud: " + str_time(end_sccloud - start_sccloud) + ".", "yellow")
+
+		# Add self points.
+		n_sample = knn_indices.shape[0]
+		knn_indices = np.concatenate((np.arange(n_sample).reshape(-1, 1), knn_indices), axis = 1)
 		np.save('sccloud_indices.npy', knn_indices)
 		cprint("Results are saved!", "yellow")
 	else:
 		cprint("Loading pre-calculated scCloud results...", "yellow")
 		knn_indices = np.load('sccloud_indices.npy')
-		cprint("Finished!", "yellow")
 
 	return knn_indices
 
@@ -78,7 +86,6 @@ def get_NN_scanpy(data, K = 100):
 	else:
 		cprint("Loading pre-calculated scanpy results...", "yellow")
 		knn_indices = np.load('scanpy_indices.npy')
-		cprint("Finished!", "yellow")
 
 	return knn_indices
 
@@ -94,40 +101,51 @@ def get_NN_Seurat(data):
 		
 		if os.system("Rscript seurat_knn.R"):
 			sys.exit(1)
-		cprint("Finished!", "yellow")
+		cprint("KNN calculation is finished!", "yellow")
 	
 	cprint("Loading calculated seurat results...", "yellow")
-	knn_indices = np.loadtxt('seurat_indices.txt')
+	knn_indices = np.loadtxt('seurat_indices.txt').astype('int')
 	knn_indices -= 1
-	cprint("Finished!", "yellow")
 	
 	return knn_indices
 
-def calc_accuracy_for_one_datapoint(idx, knn_indices, baseline_indices):
+def calc_accuracy_for_one_datapoint(idx, knn_indices, baseline_indices, debug = False):
 	# Add self point initially.
-	num_correct = 1
-	num_total = baseline_indices.shape[1] + 1
+	num_correct = 0
+	num_total = baseline_indices.shape[1]
 
 	for ptr in knn_indices[idx]:
 		if np.sum(np.isin(ptr, baseline_indices[idx])) > 0:
 			num_correct += 1
 
+	if debug:
+		print("Among {total} NN's, {consistent} are consistent with baseline result.".format(total = num_total, consistent = num_correct))
+
 	return num_correct / num_total
 
 def generate_knn_accuracy_dataframe(method, knn_indices, baseline_indices, K = 100, n_jobs = 8, temp_folder = None):
 
-	cprint("Calculating {method} KNN accuracy...".format(method = method), "green")
-	num_sample = baseline_indices.shape[0]
+	f_list = [f for f in os.listdir('.') if f == "{}_accuracy.npy".format(method)]
 
-	# No need to search for self points.
-	knn_indices = knn_indices[:, 0:K-1]
-	baseline_indices = baseline_indices[:, 0:K-1]
+	if len(f_list) == 0:
+		cprint("Calculating {method} KNN accuracy...".format(method = method), "green")
+		num_sample = baseline_indices.shape[0]
 
-	accuracy_arr = np.array(Parallel(n_jobs = n_jobs, max_nbytes = 1e7, temp_folder = temp_folder)(delayed(calc_accuracy_for_one_datapoint)(i, knn_indices, baseline_indices) for i in range(num_sample)))
+		knn_indices = knn_indices[:, 0:K]
+		baseline_indices = baseline_indices[:, 0:K]
+
+		accuracy_arr = np.array(Parallel(n_jobs = n_jobs, max_nbytes = 1e7, temp_folder = temp_folder)(delayed(calc_accuracy_for_one_datapoint)(i, knn_indices, baseline_indices) for i in range(num_sample)))
+		np.save("{}_accuracy.npy".format(method), accuracy_arr)
+	else:
+		cprint("Loading pre-calculated {} accuracy array...".format(method), "green")
+		accuracy_arr = np.load(f_list[0])
+		num_sample = accuracy_arr.shape[0]
 
 	df = pd.DataFrame({'method': [method] * num_sample, 'accuracy': accuracy_arr})
+	outliers = [y for stat in boxplot_stats(df['accuracy']) for y in stat['fliers']]
 	cprint("{method} result is generated.".format(method = method), "green")
-	cprint("Mean = {mean:.2%}, Std = {std:.2%}".format(mean = df['accuracy'].mean(), std = df['accuracy'].std()), "yellow")
+	cprint("Mean = {mean:.2%}, Std = {std:.4%}".format(mean = df['accuracy'].mean(), std = df['accuracy'].std()), "yellow")
+	cprint("Among {total} observations, {outlier} are outliers, with proportion {prop:.4%}.".format(total = num_sample, outlier = len(outliers), prop = len(outliers) / num_sample), "yellow")
 
 	return df
 
@@ -135,32 +153,33 @@ def plot_result(df_list):
 	cprint("Plotting...", "yellow")
 	df = pd.concat(df_list).reset_index()
 
-	# violin plot for accuracy
-	ax = sns.violinplot(x = "method", y = "accuracy", data = df, order = ["scCloud", "scanpy", "Seurat V3"], cut = 0)
+	# boxplot
+	flierprops = dict(markersize = 0.1)
+	ax = sns.boxplot(x = "method", y = "accuracy", data = df, order = ["scCloud", "scanpy", "Seurat V3"], linewidth = 0.5, flierprops = flierprops)
+	#ax = sns.stripplot(x = "method", y = "accuracy", data = df, jitter = True, size = 1)
 	ax.set(ylabel = 'Accuracy', xlabel = '')
 	vals = ax.get_yticks()
 	ax.set_yticklabels(['{0:.0%}'.format(x) for x in vals])
-	ax.get_figure().savefig("knn_accuracy_violinplot.pdf")
-	cprint("Violin plot is generated!", "yellow")
+	ax.get_figure().savefig("knn_accuracy_boxplot.pdf")
+	cprint("Boxplot is generated!", "yellow")
 	plt.close()
 
 	# barplot for total time
 	df_time = pd.read_csv(time_stats_file)
-	df_time['seconds'] = [0] * df_time.shape[0]
+	df_time['minutes'] = [0] * df_time.shape[0]
 
-	unit_convert = {'s': 1, 'min': 60, 'h': 3600}
+	unit_convert = {'s': 1/60, 'min': 1, 'h': 60}
 	for (unit, scaler) in unit_convert.items():
 		idx_unit = df_time.loc[df_time['unit'] == unit].index
-		df_time.loc[idx_unit, 'seconds'] = df_time.loc[idx_unit, 'time'] * scaler
+		df_time.loc[idx_unit, 'minutes'] = df_time.loc[idx_unit, 'time'] * scaler
 
-	df_time['log_seconds'] = df_time['seconds'].apply(np.log)
 	df_time = df_time.loc[df_time['method'] != 'baseline']
 
-	ax = sns.barplot(x = 'method', y = 'log_seconds', data = df_time, order = ['scCloud', 'scanpy', 'Seurat V3'])
-	ax.set(ylabel = 'Log of Total Time in seconds', xlabel = '')
-	ax.get_figure().savefig("knn_time.pdf")
-	cprint("Barplot of total time is generated!", "yellow")
-	plt.close()
+	#ax = sns.barplot(x = 'method', y = 'minutes', data = df_time, order = ['scCloud', 'scanpy', 'Seurat V3'])
+	#ax.set(ylabel = 'Total Time in minutes', xlabel = '')
+	#ax.get_figure().savefig("knn_time.pdf")
+	#cprint("Barplot of total time is generated!", "yellow")
+	#plt.close()
 
 
 
@@ -219,3 +238,5 @@ if __name__ == '__main__':
 			df_list.append(df_seurat)
 	
 			plot_result(df_list)
+		else:
+			cprint("Some method doesn't have calculated KNN indices!", "red")

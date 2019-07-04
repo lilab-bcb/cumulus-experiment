@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib import rcParams
 from matplotlib.cbook import boxplot_stats
 from termcolor import cprint
 from joblib import Parallel, delayed
@@ -142,7 +143,7 @@ def generate_knn_accuracy_dataframe(method, knn_indices, baseline_indices, K = 1
 		num_sample = accuracy_arr.shape[0]
 
 	df = pd.DataFrame({'method': [method] * num_sample, 'accuracy': accuracy_arr})
-	outliers = [y for stat in boxplot_stats(df['accuracy']) for y in stat['fliers']]
+	outliers = [y for stat in boxplot_stats(df['accuracy'], whis = rcParams['boxplot.whiskers'], bootstrap = rcParams['boxplot.bootstrap'], labels = None, autorange = False) for y in stat['fliers']]
 	cprint("{method} result is generated.".format(method = method), "green")
 	cprint("Mean = {mean:.2%}, Std = {std:.4%}".format(mean = df['accuracy'].mean(), std = df['accuracy'].std()), "yellow")
 	cprint("Among {total} observations, {outlier} are outliers, with proportion {prop:.4%}.".format(total = num_sample, outlier = len(outliers), prop = len(outliers) / num_sample), "yellow")
@@ -153,7 +154,7 @@ def plot_result(df_list):
 	cprint("Plotting...", "yellow")
 	df = pd.concat(df_list).reset_index()
 
-	# boxplot
+	# boxplot for kNN accuracy
 	flierprops = dict(markersize = 0.1)
 	ax = sns.boxplot(x = "method", y = "accuracy", data = df, order = ["scCloud", "scanpy", "Seurat V3"], linewidth = 0.5, flierprops = flierprops)
 	#ax = sns.stripplot(x = "method", y = "accuracy", data = df, jitter = True, size = 1)
@@ -175,11 +176,11 @@ def plot_result(df_list):
 
 	df_time = df_time.loc[df_time['method'] != 'baseline']
 
-	#ax = sns.barplot(x = 'method', y = 'minutes', data = df_time, order = ['scCloud', 'scanpy', 'Seurat V3'])
-	#ax.set(ylabel = 'Total Time in minutes', xlabel = '')
-	#ax.get_figure().savefig("knn_time.pdf")
-	#cprint("Barplot of total time is generated!", "yellow")
-	#plt.close()
+	ax = sns.barplot(x = 'method', y = 'minutes', data = df_time, order = ['scCloud', 'scanpy', 'Seurat V3'])
+	ax.set(ylabel = 'Total Time in minutes', xlabel = '')
+	ax.get_figure().savefig("knn_time.pdf")
+	cprint("Barplot of total time is generated!", "yellow")
+	plt.close()
 
 
 

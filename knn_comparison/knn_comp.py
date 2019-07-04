@@ -110,7 +110,7 @@ def get_NN_Seurat(data):
 	
 	return knn_indices
 
-def calc_accuracy_for_one_datapoint(idx, knn_indices, baseline_indices, debug = False):
+def calc_recall_for_one_datapoint(idx, knn_indices, baseline_indices, debug = False):
 	# Add self point initially.
 	num_correct = 0
 	num_total = baseline_indices.shape[1]
@@ -124,28 +124,29 @@ def calc_accuracy_for_one_datapoint(idx, knn_indices, baseline_indices, debug = 
 
 	return num_correct / num_total
 
-def generate_knn_accuracy_dataframe(method, knn_indices, baseline_indices, K = 100, n_jobs = 8, temp_folder = None):
+def generate_knn_recall_dataframe(method, knn_indices, baseline_indices, K = 100, n_jobs = 8, temp_folder = None):
 
-	f_list = [f for f in os.listdir('.') if f == "{}_accuracy.npy".format(method)]
+	f_list = [f for f in os.listdir('.') if f == "{}_recall.npy".format(method)]
 
 	if len(f_list) == 0:
-		cprint("Calculating {method} KNN accuracy...".format(method = method), "green")
+		cprint("Calculating {method} KNN recall...".format(method = method), "green")
 		num_sample = baseline_indices.shape[0]
 
 		knn_indices = knn_indices[:, 0:K]
 		baseline_indices = baseline_indices[:, 0:K]
 
-		accuracy_arr = np.array(Parallel(n_jobs = n_jobs, max_nbytes = 1e7, temp_folder = temp_folder)(delayed(calc_accuracy_for_one_datapoint)(i, knn_indices, baseline_indices) for i in range(num_sample)))
-		np.save("{}_accuracy.npy".format(method), accuracy_arr)
+		recall_arr = np.array(Parallel(n_jobs = n_jobs, max_nbytes = 1e7, temp_folder = temp_folder)(delayed(calc_recall_for_one_datapoint)(i, knn_indices, baseline_indices) for i in range(num_sample)))
+		np.save("{}_recall.npy".format(method), recall_arr)
+		cprint("Result is saved!", "green")
 	else:
-		cprint("Loading pre-calculated {} accuracy array...".format(method), "green")
-		accuracy_arr = np.load(f_list[0])
-		num_sample = accuracy_arr.shape[0]
+		cprint("Loading pre-calculated {} recall array...".format(method), "green")
+		recall_arr = np.load(f_list[0])
+		num_sample = recall_arr.shape[0]
 
-	df = pd.DataFrame({'method': [method] * num_sample, 'accuracy': accuracy_arr})
-	outliers = [y for stat in boxplot_stats(df['accuracy'], whis = rcParams['boxplot.whiskers'], bootstrap = rcParams['boxplot.bootstrap'], labels = None, autorange = False) for y in stat['fliers']]
+	df = pd.DataFrame({'method': [method] * num_sample, 'recall': recall_arr})
+	outliers = [y for stat in boxplot_stats(df['recall'], whis = rcParams['boxplot.whiskers'], bootstrap = rcParams['boxplot.bootstrap'], labels = None, autorange = False) for y in stat['fliers']]
 	cprint("{method} result is generated.".format(method = method), "green")
-	cprint("Mean = {mean:.2%}, Std = {std:.4%}".format(mean = df['accuracy'].mean(), std = df['accuracy'].std()), "yellow")
+	cprint("Mean = {mean:.2%}, Std = {std:.4%}".format(mean = df['recall'].mean(), std = df['recall'].std()), "yellow")
 	cprint("Among {total} observations, {outlier} are outliers, with proportion {prop:.4%}.".format(total = num_sample, outlier = len(outliers), prop = len(outliers) / num_sample), "yellow")
 
 	return df
@@ -154,14 +155,14 @@ def plot_result(df_list):
 	cprint("Plotting...", "yellow")
 	df = pd.concat(df_list).reset_index()
 
-	# boxplot for kNN accuracy
+	# boxplot for kNN recall
 	flierprops = dict(markersize = 0.1)
-	ax = sns.boxplot(x = "method", y = "accuracy", data = df, order = ["scCloud", "scanpy", "Seurat V3"], linewidth = 0.5, flierprops = flierprops)
-	#ax = sns.stripplot(x = "method", y = "accuracy", data = df, jitter = True, size = 1)
-	ax.set(ylabel = 'Accuracy', xlabel = '')
+	ax = sns.boxplot(x = "method", y = "recall", data = df, order = ["scCloud", "scanpy", "Seurat V3"], linewidth = 0.5, flierprops = flierprops)
+	#ax = sns.stripplot(x = "method", y = "recall", data = df, jitter = True, size = 1)
+	ax.set(ylabel = 'Recall', xlabel = '')
 	vals = ax.get_yticks()
 	ax.set_yticklabels(['{0:.0%}'.format(x) for x in vals])
-	ax.get_figure().savefig("knn_accuracy_boxplot.pdf")
+	ax.get_figure().savefig("knn_recall_boxplot.pdf")
 	cprint("Boxplot is generated!", "yellow")
 	plt.close()
 
@@ -225,17 +226,17 @@ if __name__ == '__main__':
 
 			# For scCloud
 			knn_indices = get_NN_sccloud(None)
-			df_sccloud = generate_knn_accuracy_dataframe('scCloud', knn_indices, baseline_indices)
+			df_sccloud = generate_knn_recall_dataframe('scCloud', knn_indices, baseline_indices)
 			df_list.append(df_sccloud)
 
 			# For scanpy
 			knn_indices = get_NN_scanpy(None)
-			df_scanpy = generate_knn_accuracy_dataframe('scanpy', knn_indices, baseline_indices)
+			df_scanpy = generate_knn_recall_dataframe('scanpy', knn_indices, baseline_indices)
 			df_list.append(df_scanpy)
 
 			# For seurat
 			knn_indices = get_NN_Seurat(None)
-			df_seurat = generate_knn_accuracy_dataframe('Seurat V3', knn_indices, baseline_indices)
+			df_seurat = generate_knn_recall_dataframe('Seurat V3', knn_indices, baseline_indices)
 			df_list.append(df_seurat)
 	
 			plot_result(df_list)

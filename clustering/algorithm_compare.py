@@ -1,6 +1,5 @@
 import scCloud
 import os, sys
-import pandas as pd
 from termcolor import cprint
 from sklearn.metrics.cluster import adjusted_mutual_info_score
 
@@ -12,16 +11,16 @@ if __name__ == '__main__':
 	if os.system("scCloud cluster -p {jobs} --run-louvain --run-approximated-louvain --run-leiden --run-approximated-leiden --run-tsne {src} {outname}".format(jobs = n_cores, src = data_src, outname = data_dst)):
 		sys.exit(1)
 
-	if os.system("scCloud plot scatter --basis tsne --attributes louvain_labels,Individual {name} {name}.louvain_labels.tsne.pdf".format(name = data_dst)):
+	if os.system("scCloud plot scatter --basis tsne --attributes louvain_labels,Individual {name}.h5ad {name}.louvain_labels.tsne.pdf".format(name = data_dst)):
 		sys.exit(1)
 
-	if os.system("scCloud plot scatter --basis tsne --attributes approx_louvain_labels,Individual {name} {name}.approx_louvain_labels.tsne.pdf".format(name = data_dst)):
+	if os.system("scCloud plot scatter --basis tsne --attributes approx_louvain_labels,Individual {name}.h5ad {name}.approx_louvain_labels.tsne.pdf".format(name = data_dst)):
 		sys.exit(1)
 
-	if os.system("scCloud plot scatter --basis tsne --attributes leiden_labels,Individual {name} {name}.leiden_labels.tsne.pdf".format(name = data_dst)):
+	if os.system("scCloud plot scatter --basis tsne --attributes leiden_labels,Individual {name}.h5ad {name}.leiden_labels.tsne.pdf".format(name = data_dst)):
 		sys.exit(1)
 
-	if os.system("scCloud plot scatter --basis tsne --attributes approx_leiden_labels,Individual {name} {name}.approx_leiden_labels.tsne.pdf".format(name = data_dst)):
+	if os.system("scCloud plot scatter --basis tsne --attributes approx_leiden_labels,Individual {name}.h5ad {name}.approx_leiden_labels.tsne.pdf".format(name = data_dst)):
 		sys.exit(1)
 
 	adata = scCloud.tools.read_input(data_dst + '.h5ad', mode = 'a')

@@ -2,29 +2,45 @@ import scCloud
 import numpy as np
 import pandas as pd
 import os, sys
+import seaborn as sns
+import matplotlib.pyplot as plt
 from termcolor import cprint
 from sklearn.metrics import adjusted_mutual_info_score
+
+n_cores = os.cpu_count()
 
 markers = np.array(['CD3D', 'CD3E', 'CD3G', 'TRAC', 'CD4', 'CD8A', 'CD8B', 'RTKN2', 'TIGIT', 'FOXP3', 'IL2RA', 'CCR7', 'SELL', 'IL7R', 'TCF7', 'CD27', 'CD19', 'MS4A1', 'CD79A', 'CD79B', 'MZB1', 'HLA-DRA', 'HLA-DRB1', 'CD34', 'IGLL1', 'NCAM1', 'NKG7', 'KLRB1', 'KLRD1', 'KLRF1', 'KLRC1', 'KLRC2', 'KLRC3', 'KLRC4', 'FCGR3A', 'ITGAL', 'ITGAM', 'VCAN', 'FCN1', 'S100A8', 'S100A9', 'CD14', 'ASAH1', 'MS4A7', 'IFITM2', 'IFITM3', 'HLA-DPA1', 'HLA-DPB1', 'HLA-DQA1', 'HLA-DQB1', 'FCER1A', 'CLEC10A', 'CD1C', 'THBD', 'JCHAIN', 'LILRA4', 'GZMB', 'IL3RA', 'SERPINF1', 'ITM2C', 'IRF7', 'CD38', 'XBP1', 'SLAMF7', 'TNFRSF17', 'TNFRSF13B', 'IGHA1', 'IGHG1', 'KIT', 'CD59', 'THY1', 'SOX4', 'GYPA', 'HBB', 'HBA1', 'TFRC', 'ITGA4', 'ANK1', 'ICAM4', 'BCAM', 'SLC4A1', 'ACKR1', 'PF4', 'PPBP', 'GP5', 'CXCR4', 'SLAMF1', 'MPL', 'ITGA2B', 'FUT4', 'MPO', 'CSF3R', 'FCGR3B', 'CEACAM8'])
 
 seurat_correct_name = "MantonBM_nonmix_seurat_corrected"
-sccloud_correct_name = "MantonBM_nonmix_new_corrected"
+sccloud_correct_name = "MantonBM_nonmix_sccloud_corrected"
+sccloud_correct_alpha_one_name = "MantonBM_nonmix_sccloud_corrected_alpha_one"
 
 
 def get_hvg():
 	cprint("Computing highly variable genes using Seurat method...", "green")
-	if os.system("scCloud cluster -p 8 --correct-batch-effect --select-hvg-flavor Seurat --run-leiden --run-approximated-leiden --run-louvain --run-approximated-louvain --run-tsne --run-fitsne --run-umap --run-fle ../MantonBM_nonmix_10x.h5 {outname}".format(outname = seurat_correct_name)):
+	if os.system("scCloud cluster -p {jobs} --correct-batch-effect --select-hvg-flavor Seurat --run-approximated-leiden --run-fle ../MantonBM_nonmix_10x.h5 {outname}".format(jobs = n_cores, outname = seurat_correct_name)):
 		sys.exit(1)
 
 	cprint("Computing highly variable genes using scCloud new method...", "green")
-	if os.system("scCloud cluster -p 8 --plot-hvg --correct-batch-effect --run-leiden --run-approximated-leiden --run-louvain --run-approximated-louvain --run-tsne --run-fitsne --run-umap --run-fle ../MantonBM_nonmix_10x.h5 {outname}".format(outname = sccloud_correct_name)):
+	if os.system("scCloud cluster -p {jobs} --plot-hvg --correct-batch-effect --run-approximated-leiden --run-fle ../MantonBM_nonmix_10x.h5 {outname}".format(jobs = n_cores, outname = sccloud_correct_name)):
 		sys.exit(1)
+
+	cprint("Computing highly variable genes using scCloud new method with alpha = 1.0...", "green")
+	if os.system("scCloud cluster -p {jobs} --correct-batch-effect --diffmap-alpha 1.0 --run-approximated-leiden --run-fle ../MantonBM_nonmix_10x.h5 {outname}".format(jobs = n_cores, outname = sccloud_correct_alpha_one_name)):
+		sys.exit(1)
+
+	adata = scCloud.tools.read_input(sccloud_corrected_alpha_one_name + '.h5ad', mode = 'a')
+	bdata = scCloud.tools.read_input(sccloud_correct_name + '.h5ad', mode = 'a')
+	assert adata.obs.index.values == bdata.obs.index.values
+	adata.obs['cell_types'] = bdata.obs['approx_leiden_labels']
+
+	scCloud.tools.write_output(adata, sccloud_corrected_alpha_one_name)
 
 
 def annotate_data(file_name):
 	cprint("Annotating Cells for {name}...".format(name = file_name), "green")
 
-	if os.system("scCloud de_analysis -p 8 --labels leiden_labels --fisher --mwu --roc {name}.h5ad {name}.de.xlsx".format(name = file_name)):
+	if os.system("scCloud de_analysis -p {jobs} --labels approx_leiden_labels {name}.h5ad {name}.de.xlsx".format(jobs = n_cores, name = file_name)):
 		sys.exit(1)
 
 	if os.system("scCloud annotate_cluster {name}.h5ad {name}.anno.txt".format(name = file_name)):
@@ -82,23 +98,49 @@ def get_mutual_info():
 	mis = adjusted_mutual_info_score(adata.obs['approx_leiden_labels'], bdata.obs['approx_leiden_labels'], average_method = 'arithmetic')
 	cprint("AMI = {:.4f}".format(mis))
 
-def plot_figures(file_name):
-	if os.system("scCloud plot scatter --basis tsne --attributes approx_leiden_labels,Individual {name}.h5ad {name}.tsne.pdf".format(name = file_name)):
+def plot_figures():
+	if os.system("scCloud plot scatter --basis fle --attributes approx_leiden_labels {name}.h5ad {name}.fle.pdf".format(name = seurat_correct_name)):
 		sys.exit(1)
 
-	if os.system("scCloud plot scatter --basis fitsne --attributes approx_leiden_labels,Individual {name}.h5ad {name}.fitsne.pdf".format(name = file_name)):
+	if os.system("scCloud plot scatter --basis fle --attributes approx_leiden_labels {name}.h5ad {name}.fle.pdf".format(name = sccloud_correct_name)):
 		sys.exit(1)
 
-	if os.system("scCloud plot scatter --basis umap --attributes approx_leiden_labels,Individual {name}.h5ad {name}.umap.pdf".format(name = file_name)):
+	if os.system("scCloud plot scatter --basis fle --attributes cell_types {name}.h5ad {name}.celltypes.fle.pdf".format(name = sccloud_correct_alpha_one_name)):
 		sys.exit(1)
 
-	if os.system("scCloud plot scatter --basis fle --attributes approx_leiden_labels,Individual {name}.h5ad {name}.fle.pdf".format(name = file_name)):
-		sys.exit(1)
+
+def plot_eigenvalues():
+
+	# For alpha = 0.5
+	adata = scCloud.tools.read_input(sccloud_correct_name, mode = 'a')
+	S = adata.uns['diffmap_evals']
+	alpha = 0.5
+	weights = S / (1 - alpha * S)
+
+	fig, ax = plt.subplots()
+	fig.set_size_inches(18, 8)
+	sns.barplot(x = list(range(1, weights.shape[0] + 1)), y = weights, color = 'salmon', ax = ax)
+	ax.set(ylabel = 'Eigenvalues', xlabel = 'Diffusion Components', ylim = (0, 2))
+	fig.savefig("new_corrected_randomize_alpha_0.5.dist.pdf")
+	plt.close()
+
+	# For alpha = 1.0
+	bdata = scCloud.tools.read_input(sccloud_correct_alpha_one_name, mode = 'a')
+	S = bdata.uns['diffmap_evals']
+	alpha = 1.0
+	weights = S / (1 - alpha * S)
+
+	fig, ax = plt.subplots()
+	fig.set_size_inches(18, 8)
+	sns.barplot(x = list(range(1, weights.shape[0] + 1)), y = weights, color = 'royalblue', ax = ax)
+	ax.set(ylabel = "Eigenvalues", xlabel = 'Diffusion Components', ylim = (0, 350))
+	fig.savefig("new_corrected_randomize_alpha_1.0.dist.pdf")
+	plt.close()
 
 
 if __name__ == '__main__':
-	f_list = [f for f in os.listdir('.') if f in ["{}.h5ad".format(seurat_correct_name), "{}.h5ad".format(sccloud_correct_name)]]
-	if len(f_list) != 2:
+	f_list = [f for f in os.listdir('.') if f in [seurat_correct_name + '.h5ad', sccloud_correct_name + '.h5ad', sccloud_correct_alpha_one_name + '.h5ad']]
+	if len(f_list) != 3:
 		get_hvg()
 		annotate_data(seurat_correct_name)
 		annotate_data(sccloud_correct_name)
@@ -106,5 +148,6 @@ if __name__ == '__main__':
 	compare_markers()
 	get_mutual_info()
 
-	#plot_figures(seurat_correct_name)
-	#plot_figures(sccloud_correct_name)
+	plot_figures()
+
+	plot_eigenvalues()

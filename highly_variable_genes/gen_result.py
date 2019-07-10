@@ -109,10 +109,10 @@ def plot_figures():
 		sys.exit(1)
 
 
-def plot_eigenvalues():
+def plot_diffusion_coeffs():
 
 	# For alpha = 0.5
-	adata = scCloud.tools.read_input(sccloud_correct_name, mode = 'a')
+	adata = scCloud.tools.read_input(sccloud_correct_name + '.h5ad', mode = 'a')
 	S = adata.uns['diffmap_evals']
 	alpha = 0.5
 	weights = S / (1 - alpha * S)
@@ -120,12 +120,14 @@ def plot_eigenvalues():
 	fig, ax = plt.subplots()
 	fig.set_size_inches(18, 8)
 	sns.barplot(x = list(range(1, weights.shape[0] + 1)), y = weights, color = 'salmon', ax = ax)
-	ax.set(ylabel = 'Eigenvalues', xlabel = 'Diffusion Components', ylim = (0, 2))
+	ax.set_xlabel("Diffusion Components", fontsize = 15)
+	ax.set_ylabel("Diffusion Coefficients", fontsize = 15)
+	ax.set(ylim = (0, 2))
 	fig.savefig("new_corrected_randomize_alpha_0.5.dist.pdf")
 	plt.close()
 
 	# For alpha = 1.0
-	bdata = scCloud.tools.read_input(sccloud_correct_alpha_one_name, mode = 'a')
+	bdata = scCloud.tools.read_input(sccloud_correct_alpha_one_name + '.h5ad', mode = 'a')
 	S = bdata.uns['diffmap_evals']
 	alpha = 1.0
 	weights = S / (1 - alpha * S)
@@ -133,7 +135,9 @@ def plot_eigenvalues():
 	fig, ax = plt.subplots()
 	fig.set_size_inches(18, 8)
 	sns.barplot(x = list(range(1, weights.shape[0] + 1)), y = weights, color = 'royalblue', ax = ax)
-	ax.set(ylabel = "Eigenvalues", xlabel = 'Diffusion Components', ylim = (0, 350))
+	ax.set_xlabel("Diffusion Components", fontsize = 15)
+	ax.set_ylabel("Diffusion Coefficients", fontsize = 15)
+	ax.set(ylim = (0, 350))
 	fig.savefig("new_corrected_randomize_alpha_1.0.dist.pdf")
 	plt.close()
 
@@ -150,4 +154,4 @@ if __name__ == '__main__':
 
 	plot_figures()
 
-	plot_eigenvalues()
+	plot_diffusion_coeffs()

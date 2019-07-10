@@ -46,7 +46,7 @@ if __name__ == '__main__':
 		process_data()
 
 	gen_plots()
-	#annotate_clusters()
+	annotate_clusters()
 
 	measure_results()
 	

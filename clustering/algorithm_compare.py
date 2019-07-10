@@ -7,7 +7,11 @@ n_cores = os.cpu_count()
 data_src = "../MantonBM_nonmix_10x.h5"
 data_dst = "MantonBM_nonmix_clustering"
 
-def calc_and_plot():
+label_list = ['louvain_labels', 'approx_louvain_labels', 'leiden_labels', 'approx_leiden_labels']
+
+def process_data():
+	cprint("Calculation with {} cores.".format(n_cores), "green")
+
 	if os.system("scCloud cluster -p {jobs} --correct-batch-effect --run-louvain --run-approximated-louvain --run-leiden --run-approximated-leiden --run-tsne {src} {outname}".format(jobs = n_cores, src = data_src, outname = data_dst)):
 		sys.exit(1)
 
@@ -16,6 +20,16 @@ def calc_and_plot():
 
 	if os.system("scCloud plot scatter --basis tsne --attributes leiden_labels,approx_leiden_labels {name}.h5ad {name}.leidens.tsne.pdf".format(name = data_dst)):
 		sys.exit(1)
+
+
+def annotate_clusters():
+	
+	for label in label_list:
+		if os.system("scCloud de_analysis -p {jobs} --labels {label} {name}.h5ad {name}.{label}.de.xlsx".format(jobs = n_cores, label = label, name = data_dst)):
+			sys.exit(1)
+
+		if os.system("scCloud annotate_cluster {name}.h5ad {name}.{label}.anno.txt".format(name = data_dst, label = label)):
+			sys.exit(1)
 
 
 def measure_results():
@@ -29,7 +43,9 @@ def measure_results():
 
 if __name__ == '__main__':
 	if (data_dst + '.h5ad') not in os.listdir('.'):
-		calc_and_plot()
+		process_data()
+
+	annotate_clusters()
 
 	measure_results()
 	

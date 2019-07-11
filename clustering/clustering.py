@@ -1,19 +1,33 @@
-import numpy as np
+import os, sys
 import scCloud
-from scipy.sparse.csgraph import connected_components
-from scipy.sparse import issparse
-from scCloud.tools.diffusion_map import calculate_affinity_matrix
+import numpy as np
+import pandas as pd
+from sklearn.cluster import KMeans
 
-def run_spectral(data, rep_key, K = 100, n_jobs = 1, random_state = 0, full_speed = False):
+n_cores = os.cpu_count()
+data_src = "MantonBM_nonmix_10x_corrected"
+data_dst = "spectral_result"
+spectral_label = "spectral_labels"
 
-	indices, distances = get_kNN(data, rep_key, K, n_jobs = n_jobs, random_state = random_state, full_speed = full_speed)
-	W = calculate_affinity_matrix(indices, distances)
+def run_spectral(data, rep_key, n_clusters = 20, K = 100, n_jobs = 1, random_state = 0, full_speed = False):
 
-	assert issparse(W)
+	X = data.obsm[rep_key].astype('float64')
+	km = KMeans(n_clusters = n_clusters, n_jobs = n_jobs, random_state = random_state)
+	km.fit(X)
 
-	Phi_pt, Lambda = calculate_diffusion_map(W, n_dc = n_components, alpha = alpha, solver = solver, random_state = random_state)
+	data.obs[spectral_label] = pd.Categorical(km.labels_)
 
-	nc, labels = connected_components(W, directed = True, connection = 'strong')
 
-	assert nc == 1
 
+if __name__ == '__main__':
+
+	if os.system("scCloud cluster -p {jobs} --correct-batch-effect ../MantonBM_nonmix_10x.h5 {name}".format(jobs = n_cores, name = data_src)):
+		sys.exit(1)
+
+	adata = scCloud.tools.read_input(data_src + '.h5ad', mode = 'a')
+	run_spectral(adata, 'X_diffmap', n_clusters = 20, n_jobs = n_cores)
+	scCloud.tools.run_fitsne(adata, 'X_pca', n_jobs = n_cores)
+	scCloud.tools.write_output(adata, data_dst)
+
+	if os.system("scCloud plot scatter --basis fitsne --attributes {label},Individual {name}.h5ad {name}.fitsne.pdf".format(label = spectral_label, name = data_dst)):
+		sys.exit(1)

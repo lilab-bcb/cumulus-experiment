@@ -23,16 +23,18 @@ def run_spectral(data, rep_key, n_clusters = 20, K = 100, n_jobs = 1, random_sta
 
 if __name__ == '__main__':
 
-	if os.system("scCloud cluster -p {jobs} --correct-batch-effect ../MantonBM_nonmix_10x.h5 {name}".format(jobs = n_cores, name = data_src)):
-		sys.exit(1)
+	if (data_src + '.h5ad') not in os.listdir('.'):
+		if os.system("scCloud cluster -p {jobs} --correct-batch-effect ../MantonBM_nonmix_10x.h5 {name}".format(jobs = n_cores, name = data_src)):
+			sys.exit(1)
 
-	adata = scCloud.tools.read_input(data_src + '.h5ad', mode = 'a')
-	start_spec = time.time()
-	run_spectral(adata, 'X_diffmap', n_clusters = 20, n_jobs = n_cores)
-	end_spec = time.time()
-	cprint("Time for spectral clustering = {} s.".format(end_spec - start_spec), "yellow")
-	scCloud.tools.run_tsne(adata, 'X_pca', n_jobs = n_cores)
-	scCloud.tools.write_output(adata, data_dst)
+	if (data_dst + '.h5ad') not in os.listdir('.'):
+		adata = scCloud.tools.read_input(data_src + '.h5ad', mode = 'a')
+		start_spec = time.time()
+		run_spectral(adata, 'X_diffmap', n_clusters = 20, n_jobs = n_cores)
+		end_spec = time.time()
+		cprint("Time for spectral clustering = {} s.".format(end_spec - start_spec), "yellow")
+		scCloud.tools.run_tsne(adata, 'X_pca', n_jobs = n_cores)
+		scCloud.tools.write_output(adata, data_dst)
 
 	if os.system("scCloud plot scatter --basis tsne --attributes {label} {name}.h5ad {name}.fitsne.pdf".format(label = spectral_label, name = data_dst)):
 		sys.exit(1)

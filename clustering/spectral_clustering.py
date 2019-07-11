@@ -3,7 +3,7 @@ import scCloud
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
-from time import time
+import time
 from termcolor import cprint
 
 n_cores = os.cpu_count()

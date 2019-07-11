@@ -3,6 +3,8 @@ import scCloud
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
+from time import time
+from termcolor import cprint
 
 n_cores = os.cpu_count()
 data_src = "MantonBM_nonmix_10x_corrected"
@@ -25,9 +27,18 @@ if __name__ == '__main__':
 		sys.exit(1)
 
 	adata = scCloud.tools.read_input(data_src + '.h5ad', mode = 'a')
+	start_spec = time.time()
 	run_spectral(adata, 'X_diffmap', n_clusters = 20, n_jobs = n_cores)
-	scCloud.tools.run_fitsne(adata, 'X_pca', n_jobs = n_cores)
+	end_spec = time.time()
+	cprint("Time for spectral clustering = {} s.".format(end_spec - start_spec))
+	scCloud.tools.run_tsne(adata, 'X_pca', n_jobs = n_cores)
 	scCloud.tools.write_output(adata, data_dst)
 
-	if os.system("scCloud plot scatter --basis fitsne --attributes {label},Individual {name}.h5ad {name}.fitsne.pdf".format(label = spectral_label, name = data_dst)):
+	if os.system("scCloud plot scatter --basis tsne --attributes {label} {name}.h5ad {name}.fitsne.pdf".format(label = spectral_label, name = data_dst)):
+		sys.exit(1)
+
+	if os.system("scCloud de_analysis -p {jobs} --labels {label} {name}.h5ad {name}.de.xlsx".format(jobs = n_cores, label = spectral_label, name = data_dst)):
+		sys.exit(1)
+
+	if os.system("scCloud annotate_cluster {name}.h5ad {name}.anno.txt".format(name = data_dst)):
 		sys.exit(1)

@@ -20,6 +20,12 @@ def calc_and_plot():
 		if os.system("scCloud plot scatter --basis {basis} --attributes approx_leiden_labels {name}.h5ad {name}.approx_leiden_labels.{basis}.pdf".format(basis = basis, name = data_dst)):
 			sys.exit(1)
 
+	if os.system("scCloud de_analysis -p {jobs} --labels approx_leiden_labels {name}.h5ad {name}.de.xlsx".format(jobs = n_cores, name = data_dst)):
+		sys.exit(1)
+
+	if os.system("scCloud annotate_cluster {name}.h5ad {name}.anno.txt".format(name = data_dst)):
+		sys.exit(1)
+
 
 def measure_algorithms(adata):
 	cprint("Calculating kSIM measurements...", "green")

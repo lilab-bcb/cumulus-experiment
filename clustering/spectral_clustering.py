@@ -11,7 +11,7 @@ data_src = "MantonBM_nonmix_10x_corrected"
 data_dst = "spectral_result"
 spectral_label = "spectral_labels"
 
-def run_spectral(data, rep_key, n_clusters, K = 100, n_jobs = 1, random_state = 0, full_speed = False):
+def run_spectral(data, rep_key, n_clusters, K = 100, n_jobs = 1, random_state = 0):
 
 	X = data.obsm[rep_key].astype('float64')
 	km = KMeans(n_clusters = n_clusters, n_jobs = n_jobs, random_state = random_state)

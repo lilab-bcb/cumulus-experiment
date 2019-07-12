@@ -18,7 +18,7 @@ def process_data():
 def gen_plots():
 
 	for label in label_list:
-		if os.system("scCloud plot scatter --basis tsne --attributes {label} {name}.h5ad {name}.{label}.tsne.pdf".format(label = label, name = data_dst)):
+		if os.system("scCloud plot scatter --basis fitsne --attributes {label} {name}.h5ad {name}.{label}.fitsne.pdf".format(label = label, name = data_dst)):
 			sys.exit(1)
 
 

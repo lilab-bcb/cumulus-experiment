@@ -11,7 +11,7 @@ data_src = "MantonBM_nonmix_10x_corrected"
 data_dst = "spectral_result"
 spectral_label = "spectral_labels"
 
-def run_spectral(data, rep_key, n_clusters = 21, K = 100, n_jobs = 1, random_state = 0, full_speed = False):
+def run_spectral(data, rep_key, n_clusters, K = 100, n_jobs = 1, random_state = 0, full_speed = False):
 
 	X = data.obsm[rep_key].astype('float64')
 	km = KMeans(n_clusters = n_clusters, n_jobs = n_jobs, random_state = random_state)
@@ -30,7 +30,7 @@ if __name__ == '__main__':
 	if (data_dst + '.h5ad') not in os.listdir('.'):
 		adata = scCloud.tools.read_input(data_src + '.h5ad', mode = 'a')
 		start_spec = time.time()
-		run_spectral(adata, 'X_diffmap', n_clusters = 20, n_jobs = n_cores)
+		run_spectral(adata, 'X_diffmap', n_clusters = 21, n_jobs = n_cores)
 		end_spec = time.time()
 		cprint("Time for spectral clustering = {} s.".format(end_spec - start_spec), "yellow")
 		scCloud.tools.run_fitsne(adata, 'X_pca', n_jobs = n_cores)

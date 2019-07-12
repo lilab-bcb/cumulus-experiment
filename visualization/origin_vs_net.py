@@ -36,7 +36,7 @@ def net_umap_phase_plots(adata):
 	bdata.obsm['X_net_umap_init'] = bdata.uns['X_net_umap_small']
 	scCloud.tools.write_output(bdata, "net_umap_init")
 
-	if os.system("scCloud plot scatter --basis net_uamp_init --attributes approx_leiden_labels net_umap_init.h5ad net_umap_init.umap.pdf"):
+	if os.system("scCloud plot scatter --basis net_umap_init --attributes approx_leiden_labels net_umap_init.h5ad net_umap_init.umap.pdf"):
 		sys.exit(1)
 
 	# Predict plot

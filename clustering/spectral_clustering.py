@@ -36,7 +36,7 @@ if __name__ == '__main__':
 		scCloud.tools.run_tsne(adata, 'X_pca', n_jobs = n_cores)
 		scCloud.tools.write_output(adata, data_dst)
 
-	if os.system("scCloud plot scatter --basis tsne --attributes {label} {name}.h5ad {name}.fitsne.pdf".format(label = spectral_label, name = data_dst)):
+	if os.system("scCloud plot scatter --basis fitsne --attributes {label} {name}.h5ad {name}.fitsne.pdf".format(label = spectral_label, name = data_dst)):
 		sys.exit(1)
 
 	if os.system("scCloud de_analysis -p {jobs} --labels {label} {name}.h5ad {name}.de.xlsx".format(jobs = n_cores, label = spectral_label, name = data_dst)):

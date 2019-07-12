@@ -33,7 +33,7 @@ def net_umap_phase_plots(adata):
 
 	# Initial plot
 	bdata = adata[adata.obs['ds_selected'], :]
-	bdata.obsm['X_net_umap_init'] = bdata.obsm['X_net_umap_small']
+	bdata.obsm['X_net_umap_init'] = bdata.uns['X_net_umap_small']
 	scCloud.tools.write_output(bdata, "net_umap_init")
 
 	if os.system("scCloud plot scatter --basis net_uamp_init --attributes approx_leiden_labels net_umap_init.h5ad net_umap_init.umap.pdf"):
@@ -50,5 +50,5 @@ if __name__ == '__main__':
 
 	adata = scCloud.tools.read_input(data_dst + '.h5ad', mode = 'a')
 
-	measure_algorithms(adata)
+	#measure_algorithms(adata)
 	net_umap_phase_plots(adata)

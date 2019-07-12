@@ -26,7 +26,7 @@ def measure_algorithms(adata):
 
 	for basis in basis_list:
 		ksim, ac_rate = scCloud.tools.calc_kSIM(adata, 'approx_leiden_labels', rep_key = 'X_' + basis, n_jobs = n_cores)
-		cprint("For {basis}, kSIM is {ksim}, accept rate is {ac_rate}.".format(basis = basis, ksim = ksim, ac_rate = ac_rate), "yellow")
+		cprint("For {basis}, kSIM is {ksim:.4f}, accept rate is {ac_rate:.4f}.".format(basis = basis, ksim = ksim, ac_rate = ac_rate), "yellow")
 
 def net_umap_phase_plots(adata):
 	cprint("Generate phase plots for Net UMAP...", "green")

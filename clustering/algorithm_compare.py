@@ -12,7 +12,7 @@ label_list = ['louvain_labels', 'approx_louvain_labels', 'leiden_labels', 'appro
 def process_data():
 	cprint("Calculation with {} cores.".format(n_cores), "green")
 
-	if os.system("scCloud cluster -p {jobs} --correct-batch-effect --run-louvain --run-approximated-louvain --run-leiden --run-approximated-leiden --run-tsne {src} {outname}".format(jobs = n_cores, src = data_src, outname = data_dst)):
+	if os.system("scCloud cluster -p {jobs} --correct-batch-effect --run-louvain --run-approximated-louvain --run-leiden --run-approximated-leiden --run-fitsne {src} {outname}".format(jobs = n_cores, src = data_src, outname = data_dst)):
 		sys.exit(1)
 
 def gen_plots():

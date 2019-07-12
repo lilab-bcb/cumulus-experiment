@@ -33,7 +33,7 @@ if __name__ == '__main__':
 		run_spectral(adata, 'X_diffmap', n_clusters = 20, n_jobs = n_cores)
 		end_spec = time.time()
 		cprint("Time for spectral clustering = {} s.".format(end_spec - start_spec), "yellow")
-		scCloud.tools.run_tsne(adata, 'X_pca', n_jobs = n_cores)
+		scCloud.tools.run_fitsne(adata, 'X_pca', n_jobs = n_cores)
 		scCloud.tools.write_output(adata, data_dst)
 
 	if os.system("scCloud plot scatter --basis fitsne --attributes {label} {name}.h5ad {name}.fitsne.pdf".format(label = spectral_label, name = data_dst)):

@@ -1,42 +1,39 @@
-#!/usr/bin/env python
-
 import numpy as np
-import scanpy as sc
+import pandas as pd
 import os, sys, time
+import scanpy as sc
+from bbknn import bbknn
 
 sc.settings.n_jobs = os.cpu_count()
 rand_seed = 0
-output_dir = "scanpy_output"
+filter_norm_data = "../MantonBM_nonmix_10x_filter_norm.h5ad"
+hvg_file = "../hvg.txt"
+pca_data = "../MantonBM_nonmix_10x_filter_norm_pca.h5ad"
+corrected_data = "./sccloud_output/MantonBM_nonmix_sccloud_corrected.h5ad"
 
-if output_dir not in os.listdir('.'):
-	if os.system("mkdir {}".format(output_dir)):
-		sys.exit(1)
-
-f = open(output_dir + "/scanpy.log", "w")
+f = open(output_dir + "scanpy.log", "w")
 
 print("Reading ICA (bone marrow) dataset")
 start = time.time()
-adata = sc.read_10x_h5("../MantonBM_nonmix_10x.h5", genome='GRCh38')
-adata.obs['channel'] = list(map(lambda s : s.split('-')[0], adata.obs.index.values))
-adata.var_names_make_unique()
-
-print("Filtering cells")
-sc.pp.filter_cells(adata, min_genes=500)
-sc.pp.filter_cells(adata, max_genes=5999)
-mito_genes = adata.var_names.str.startswith('MT-')
-adata.obs['percent_mito'] = np.sum(adata[:, mito_genes].X, axis=1).A1 / np.sum(adata.X, axis=1).A1
-adata = adata[adata.obs['percent_mito'] < 0.1, :]
-
-print("Filtering genes")
-sc.pp.filter_genes(adata, min_cells=138)
-
-print("Normalizing data")
-sc.pp.normalize_per_cell(adata, counts_per_cell_after=1e5)
-sc.pp.log1p(adata)
-
+adata_filter_norm = sc.read_h5ad(filter_norm_data)
 print("Finding variable genes")
-sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=7, min_disp=0.5)
-adata_variable_genes = adata[:, adata.var['highly_variable']]
+start_hvg = time.time()
+sc.pp.highly_variable_genes(adata_filter_norm, min_mean=0.0125, max_mean=7, min_disp=0.5)
+end_hvg = time.time()
+print("Time spent for HVG = {:.2f} seconds.".format(end_hvg - start_hvg))
+f.write("Time spent for HVG = {:.2f} seconds.\n".format(end_hvg - start_hvg))
+
+print("Getting Highly Variable Genes from scCloud")
+df_hvg = pd.read_csv(hvg_file)
+print("Highly variable gene set of size " + str(df_hvg.shape[0]))
+df_hvg['highly_variable_genes'] = [True] * df_hvg.shape[0]
+df_hvg.set_index('index', inplace = True)
+df_hvg.drop(columns = ['gene_ids'], inplace = True)
+adata_filter_norm.var.drop(columns = ['highly_variable_genes'], inplace = True)
+df_join = adata_filter_norm.var.join(df_hvg)
+df_join['highly_variable_genes'].fillna(False, inplace = True)
+adata_variable_genes = adata_filter_norm[:, df_join['highly_variable_genes']].copy()
+
 
 print("Scale expression matrix of variable genes")
 sc.pp.scale(adata_variable_genes, max_value=10)
@@ -50,11 +47,11 @@ print("Time spent for PCA = " + str(end_pca - start_pca) + " seconds.")
 f.write("Time spent for PCA = " + str(end_pca - start_pca) + " seconds.\n")
 
 print("Computing neighborhood graph")
-start_nn = time.time()
-sc.pp.neighbors(adata, n_neighbors=100)
-end_nn = time.time()
-print("Time spent for knn = " + str(end_nn - start_nn) + " seconds.")
-f.write("Time spent for knn = " + str(end_nn - start_nn) + " seconds.\n")
+start_bbknn = time.time()
+bbknn(adata, batch_key = 'Channel', metric = 'euclidean')
+end_bbknn = time.time()
+print("Time spent for bbknn = " + str(end_nn - start_nn) + " seconds.")
+f.write("Time spent for bbknn = " + str(end_nn - start_nn) + " seconds.\n")
 
 print("Finding Clusters")
 start_cluster = time.time()

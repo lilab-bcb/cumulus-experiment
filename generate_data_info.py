@@ -28,6 +28,7 @@ def preprocess_data(in_file):
 	# Filtration and Normalization.
 	suffix1 = "_filter_norm"
 	output_name1 = in_file.split('.')[0] + suffix1
+	output_hvg_name1 = output_name1 + "_hvg"
 
 	adata = scCloud.tools.read_input(in_file)
 	scCloud.tools.update_var_names(adata)
@@ -44,16 +45,21 @@ def preprocess_data(in_file):
 	df_join['highly_variable_genes'].fillna(False, inplace = True)
 	adata_hvg = adata[:, df_join['highly_variable_genes']].copy()
 
-	scCloud.tools.write_output(adata_hvg, output_name1)
+	scCloud.tools.write_output(adata, output_name1)
+	scCloud.tools.write_output(adata_hvg, output_hvg_name1)
 
 	# Furthermore, do PCA.
 	suffix2 = "_filter_norm_pca"
 	output_name2 = in_file.split('.')[0] + suffix2
+	output_hvg_name2 = output_name2 + "_hvg"
 	adata_hvg_c = adata_hvg.copy()
 	scCloud.tools.run_pca(adata_hvg_c)
 
+	adata.obsm['X_pca'] = adata_hvg_c.obsm['X_pca']
+	scCloud.tools.write_output(adata, output_name2)
+
 	adata_hvg.obsm['X_pca'] = adata_hvg_c.obsm['X_pca']
-	scCloud.tools.write_output(adata_hvg, output_name2)
+	scCloud.tools.write_output(adata_hvg, output_hvg_name2)
 
 if __name__ == '__main__':
 	extract_hvg()

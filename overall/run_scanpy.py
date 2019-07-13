@@ -58,7 +58,6 @@ f.write("Time spent for knn = " + str(end_nn - start_nn) + " seconds.\n")
 
 print("Finding Clusters")
 start_cluster = time.time()
-#sc.tl.louvain(adata, resolution = 1.3, random_state = rand_seed)
 sc.tl.leiden(adata, resolution = 1.3, random_state = rand_seed)
 end_cluster = time.time()
 print("Time spent for leiden = " + str(end_lv - start_lv) + " seconds.")

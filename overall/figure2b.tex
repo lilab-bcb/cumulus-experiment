@@ -1,0 +1,42 @@
+\documentclass[10pt]{article}
+\usepackage[hmargin=1in, top=0.5in, bottom = 0.85in, centering]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage[labelformat=simple]{subcaption}
+\usepackage{parskip}
+\usepackage{mathtools}
+
+
+
+\begin{document}
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		Analysis & Seurat v3 & SCANPY & scCloud\\
+		\hline \hline
+		HVG selection & ? & ? & ? \\
+		\hline
+		Batch correction & ? & ? & ? \\
+		\hline
+		PCA & 6 min 40 sec & 21 sec & \textbf{19 sec} \\
+		\hline
+		Find K nearest neighbors & 8 min 11 sec &  5 min 41 sec & \textbf{7 sec}\\
+		\hline
+		Diffusion map & N/A & 28 min 37 sec & \textbf{2 min 57 sec} \\
+		\hline 
+		Clustering & 37 min 34 sec & 19 min 22 sec & \textbf{1 min 5 sec}\\
+		\hline
+		t-SNE-based visualization & 2 min 39 sec & 24 min 12 sec & \textbf{2 min 34 sec}\\
+		\hline
+		UMAP-based visualization & 1 h 6 min 16 sec & 20 min 18 sec & \textbf{3 min 18 sec}\\
+		\hline
+		FLE-based visualization & N/A & $>$ 6 h & \textbf{21 min 33 sec}\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\end{document}

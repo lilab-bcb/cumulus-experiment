@@ -3,7 +3,7 @@ from termcolor import cprint
 
 n_cores = os.cpu_count()
 output_dir = "sccloud_output"
-out_name = "MantonBM_nonmix_sccloud"
+out_name = "MantonBM_nonmix_sccloud_corrected"
 data_src = "../MantonBM_nonmix_10x.h5"
 
 if output_dir not in os.listdir('.'):
@@ -15,6 +15,3 @@ if os.system("scCloud cluster -p {jobs} --correct-batch-effect --diffmap-full-sp
 	sys.exit(1)
 end_sccloud = time.time()
 cprint("scCloud finishes in {:.2f} seconds.".format(end_sccloud - start_sccloud), "yellow")
-
-if os.system("mv {src} ..".format(src = output_dir + '/' + out_name + '.h5ad')):
-	sys.exit(1)

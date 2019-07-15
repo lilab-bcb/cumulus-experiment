@@ -16,4 +16,5 @@
 *.log
 *.pdf
 *.synctex.gz
+*.tar.gz
 __pycache__/

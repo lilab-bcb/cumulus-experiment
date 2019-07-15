@@ -7,6 +7,7 @@ n.cores <- detectCores()
 setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores."))
 
+<<<<<<< HEAD
 start <- Sys.time()
 adata <- Read10X_h5("../MantonBM_nonmix_10x.h5")
 rownames(adata) <- make.names(adata[,1], unique = TRUE)
@@ -25,11 +26,18 @@ ica <- NormalizeData(ica, selection.method = "LogNormalize", scale.factor = 1e5)
 print("Normalizing data:")
 print(Sys.time() - now)
 
+=======
+
+## Benchmark Highly Variable Gene selection.
+ica <- ReadH5AD("../MantonBM_nonmix_10x_filter_norm.h5ad")
+>>>>>>> 2f87f20... don't upload tar.gz
 now <- Sys.time()
-ica <- FindVariableFeatures(ica, selection.method = "mean.var.plot", mean.cutoff = c(0.0125, 7), dispersion.cutoff = c(0.5, Inf))
-print("Finding variable genes:")
+ica <- FindVariableFeatures(ica, selection.method = "vst", mean.cutoff = c(0.0125, 7), dispersion.cutoff = c(0.5, Inf))
+print("Finding Highly Variable Genes:")
 print(Sys.time() - now)
 
+## Benchmark PCA.
+adata <- ReadH5AD("./sccloud_output/MantonBM_nonmix_sccloud_corrected.h5ad")
 now <- Sys.time()
 ##ica <- ScaleData(ica, features = rownames(ica), scale.max = 10)
 ica <- ScaleData(ica, scale.max = 10)

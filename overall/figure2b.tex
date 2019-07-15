@@ -7,7 +7,7 @@
 \usepackage[labelformat=simple]{subcaption}
 \usepackage{parskip}
 \usepackage{mathtools}
-
+\usepackage{color}
 
 
 \begin{document}
@@ -18,21 +18,21 @@
 		\hline
 		Analysis & Seurat v3 & SCANPY & scCloud\\
 		\hline \hline
-		HVG selection & 36 sec & 13 sec & \textbf{0.06 sec} \\
+		HVG selection & 49 sec & 13 sec & \textbf{0.06 sec} \\
 		\hline
-		Batch correction & ? & ? & \textbf{19 sec} \\
+		Batch correction & ? & 8 min 31 sec & \textbf{19 sec} \\
 		\hline
-		PCA & 6 min 40 sec & 21 sec & \textbf{18 sec} \\
+		PCA & ? & 14 sec & 18 sec \\
 		\hline
-		Find K nearest neighbors & 8 min 11 sec &  5 min 41 sec & \textbf{6 sec}\\
+		Find K nearest neighbors &  ? &  6 min 33 sec & \textbf{6 sec}\\
 		\hline
 		Diffusion map & N/A & 3 min 2 sec & \textbf{2 min 8 sec} \\
 		\hline 
-		Clustering & 37 min 34 sec & 19 min 22 sec & \textbf{50 sec}\\
+		Clustering & ? & 23 min 14 sec & \textbf{50 sec}\\
 		\hline
-		t-SNE-based visualization & 2 min 39 sec & 24 min 12 sec & \textbf{2 min 49 sec}\\
+		t-SNE-based visualization & ? & 15 min 54 sec & \textbf{2 min 49 sec}\\
 		\hline
-		UMAP-based visualization & 1 h 6 min 16 sec & 20 min 18 sec & \textbf{2 min 29 sec}\\
+		UMAP-based visualization & ? & 12 min 31 sec & \textbf{2 min 29 sec}\\
 		\hline
 		FLE-based visualization & N/A & $\approx$ 14.8  h & \textbf{14 min 19 sec}\\
 		\hline

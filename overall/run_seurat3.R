@@ -7,7 +7,9 @@ n.cores <- detectCores()
 setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores."))
 
+skip.finished <- TRUE
 
+if (!skip.finished) {
 ## Benchmark Highly Variable Gene selection.
 ica <- ReadH5AD("../MantonBM_nonmix_10x_filter_norm.h5ad")
 now <- Sys.time()
@@ -15,20 +17,16 @@ ica <- FindVariableFeatures(ica, selection.method = "vst", mean.cutoff = c(0.012
 print("Finding Highly Variable Genes:")
 print(Sys.time() - now)
 
+}
+
 ## Benchmark PCA.
-##adata <- ReadH5AD("./sccloud_output/MantonBM_nonmix_sccloud_corrected.h5ad")
-##now <- Sys.time()
-####ica <- ScaleData(ica, features = rownames(ica), scale.max = 10)
-##ica <- ScaleData(ica, scale.max = 10)
-##print("Scale expression matrix of variable genes:")
-##print(Sys.time() - now)
-##
-##now <- Sys.time()
-##print("Running PCA:")
-##ica <- RunPCA(ica, features = VariableFeatures(ica), verbose = FALSE, seed.use = seed)
-##print("PCA time:")
-##print(Sys.time() - now)
-##
+adata <- ReadH5AD("./sccloud_output/MantonBM_nonmix_sccloud_corrected_hvg.h5ad")
+now <- Sys.time()
+adata <- ScaleData(adata, scale.max = 10, verbose = FALSE)
+adata <- RunPCA(adata, verbose = FALSE, seed.use = seed, features = GetAssayData(adata, slot = "data")@Dimnames[[1]])
+print("PCA time:")
+print(Sys.time() - now)
+
 ##now <- Sys.time()
 ##print("Computing neighborhood graph:")
 ##ica <- FindNeighbors(ica, k.param = 100, compute.SNN = FALSE) # Issue: Do I have to compute SNN?

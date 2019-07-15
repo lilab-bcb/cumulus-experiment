@@ -11,7 +11,7 @@ print(paste("Use", n.cores, "cores."))
 ## Benchmark Highly Variable Gene selection.
 ica <- ReadH5AD("../MantonBM_nonmix_10x_filter_norm.h5ad")
 now <- Sys.time()
-ica <- FindVariableFeatures(ica, selection.method = "vst", mean.cutoff = c(0.0125, 7), dispersion.cutoff = c(0.5, Inf))
+ica <- FindVariableFeatures(ica, selection.method = "vst", mean.cutoff = c(0.0125, 7), dispersion.cutoff = c(0.5, Inf), verbose = FALSE)
 print("Finding Highly Variable Genes:")
 print(Sys.time() - now)
 

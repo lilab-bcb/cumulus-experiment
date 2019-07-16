@@ -6,13 +6,13 @@ import os, sys, time
 
 sc.settings.n_jobs = os.cpu_count()
 rand_seed = 0
-output_dir = "scanpy_output"
 
-if output_dir not in os.listdir('.'):
-	if os.system("mkdir {}".format(output_dir)):
-		sys.exit(1)
+filter_norm_data = "../MantonBM_nonmix_10x_filter_norm.h5ad"
+hvg_file = "../hvg.txt"
+pca_data = "../MantonBM_nonmix_10x_pca_data.h5ad"
+corrected_data = "./sccloud_output/MantonBM_nonmix_sccloud_corrected.h5ad"
 
-f = open(output_dir + "/scanpy.log", "w")
+f = open("scanpy.log", "w")
 
 print("Reading ICA (bone marrow) dataset")
 adata = sc.read_h5ad(filter_norm_data)

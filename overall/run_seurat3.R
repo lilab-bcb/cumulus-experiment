@@ -17,7 +17,7 @@ ica <- FindVariableFeatures(ica, selection.method = "vst", mean.cutoff = c(0.012
 print("Finding Highly Variable Genes:")
 print(Sys.time() - now)
 
-}
+
 
 ## Benchmark PCA.
 adata <- ReadH5AD("./sccloud_output/MantonBM_nonmix_sccloud_corrected_hvg.h5ad")
@@ -27,12 +27,16 @@ adata <- RunPCA(adata, verbose = FALSE, seed.use = seed, features = GetAssayData
 print("PCA time:")
 print(Sys.time() - now)
 
-##now <- Sys.time()
-##print("Computing neighborhood graph:")
-##ica <- FindNeighbors(ica, k.param = 100, compute.SNN = FALSE) # Issue: Do I have to compute SNN?
-##print("kNN time:")
-##print(Sys.time() - now)
-##
+}
+
+now <- Sys.time()
+adata <- ReadH5AD("./sccloud_output/MantonBM_nonmix_sccloud_corrected_hvg.h5ad")
+df.pca <- read.table("./sccloud_output/x_pca.txt")
+print("Computing neighborhood graph:")
+adata <- FindNeighbors(adata, k.param = 100, compute.SNN = FALSE, dims = 1:50)
+print("kNN time:")
+print(Sys.time() - now)
+
 ##now <- Sys.time()
 ##print("Finding Clusters using Leiden:")
 ##ica <- FindClusters(ica, resolution = 1.3, random.seed = seed, algorithm = 4, verbose = FALSE) # TODO: Check if 2 is faster than 4.

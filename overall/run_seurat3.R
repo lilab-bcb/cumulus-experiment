@@ -8,13 +8,23 @@ setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores."))
 
 ## Benchmark Highly Variable Gene selection. ##
-src.obj <- ReadH5AD("../MantonBM_nonmix_10x_filter_norm.h5ad")
-obj.list <- SplitObject(src.obj, split.by = "Channel")
+##src.obj <- ReadH5AD("../MantonBM_nonmix_10x_filter_norm.h5ad")
+##obj.list <- SplitObject(src.obj, split.by = "Channel")
+##now <- Sys.time()
+##hvg <- SelectIntegrationFeatures(obj.list, nfeatures = 2000, fvf.nfeatures = 2000, selection.method = "vst", mean.cutoff = c(0.0125, 7), dispersion.cutoff = c(0.5, Inf))
+##print("Finding Highly Variable Genes:")
+##print(Sys.time() - now)
 
+## Benchmark Batch Correction. ##
+src.obj <- ReadH5AD("../MantonBM_nonmix_10x_filter_norm_hvg.h5ad")
+obj.list <- SplitObject(src.obj, split.by = "Channel")
 now <- Sys.time()
-hvg <- SelectIntegrationFeatures(obj.list, nfeatures = 2000, fvf.nfeatures = 2000, selection.method = "vst", mean.cutoff = c(0.0125, 7), dispersion.cutoff = c(0.5, Inf))
-print("Finding Highly Variable Genes:")
+bm.anchors <- FindIntegrationAnchors(obj.list)
+bm.combined <- IntegrateData(bm.anchors)
+print("Batch Correction:")
 print(Sys.time() - now)
+
+
 
 if (1 == 0) {
 

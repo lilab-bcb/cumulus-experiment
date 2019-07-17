@@ -14,7 +14,7 @@ adata = sc.read_h5ad(src_file)
 
 print("Computing neighborhood graph using BBKNN...")
 start_correction = time.time()
-bbknn(adata, batch_key = 'Channel', metric = 'euclidean')
+bbknn(adata, batch_key = 'Channel')
 end_correction = time.time()
 print("BBKNN Time = {:.4f} s.".format(end_correction - start_correction))
 

@@ -5,6 +5,7 @@ from bbknn import bbknn
 import os, sys, time
 
 sc.settings.n_jobs = os.cpu_count()
+sc.settings.verbosity = 4
 rand_seed = 0
 
 filter_norm_data = "../MantonBM_nonmix_10x_filter_norm.h5ad"

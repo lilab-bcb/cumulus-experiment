@@ -7,17 +7,16 @@ n.cores <- detectCores()
 setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores."))
 
-skip.finished <- TRUE
+## Benchmark Highly Variable Gene selection. ##
+src.obj <- ReadH5AD("../MantonBM_nonmix_10x_filter_norm.h5ad")
+obj.list <- SplitObject(src.obj, split.by = "Channel")
 
-if (!skip.finished) {
-## Benchmark Highly Variable Gene selection.
-ica <- ReadH5AD("../MantonBM_nonmix_10x_filter_norm.h5ad")
 now <- Sys.time()
-ica <- FindVariableFeatures(ica, selection.method = "vst", mean.cutoff = c(0.0125, 7), dispersion.cutoff = c(0.5, Inf), verbose = FALSE)
+hvg <- SelectIntegrationFeatures(obj.list, nfeatures = 2000, fvf.nfeatures = 2000, selection.method = "vst", mean.cutoff = c(0.0125, 7), dispersion.cutoff = c(0.5, Inf))
 print("Finding Highly Variable Genes:")
 print(Sys.time() - now)
 
-}
+if (1 == 0) {
 
 ## Benchmark PCA.
 adata <- ReadH5AD("../MantonBM_nonmix_corrected_hvg.h5ad")
@@ -40,7 +39,7 @@ save(adata, file = "seurat_knn.RData")
 
 print("Finding Clusters using Leiden:")
 now <- Sys.time()
-adata <- FindClusters(adata, resolution = 1.3, random.seed = seed, algorithm = 4, verbose = FALSE)
+adata <- FindClusters(adata, resolution = 1.3, random.seed = seed, algorithm = 1)
 print("Leiden Clustering time:")
 print(Sys.time() - now)
 
@@ -48,7 +47,7 @@ save(adata, file = "seurat_cluster.RData")
 
 print("Computing UMAP embedding:")
 now <- Sys.time()
-ica <- RunUMAP(ica, min.dist = 0.5, seed.use = seed, features = ica[["pca"]], verbose = FALSE)
+ica <- RunUMAP(ica, n.neighbors = 15, min.dist = 0.5, seed.use = seed, features = ica[["pca"]], metric = 'euclidean')
 print("UMAP time:")
 print(Sys.time() - now)
 
@@ -57,3 +56,5 @@ now <- Sys.time()
 ica <- RunTSNE(ica, seed.use = seed, tsne.method = "FIt-SNE", features = ica[["pca"]])
 print("FItSNE time:")
 print(Sys.time() - now)
+
+}

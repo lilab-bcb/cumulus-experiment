@@ -1,7 +1,7 @@
-#!/usr/bin/env python
-
 import numpy as np
+import pandas as pd
 import scanpy as sc
+from bbknn import bbknn
 import os, sys, time
 
 sc.settings.n_jobs = os.cpu_count()
@@ -9,7 +9,7 @@ rand_seed = 0
 
 filter_norm_data = "../MantonBM_nonmix_10x_filter_norm.h5ad"
 hvg_file = "../hvg.txt"
-pca_data = "../MantonBM_nonmix_10x_pca_data.h5ad"
+pca_data = "../MantonBM_nonmix_10x_filter_norm_pca.h5ad"
 corrected_data = "../MantonBM_nonmix_corrected.h5ad"
 
 f = open("scanpy.log", "w")
@@ -33,7 +33,7 @@ df_join = adata.var.join(df_hvg)
 df_join['highly_variable_genes'].fillna(False, inplace = True)
 adata_hvg = adata[:, df_join['highly_variable_genes']].copy()
 start_bbknn = time.time()
-sc.external.pp.bbknn(adata_hvg, batch_key = 'Channel')
+bbknn(adata_hvg, batch_key = 'Channel')
 end_bbknn = time.time()
 print("Time spend for BBKNN batch correction = {:.2f} seconds.".format(end_bbknn - start_bbknn))
 f.write("Time spend for BBKNN batch correction = {:.2f} seconds.\n".format(end_bbknn - start_bbknn))

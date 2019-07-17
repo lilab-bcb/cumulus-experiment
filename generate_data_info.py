@@ -12,14 +12,30 @@ def extract_hvg():
 
 	# Run correction.
 	cprint("Running scCloud batch correction on full data...", "green")
-	if os.system("scCloud cluster -p 8 --correct-batch-effect {src} MantonBM_nonmix_corrected".format(src = full_data_source)):
-		sys.exit(1)
+	adata = scCloud.tools.read_input(full_data_source)
+	scCloud.tools.update_var_names(adata)
+	scCloud.tools.filter_data(adata)
+	scCloud.tools.log_norm(adata, norm_count = 1e5)
+	scCloud.tools.set_group_attribute(adata, attribute_string = None)
+	scCloud.tools.estimate_adjustment_matrices(adata)
+	scCloud.tools.select_highly_variable_genes(adata, consider_batch = True, n_jobs = 8)
+
+	adata_c = scCloud.tools.collect_highly_variable_gene_matrix(adata)
+	scCloud.tools.correct_batch_effects(adata_c)
+	scCloud.tools.run_pca(adata_c)
+	adata.obsm['X_pca'] = adata_c.obsm['X_pca']
+	
+	scCloud.tools.get_kNN(adata, 'X_pca', K = 100, n_jobs = 8)
 
 	# Extract highly variable gene set to file.
 	cprint("Extracting highly variable gene set to file...", "green")
-	adata = scCloud.tools.read_input("MantonBM_nonmix_corrected.h5ad", mode = 'a')
 	df_hvg = adata.var.loc[adata.var["highly_variable_genes"]][["gene_ids"]]
 	df_hvg.to_csv(hvg_file)
+
+	scCloud.tools.write_output(adata, "MantonBM_nonmix_corrected")
+
+	bdata = adata[:, adata.var['highly_variable_genes']].copy()
+	scCloud.tools.write_output(bdata, "MantonBM_nonmix_corrected_hvg")
 
 def preprocess_data(in_file):
 
@@ -63,5 +79,5 @@ def preprocess_data(in_file):
 
 if __name__ == '__main__':
 	extract_hvg()
-	preprocess_data(full_data_source)
-	preprocess_data(tiny_data_source)
+	#preprocess_data(full_data_source)
+	#preprocess_data(tiny_data_source)

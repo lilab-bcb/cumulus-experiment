@@ -10,7 +10,7 @@ rand_seed = 0
 filter_norm_data = "../MantonBM_nonmix_10x_filter_norm.h5ad"
 hvg_file = "../hvg.txt"
 pca_data = "../MantonBM_nonmix_10x_pca_data.h5ad"
-corrected_data = "./sccloud_output/MantonBM_nonmix_sccloud_corrected.h5ad"
+corrected_data = "../MantonBM_nonmix_corrected.h5ad"
 
 f = open("scanpy.log", "w")
 
@@ -18,7 +18,7 @@ print("Reading ICA (bone marrow) dataset")
 adata = sc.read_h5ad(filter_norm_data)
 print("Finding highly variable genes")
 start_hvg = time.time()
-sc.pp.highly_variable_genes(adata_filter_norm, min_mean=0.0125, max_mean=7, min_disp=0.5)
+sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=7, min_disp=0.5, n_top_genes = 2000, batch_key = 'Channel')
 end_hvg = time.time()
 print("Time spent for HVG = {:.2f} seconds.".format(end_hvg - start_hvg))
 f.write("Time spent for HVG = {:.2f} seconds.\n".format(end_hvg - start_hvg))
@@ -33,7 +33,7 @@ df_join = adata.var.join(df_hvg)
 df_join['highly_variable_genes'].fillna(False, inplace = True)
 adata_hvg = adata[:, df_join['highly_variable_genes']].copy()
 start_bbknn = time.time()
-bbknn(adata_hvg, batch_key = 'Channel', metric = 'euclidean')
+sc.external.pp.bbknn(adata_hvg, batch_key = 'Channel')
 end_bbknn = time.time()
 print("Time spend for BBKNN batch correction = {:.2f} seconds.".format(end_bbknn - start_bbknn))
 f.write("Time spend for BBKNN batch correction = {:.2f} seconds.\n".format(end_bbknn - start_bbknn))

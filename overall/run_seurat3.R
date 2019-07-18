@@ -47,10 +47,10 @@ print(Sys.time() - now)
 
 save(adata, file = "seurat_knn.RData")
 
-print("Finding Clusters using Leiden:")
+print("Finding Clusters:")
 now <- Sys.time()
 adata <- FindClusters(adata, resolution = 1.3, random.seed = seed, algorithm = 1)
-print("Leiden Clustering time:")
+print("Clustering time:")
 print(Sys.time() - now)
 
 save(adata, file = "seurat_cluster.RData")

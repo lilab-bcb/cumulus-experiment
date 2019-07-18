@@ -17,6 +17,7 @@ print(paste("Use", n.cores, "cores."))
 
 ## Benchmark Batch Correction. ##
 src.obj <- ReadH5AD("../MantonBM_nonmix_10x_filter_norm_hvg.h5ad")
+VariableFeatures(src.obj) <- GetAssayData(src.obj)@Dimnames[[1]]
 obj.list <- SplitObject(src.obj, split.by = "Channel")
 now <- Sys.time()
 bm.anchors <- FindIntegrationAnchors(obj.list)

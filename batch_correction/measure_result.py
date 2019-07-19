@@ -192,16 +192,18 @@ def plot_scatter(precomputed = False):
 
 	ax = sns.scatterplot(x = 'kSIM', y = 'kBET', hue = 'method', data = df_measure, legend = False)
 	for line in range(0, df_measure.shape[0]):
-		x_pos = df_measure.kSIM[line]
+		x_pos = df_measure.kSIM[line] + 0.003
 		y_pos = df_measure.kBET[line]
-		if df_measure.method[line] == 'MNN':
-			x_pos -= 0.015
-			y_pos += 0.003
-		elif df_measure.method[line] == 'BBKNN':
-			x_pos += 0.003
+		if df_measure.method[line] == 'BBKNN':
 			y_pos -= 0.003
-		else:
-			x_pos += 0.003
+		#if df_measure.method[line] == 'MNN':
+		#	x_pos -= 0.015
+		#	y_pos += 0.003
+		#elif df_measure.method[line] == 'BBKNN':
+		#	x_pos += 0.003
+		#	y_pos -= 0.003
+		#else:
+		#	x_pos += 0.003
 		ax.text(x_pos, y_pos, df_measure.method[line], horizontalalignment = 'left', size = 'medium', color = 'black')
 	plt.xlabel('kSIM accept rate')
 	plt.ylabel('kBET accept rate')

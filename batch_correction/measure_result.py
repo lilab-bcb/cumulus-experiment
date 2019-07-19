@@ -196,21 +196,13 @@ def plot_scatter(precomputed = False):
 		y_pos = df_measure.kBET[line]
 		if df_measure.method[line] == 'BBKNN':
 			y_pos -= 0.003
-		#if df_measure.method[line] == 'MNN':
-		#	x_pos -= 0.015
-		#	y_pos += 0.003
-		#elif df_measure.method[line] == 'BBKNN':
-		#	x_pos += 0.003
-		#	y_pos -= 0.003
-		#else:
-		#	x_pos += 0.003
 		ax.text(x_pos, y_pos, df_measure.method[line], horizontalalignment = 'left', size = 'medium', color = 'black')
 	plt.xlabel('kSIM accept rate')
 	plt.ylabel('kBET accept rate')
 	plt.xlim(0.73, 0.91)
 
 
-	plt.savefig("Figure_2C.pdf")
+	plt.savefig("Figure_2D.pdf")
 	plt.close()
 
 

@@ -50,7 +50,7 @@ save(adata, file = "seurat_knn.RData")
 
 print("Finding Clusters:")
 now <- Sys.time()
-adata <- FindClusters(adata, resolution = 1.3, random.seed = seed, algorithm = 1)
+adata <- FindClusters(adata, resolution = 1.3, random.seed = seed, algorithm = "louvain")
 print("Clustering time:")
 print(Sys.time() - now)
 

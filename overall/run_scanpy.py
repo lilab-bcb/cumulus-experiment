@@ -1,8 +1,9 @@
+import os, sys, time
 import numpy as np
 import pandas as pd
 import scanpy as sc
 from bbknn import bbknn
-import os, sys, time
+from scanpy.neighbors import compute_connectivities_umap
 
 sc.settings.n_jobs = os.cpu_count()
 sc.settings.verbosity = 4
@@ -58,6 +59,17 @@ sc.pp.neighbors(adata, n_neighbors = 100, random_state = rand_seed)
 end_nn = time.time()
 print("Time spent for knn = {:.2f} seconds.".format(end_nn - start_nn))
 f.write("Time spent for knn = {:.2f} seconds.\n".format(end_nn - start_nn))
+
+
+adata = sc.read_h5ad(corrected_data)
+n_cells = adata.shape[0]
+knn_indices = np.concatenate((np.arange(n_cells).reshape(-1, 1), adata.uns['knn_indices']), axis = 1)
+knn_distances = np.concatenate((np.zeros(n_cells).reshape(-1, 1), adata.uns['knn_distances']), axis = 1)
+distances, connectivities = compute_connectivities_umap(knn_indices, knn_distances, n_obs = n_cells, n_neighbors = 100)
+adata.uns['neighbors']['indices'] = knn_indices
+adata.uns['neighbors']['distances'] = distances
+adata.uns['neighbors']['connectivities'] = connectivities
+adata.uns['neighbors']['params'] = {'n_neighbors': 100, 'method': 'umap', 'metric': 'euclidean'}
 
 
 print("Finding Clusters")

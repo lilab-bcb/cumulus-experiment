@@ -18,11 +18,11 @@ sccloud_correct_alpha_one_name = "MantonBM_nonmix_sccloud_corrected_alpha_one"
 
 def get_hvg():
 	cprint("Computing highly variable genes using Seurat method...", "green")
-	if os.system("scCloud cluster -p {jobs} --correct-batch-effect --select-hvg-flavor Seurat --run-approximated-leiden --run-fle ../MantonBM_nonmix_10x.h5 {outname}".format(jobs = n_cores, outname = seurat_correct_name)):
+	if os.system("scCloud cluster -p {jobs} --correct-batch-effect --select-hvg-flavor Seurat --run-approximated-leiden --run-fitsne --run-fle ../MantonBM_nonmix_10x.h5 {outname}".format(jobs = n_cores, outname = seurat_correct_name)):
 		sys.exit(1)
 
 	cprint("Computing highly variable genes using scCloud new method...", "green")
-	if os.system("scCloud cluster -p {jobs} --plot-hvg --correct-batch-effect --run-approximated-leiden --run-fle ../MantonBM_nonmix_10x.h5 {outname}".format(jobs = n_cores, outname = sccloud_correct_name)):
+	if os.system("scCloud cluster -p {jobs} --plot-hvg --correct-batch-effect --run-approximated-leiden --run-fitsne --run-fle ../MantonBM_nonmix_10x.h5 {outname}".format(jobs = n_cores, outname = sccloud_correct_name)):
 		sys.exit(1)
 
 	cprint("Computing highly variable genes using scCloud new method with alpha = 1.0...", "green")

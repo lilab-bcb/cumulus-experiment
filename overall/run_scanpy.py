@@ -51,7 +51,6 @@ print("Time spent for PCA = {:.2f} seconds.".format(end_pca - start_pca))
 f.write("Time spent for PCA = {:.2f} seconds.\n".format(end_pca - start_pca))
 
 
-
 print("Computing neighborhood graph")
 adata = sc.read_h5ad(corrected_data)
 start_nn = time.time()
@@ -93,12 +92,12 @@ end_tsne = time.time()
 print("Time spent for tSNE = {:.2f} seconds.".format(end_tsne - start_tsne))
 f.write("Time spent for tSNE = {:.2f} seconds.\n".format(end_tsne - start_tsne))
 
-print("Computing FLE embedding")
-start_fle = time.time()
-sc.tl.draw_graph(adata, random_state = rand_seed, n_jobs = sc.settings.n_jobs)
-end_fle = time.time()
-print("Time spent for FLE = {:.2f} seconds.".format(end_fle - start_fle))
-f.write("Time spent for FLE = {:.2f} seconds.\n".format(end_fle - start_fle))
+#print("Computing FLE embedding")
+#start_fle = time.time()
+#sc.tl.draw_graph(adata, random_state = rand_seed, n_jobs = sc.settings.n_jobs)
+#end_fle = time.time()
+#print("Time spent for FLE = {:.2f} seconds.".format(end_fle - start_fle))
+#f.write("Time spent for FLE = {:.2f} seconds.\n".format(end_fle - start_fle))
 
 print("Computing diffmap")
 adata = sc.read_h5ad(corrected_data)

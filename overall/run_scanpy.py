@@ -65,6 +65,7 @@ n_cells = adata.shape[0]
 knn_indices = np.concatenate((np.arange(n_cells).reshape(-1, 1), adata.uns['knn_indices']), axis = 1)
 knn_distances = np.concatenate((np.zeros(n_cells).reshape(-1, 1), adata.uns['knn_distances']), axis = 1)
 distances, connectivities = compute_connectivities_umap(knn_indices, knn_distances, n_obs = n_cells, n_neighbors = 100)
+adata.uns['neighbors'] = {}
 adata.uns['neighbors']['indices'] = knn_indices
 adata.uns['neighbors']['distances'] = distances
 adata.uns['neighbors']['connectivities'] = connectivities

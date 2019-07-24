@@ -43,6 +43,7 @@ print(paste("Use", n.cores, "cores."))
 ##save(adata, file = "seurat_pca.RData")
 ##
 ##print("Computing neighborhood graph:")
+load("seurat_knn.RData")
 n.pc <- dim(adata[["pca"]])[2]
 ##now <- Sys.time()
 ##bdata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, compute.SNN = FALSE)
@@ -54,7 +55,7 @@ n.pc <- dim(adata[["pca"]])[2]
 ##save(adata, file = "seurat_knn.RData")
 ##
 
-load("seurat_knn.RData")
+
 
 ##print("Finding Clusters:")
 ##now <- Sys.time()

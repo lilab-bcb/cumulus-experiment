@@ -81,13 +81,21 @@ adata.uns['neighbors']['connectivities'] = connectivities
 adata.uns['neighbors']['params'] = {'n_neighbors': 100, 'method': 'umap', 'metric': 'euclidean'}
 
 
-print("Finding Clusters")
-start_cluster = time.time()
+print("Finding Clusters using Louvain")
+start_louvain = time.time()
+sc.tl.louvain(adata, resolution = 1.3, random_state = rand_seed)
+end_louvain = time.time()
+logstr_louvain = "Time spent for louvain: {}.".format(timedelta(seconds = end_louvain - start_louvain))
+cprint(logstr_louvain, "yellow")
+f.write(logstr_louvain + '\n')
+
+print("Finding Clusters using Leiden")
+start_leiden = time.time()
 sc.tl.leiden(adata, resolution = 1.3, random_state = rand_seed)
-end_cluster = time.time()
-logstr_cluster = "Time spent for leiden: {}.".format(timedelta(seconds = end_cluster - start_cluster))
-cprint(logstr_cluster, "yellow")
-f.write(logstr_cluster + '\n')
+end_leiden = time.time()
+logstr_leiden = "Time spent for leiden: {}.".format(timedelta(seconds = end_leiden - start_leiden))
+cprint(logstr_leiden, "yellow")
+f.write(logstr_leiden + '\n')
 
 
 print("Computing UMAP embedding")

@@ -43,7 +43,7 @@ print(paste("Use", n.cores, "cores."))
 ##save(adata, file = "seurat_pca.RData")
 ##
 ##print("Computing neighborhood graph:")
-##n.pc <- dim(adata[["pca"]])[2]
+n.pc <- dim(adata[["pca"]])[2]
 ##now <- Sys.time()
 ##bdata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, compute.SNN = FALSE)
 ##logstr.knn <- Sys.time() - now
@@ -53,6 +53,9 @@ print(paste("Use", n.cores, "cores."))
 ##adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, compute.SNN = TRUE)
 ##save(adata, file = "seurat_knn.RData")
 ##
+
+load("seurat_knn.RData")
+
 ##print("Finding Clusters:")
 ##now <- Sys.time()
 ##adata <- FindClusters(adata, resolution = 1.3, random.seed = seed, algorithm = "louvain")
@@ -60,11 +63,9 @@ print(paste("Use", n.cores, "cores."))
 ##print(logstr.cluster)
 ##write(paste("Clustering time:", logstr.cluster, attr(logstr.cluster, "units")), file = logfile, append = TRUE)
 
-load("seurat_knn.RData")
-
 print("Computing UMAP embedding:")
 now <- Sys.time()
-adata <- RunUMAP(adata, n.neighbors = 15, min.dist = 0.5, seed.use = seed, features = adata[["pca"]], metric = 'euclidean')
+adata <- RunUMAP(adata, n.neighbors = 15, min.dist = 0.5, seed.use = seed, dims = 1:n.pc)
 logstr.umap <- Sys.time() - now
 print(logstr.umap)
 write(paste("UMAP time:", logstr.umap, attr(logstr.umap, "units")), file = logfile, append = TRUE)
@@ -72,7 +73,7 @@ write(paste("UMAP time:", logstr.umap, attr(logstr.umap, "units")), file = logfi
 
 print("Computing FItSNE embedding:")
 now <- Sys.time()
-adata <- RunTSNE(adata, seed.use = seed, tsne.method = "FIt-SNE", features = adata[["pca"]])
+adata <- RunTSNE(adata, seed.use = seed, tsne.method = "FIt-SNE", dims = 1:n.pc)
 logstr.tsne <- Sys.time() - now
 print(logstr.tsne)
 write(paste("TSNE time:", logstr.tsne, attr(logstr.tsne, "units")), file = logfile, append = TRUE)

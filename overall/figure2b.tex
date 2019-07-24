@@ -18,21 +18,23 @@
 		\hline
 		Analysis & Seurat v3 & SCANPY & scCloud\\
 		\hline \hline
-		HVG selection & 2 min 36 sec & 1 min 26 sec & \textbf{11 sec} \\
+		HVG selection & 2 min 36 sec & 1 min 24 sec & \textbf{11 sec} \\
 		\hline
-		Batch correction & Failed after $\approx$ 24 h & 9 min 56 sec & \textbf{19 sec} \\
+		Batch correction & Failed after $\approx$ 24 h & 9 min 59 sec & \textbf{19 sec} \\
 		\hline
-		PCA & 5 min 29 sec & 14 sec & 18 sec \\
+		PCA & 5 min 29 sec & 15 sec & 18 sec \\
 		\hline
-		Find K nearest neighbors &  1 h 20 min &  5 min 15 sec & \textbf{6 sec}\\
+		Find K nearest neighbors &  1 h 20 min &  4 min 43 sec & \textbf{6 sec}\\
 		\hline
-		Diffusion map & N/A & 3 min 8 sec & \textbf{2 min 8 sec} \\
+		Diffusion map & N/A & 3 min 1 sec & \textbf{2 min 8 sec} \\
+		\hline
+		Louvain Clustering & 7 min 30 sec & 10 min 44 sec & \\
 		\hline 
-		Clustering & 7 min 30 sec & 28 min 42 sec & \textbf{50 sec}\\
+		Leiden Clustering & Failed due to large SNN graph & 29 min 9 sec & \textbf{50 sec}\\
 		\hline
-		t-SNE-based visualization & 3 min 3 sec & 16 min 37 sec & \textbf{2 min 49 sec}\\
+		t-SNE-based visualization & 3 min 3 sec & 16 min 12 sec & \textbf{2 min 49 sec}\\
 		\hline
-		UMAP-based visualization & 10 min 40 sec & 12 min 35 sec & \textbf{2 min 29 sec}\\
+		UMAP-based visualization & 10 min 40 sec & 13 min 33 sec  & \textbf{2 min 29 sec}\\
 		\hline
 		FLE-based visualization & N/A & $\approx$ 14.8  h & \textbf{14 min 19 sec}\\
 		\hline

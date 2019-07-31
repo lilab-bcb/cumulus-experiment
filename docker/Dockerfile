@@ -65,11 +65,15 @@ ARG old_path=$PATH
 
 # Install scCloud environment
 RUN conda create -n scCloud -y pip
+
 #RUN	conda install -n scCloud -y -c anaconda numpy && \
 #	conda install -n scCloud -y -c anaconda cython && \
 #	conda install -n scCloud -y -c anaconda pybind11 && \
 #	conda install -n scCloud -y -c conda-forge fftw && \
 #	conda install -n scCloud -y -c anaconda pytables
+
+RUN conda install -n scCloud -y -c anaconda numpy && \
+	conda install -n scCloud -y -c conda-forge fftw
 
 ENV PATH=/root/miniconda3/envs/scCloud/bin:$old_path
 RUN	pip install numpy==1.16.3 && \

@@ -12,6 +12,8 @@
 
 \begin{document}
 
+\section{270K Bone Marrow Dataset}
+
 \begin{table}[H]
 	\centering
 	\begin{tabular}{|c|c|c|c|}
@@ -28,7 +30,7 @@
 		\hline
 		Diffusion map & N/A & 3 min 1 sec & \textbf{2 min 8 sec} \\
 		\hline
-		Louvain Clustering & 7 min 30 sec & 10 min 44 sec & \\
+		Louvain Clustering & 7 min 30 sec & 10 min 44 sec & \textbf{54 sec} \\
 		\hline 
 		Leiden Clustering & Failed due to large SNN graph & 29 min 9 sec & \textbf{50 sec}\\
 		\hline
@@ -37,6 +39,37 @@
 		UMAP-based visualization & 10 min 40 sec & 13 min 33 sec  & \textbf{2 min 29 sec}\\
 		\hline
 		FLE-based visualization & N/A & $\approx$ 14.8  h & \textbf{14 min 19 sec}\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\section{1M Mouse Neuron Dataset}
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|c|}
+		\hline
+		Analysis  & SCANPY & scCloud\\
+		\hline \hline
+		HVG selection  &  & \textbf{1 min 33 sec}  \\
+		\hline
+		Batch correction  &  & \textbf{35 sec}  \\
+		\hline
+		PCA   &  & 1 min 25 sec  \\
+		\hline
+		Find K nearest neighbors  &  & \textbf{1 min 29 sec}  \\
+		\hline
+		Diffusion map   &  & \textbf{12 min 40 sec}  \\
+		\hline
+		Louvain Clustering  &  & \textbf{4 min 49 sec}  \\
+		\hline 
+		Leiden Clustering &  & \textbf{5 min 27 sec}  \\
+		\hline
+		t-SNE-based visualization  &  & \textbf{12 min 1 sec}  \\
+		\hline
+		UMAP-based visualization  &  & \textbf{11 min 48 sec}  \\
+		\hline
+		FLE-based visualization   &  & \textbf{1 h 33 min}  \\
 		\hline
 	\end{tabular}
 \end{table}

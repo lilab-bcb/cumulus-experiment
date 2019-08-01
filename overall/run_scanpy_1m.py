@@ -18,7 +18,7 @@ corrected_data = "/projects/benchmark/1M_neurons_corrected.h5ad"
 
 f = open("scanpy.log", "w")
 
-print("Reading ICA (bone marrow) dataset")
+print("Reading Mouse Neuron dataset")
 adata = sc.read_h5ad(filter_norm_data)
 print("Finding highly variable genes")
 start_hvg = time.time()
@@ -128,7 +128,7 @@ f.close()
 
 print("Computing FLE embedding")
 start_fle = time.time()
-sc.tl.draw_graph(adata, random_state = rand_seed, n_jobs = sc.settings.n_jobs)
+sc.tl.draw_graph(adata, random_state = rand_seed, n_jobs = sc.settings.n_jobs, iterations = 5000)
 end_fle = time.time()
 logstr_fle = "Time spent for FLE: {}.".format(timedelta(seconds = end_fle - start_fle))
 cprint(logstr_fle, "yellow")

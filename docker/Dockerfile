@@ -12,8 +12,6 @@ RUN apt-get update -qq && \
 		cmake \
 		gnupg \
 		wget \
-		vim \
-		emacs \
 		lsb-release \
 		libfftw3-dev \
 		libboost-iostreams-dev && \

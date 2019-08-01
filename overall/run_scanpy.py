@@ -128,7 +128,7 @@ f.close()
 
 print("Computing FLE embedding")
 start_fle = time.time()
-sc.tl.draw_graph(adata, random_state = rand_seed, n_jobs = sc.settings.n_jobs)
+sc.tl.draw_graph(adata, random_state = rand_seed, n_jobs = sc.settings.n_jobs, iterations = 5000)
 end_fle = time.time()
 logstr_fle = "Time spent for FLE: {}.".format(timedelta(seconds = end_fle - start_fle))
 cprint(logstr_fle, "yellow")

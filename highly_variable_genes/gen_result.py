@@ -18,15 +18,15 @@ sccloud_correct_alpha_one_name = "MantonBM_nonmix_sccloud_corrected_alpha_one"
 
 def get_hvg():
 	cprint("Computing highly variable genes using Seurat method...", "green")
-	if os.system("sccloud cluster -p {jobs} --correct-batch-effect --select-hvg-flavor Seurat --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = seurat_correct_name)):
+	if os.system("sccloud cluster -p {jobs} --correct-batch-effect --select-hvf-flavor Seurat --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = seurat_correct_name)):
 		sys.exit(1)
 
 	cprint("Computing highly variable genes using scCloud new method...", "green")
-	if os.system("sccloud cluster -p {jobs} --plot-hvg --correct-batch-effect --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_name)):
+	if os.system("sccloud cluster -p {jobs} --plot-hvf --correct-batch-effect --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_name)):
 		sys.exit(1)
 
 	cprint("Computing highly variable genes using scCloud new method with alpha = 1.0...", "green")
-	if os.system("sccloud cluster -p {jobs} --correct-batch-effect --diffmap-alpha 1.0 --spectral-leiden --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_alpha_one_name)):
+	if os.system("sccloud cluster -p {jobs} --correct-batch-effect --diffmap-alpha 1.0 --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_alpha_one_name)):
 		sys.exit(1)
 
 	adata = scc.read_input(sccloud_corrected_alpha_one_name + '.h5ad', mode = 'a')

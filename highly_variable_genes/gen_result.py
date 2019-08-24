@@ -18,15 +18,15 @@ sccloud_correct_alpha_one_name = "MantonBM_nonmix_sccloud_corrected_alpha_one"
 
 def get_hvg():
 	cprint("Computing highly variable genes using Seurat method...", "green")
-	if os.system("scCloud cluster -p {jobs} --correct-batch-effect --select-hvg-flavor Seurat --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = seurat_correct_name)):
+	if os.system("sccloud cluster -p {jobs} --correct-batch-effect --select-hvg-flavor Seurat --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = seurat_correct_name)):
 		sys.exit(1)
 
 	cprint("Computing highly variable genes using scCloud new method...", "green")
-	if os.system("scCloud cluster -p {jobs} --plot-hvg --correct-batch-effect --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_name)):
+	if os.system("sccloud cluster -p {jobs} --plot-hvg --correct-batch-effect --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_name)):
 		sys.exit(1)
 
 	cprint("Computing highly variable genes using scCloud new method with alpha = 1.0...", "green")
-	if os.system("scCloud cluster -p {jobs} --correct-batch-effect --diffmap-alpha 1.0 --spectral-leiden --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_alpha_one_name)):
+	if os.system("sccloud cluster -p {jobs} --correct-batch-effect --diffmap-alpha 1.0 --spectral-leiden --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_alpha_one_name)):
 		sys.exit(1)
 
 	adata = scc.read_input(sccloud_corrected_alpha_one_name + '.h5ad', mode = 'a')
@@ -40,10 +40,10 @@ def get_hvg():
 def annotate_data(file_name):
 	cprint("Annotating Cells for {name}...".format(name = file_name), "green")
 
-	if os.system("scCloud de_analysis -p {jobs} --labels spectral_leiden_labels {name}.h5ad {name}.de.xlsx".format(jobs = n_cores, name = file_name)):
+	if os.system("sccloud de_analysis -p {jobs} --labels spectral_leiden_labels --t {name}.h5ad {name}.de.xlsx".format(jobs = n_cores, name = file_name)):
 		sys.exit(1)
 
-	if os.system("scCloud annotate_cluster {name}.h5ad {name}.anno.txt".format(name = file_name)):
+	if os.system("sccloud annotate_cluster {name}.h5ad {name}.anno.txt".format(name = file_name)):
 		sys.exit(1)
 
 
@@ -99,13 +99,13 @@ def get_mutual_info():
 	cprint("AMI = {:.4f}".format(mis))
 
 def plot_figures():
-	if os.system("scCloud plot scatter --basis fle --attributes approx_leiden_labels {name}.h5ad {name}.fle.pdf".format(name = seurat_correct_name)):
+	if os.system("sccloud plot scatter --basis fle --attributes spectral_leiden_labels {name}.h5ad {name}.fle.pdf".format(name = seurat_correct_name)):
 		sys.exit(1)
 
-	if os.system("scCloud plot scatter --basis fle --attributes approx_leiden_labels {name}.h5ad {name}.fle.pdf".format(name = sccloud_correct_name)):
+	if os.system("sccloud plot scatter --basis fle --attributes spectral_leiden_labels {name}.h5ad {name}.fle.pdf".format(name = sccloud_correct_name)):
 		sys.exit(1)
 
-	if os.system("scCloud plot scatter --basis fle --attributes cell_types {name}.h5ad {name}.celltypes.fle.pdf".format(name = sccloud_correct_alpha_one_name)):
+	if os.system("sccloud plot scatter --basis fle --attributes cell_types {name}.h5ad {name}.celltypes.fle.pdf".format(name = sccloud_correct_alpha_one_name)):
 		sys.exit(1)
 
 

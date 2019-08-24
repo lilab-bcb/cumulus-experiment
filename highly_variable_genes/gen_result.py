@@ -1,4 +1,4 @@
-import scCloud
+import sccloud as scc
 import numpy as np
 import pandas as pd
 import os, sys
@@ -29,12 +29,12 @@ def get_hvg():
 	if os.system("scCloud cluster -p {jobs} --correct-batch-effect --diffmap-alpha 1.0 --spectral-leiden --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_alpha_one_name)):
 		sys.exit(1)
 
-	adata = scCloud.tools.read_input(sccloud_corrected_alpha_one_name + '.h5ad', mode = 'a')
-	bdata = scCloud.tools.read_input(sccloud_correct_name + '.h5ad', mode = 'a')
+	adata = scc.read_input(sccloud_corrected_alpha_one_name + '.h5ad', mode = 'a')
+	bdata = scc.read_input(sccloud_correct_name + '.h5ad', mode = 'a')
 	assert adata.obs.index.values == bdata.obs.index.values
 	adata.obs['cell_types'] = bdata.obs['approx_leiden_labels']
 
-	scCloud.tools.write_output(adata, sccloud_corrected_alpha_one_name)
+	scc.write_output(adata, sccloud_corrected_alpha_one_name)
 
 
 def annotate_data(file_name):
@@ -51,7 +51,7 @@ def compare_markers():
 
 	cprint("Processing Seurat HVG selection...", "green")
 
-	adata = scCloud.tools.read_input(seurat_correct_name + ".h5ad", mode = 'a')
+	adata = scc.read_input(seurat_correct_name + ".h5ad", mode = 'a')
 	hvg_seurat = adata.var.loc[adata.var['highly_variable_genes']].index.values
 	cprint("{num} genes are marked as HVG in Seurat method.".format(num = hvg_seurat.shape[0]), "yellow")
 	pd.DataFrame({'gene': hvg_seurat}).to_csv("seurat_hvg.txt", header = False, index = False)
@@ -59,7 +59,7 @@ def compare_markers():
 	cprint("Find {num} markers in Seurat HVG selection method.".format(num = marker_seurat.shape[0]), "yellow")
 
 	cprint("Processing scCloud HVG selection...", "green")
-	adata = scCloud.tools.read_input(sccloud_correct_name + ".h5ad", mode = 'a')
+	adata = scc.read_input(sccloud_correct_name + ".h5ad", mode = 'a')
 	hvg_sccloud = adata.var.loc[adata.var['highly_variable_genes']].index.values
 	cprint("{num} genes are marked as HVG in scCloud method.".format(num = hvg_sccloud.shape[0]), "yellow")
 	pd.DataFrame({'gene': hvg_sccloud}).to_csv("sccloud_hvg.txt", header = False, index = False)
@@ -92,8 +92,8 @@ def get_mutual_info():
 
 	cprint("Calculating AMI Score on Approximated Leiden Clustering Results between two methods...", "green")
 
-	adata = scCloud.tools.read_input(seurat_correct_name + ".h5ad", mode = 'a')
-	bdata = scCloud.tools.read_input(sccloud_correct_name + ".h5ad", mode = 'a')
+	adata = scc.read_input(seurat_correct_name + ".h5ad", mode = 'a')
+	bdata = scc.read_input(sccloud_correct_name + ".h5ad", mode = 'a')
 
 	mis = adjusted_mutual_info_score(adata.obs['approx_leiden_labels'], bdata.obs['approx_leiden_labels'], average_method = 'arithmetic')
 	cprint("AMI = {:.4f}".format(mis))
@@ -112,7 +112,7 @@ def plot_figures():
 def plot_diffusion_coeffs():
 
 	# For alpha = 0.5
-	adata = scCloud.tools.read_input(sccloud_correct_name + '.h5ad', mode = 'a')
+	adata = scc.read_input(sccloud_correct_name + '.h5ad', mode = 'a')
 	S = adata.uns['diffmap_evals']
 	alpha = 0.5
 	weights = S / (1 - alpha * S)
@@ -127,7 +127,7 @@ def plot_diffusion_coeffs():
 	plt.close()
 
 	# For alpha = 1.0
-	bdata = scCloud.tools.read_input(sccloud_correct_alpha_one_name + '.h5ad', mode = 'a')
+	bdata = scc.read_input(sccloud_correct_alpha_one_name + '.h5ad', mode = 'a')
 	S = bdata.uns['diffmap_evals']
 	alpha = 1.0
 	weights = S / (1 - alpha * S)

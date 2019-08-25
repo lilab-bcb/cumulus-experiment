@@ -92,14 +92,16 @@ RUN	pip install numpy==1.16.3 && \
 	pip install pycparser==2.19 && \
 	pip install pyparsing==2.4.0 && \
 	pip install python-igraph==0.7.1.post6 && \
-	pip install scikit-learn==0.21.1 && \
+	pip install scikit-learn==0.21.3 && \
 	pip install scikit-misc==0.1.1 && \
 	pip install scipy==1.2.1 && \
 	pip install six==1.12.0 && \
 	pip install statsmodels==0.10.1 && \
 	pip install tables==3.5.1 && \
 	pip install umap-learn==0.3.9 && \
-	git clone https://github.com/klarman-cell-observatory/scCloudPy.git /opt/scCloudPy && cd /opt/scCloudPy && pip install .
+	pip install anndata==0.6.22.post1 && \
+	pip install termcolor==1.1.0 && \
+	git clone https://github.com/klarman-cell-observatory/scCloudPy.git /opt/sccloud && cd /opt/sccloud && pip install -e .
 	
 
 # Install scanpy environment
@@ -121,7 +123,7 @@ RUN pip install numpy==1.16.3 && \
 	pip install patsy==0.5.1 && \
 	pip install pybind11==2.2.4 && \
 	pip install python-igraph==0.7.1.post6 && \
-	pip install scikit-learn==0.21.2 && \
+	pip install scikit-learn==0.21.3 && \
 	pip install scikit-misc==0.1.1 && \
 	pip install scipy==1.3.0 && \
 	pip install six==1.12.0 && \
@@ -136,6 +138,7 @@ RUN pip install numpy==1.16.3 && \
 	pip install leidenalg==0.7.0 && \
 	pip install umap-learn==0.3.9 && \
 	pip install mnnpy==0.1.9.5 && \
-	pip install fa2==0.3.5
+	pip install fa2==0.3.5 && \
+	pip install termcolor==1.1.0
 
 ENV PATH=$old_path

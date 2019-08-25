@@ -25,16 +25,16 @@ def get_hvg():
 	if os.system("sccloud cluster -p {jobs} --plot-hvf --correct-batch-effect --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_name)):
 		sys.exit(1)
 
-	cprint("Computing highly variable genes using scCloud new method with alpha = 1.0...", "green")
-	if os.system("sccloud cluster -p {jobs} --correct-batch-effect --diffmap-alpha 1.0 --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_alpha_one_name)):
-		sys.exit(1)
+	#cprint("Computing highly variable genes using scCloud new method with alpha = 1.0...", "green")
+	#if os.system("sccloud cluster -p {jobs} --correct-batch-effect --diffmap-alpha 1.0 --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_alpha_one_name)):
+	#	sys.exit(1)
 
-	adata = scc.read_input(sccloud_corrected_alpha_one_name + '.h5ad', mode = 'a')
-	bdata = scc.read_input(sccloud_correct_name + '.h5ad', mode = 'a')
-	assert adata.obs.index.values == bdata.obs.index.values
-	adata.obs['cell_types'] = bdata.obs['approx_leiden_labels']
+	#adata = scc.read_input(sccloud_corrected_alpha_one_name + '.h5ad', mode = 'a')
+	#bdata = scc.read_input(sccloud_correct_name + '.h5ad', mode = 'a')
+	#assert adata.obs.index.values == bdata.obs.index.values
+	#adata.obs['cell_types'] = bdata.obs['approx_leiden_labels']
 
-	scc.write_output(adata, sccloud_corrected_alpha_one_name)
+	#scc.write_output(adata, sccloud_corrected_alpha_one_name)
 
 
 def annotate_data(file_name):

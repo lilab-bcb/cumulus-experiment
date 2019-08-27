@@ -61,19 +61,20 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh &
 ENV PATH=/root/miniconda3/bin:$PATH
 ARG old_path=$PATH
 
+RUN conda update -n base -c defaults conda
+
 # Install scCloud environment
-RUN conda create -n scCloud -y pip
+RUN conda create -n sccloud python=3.7.3 -y
 
-#RUN	conda install -n scCloud -y -c anaconda numpy && \
-#	conda install -n scCloud -y -c anaconda cython && \
-#	conda install -n scCloud -y -c anaconda pybind11 && \
-#	conda install -n scCloud -y -c conda-forge fftw && \
-#	conda install -n scCloud -y -c anaconda pytables
+RUN conda install -n sccloud -y -c anaconda mkl==2019.3 && \
+	conda install -n sccloud -y -c anaconda mkl_fft==1.0.12 && \
+	conda install -n sccloud -y -c anaconda mkl_random==1.0.2 && \
+	conda install -n sccloud -y -c anaconda blas==1.0 && \
+	conda install -n sccloud -y -c anaconda intel-openmp==2019.3 && \
+	conda install -n sccloud -y -c anaconda numpy==1.16.3 && \
+	conda install -n sccloud -y -c conda-forge fftw
 
-RUN conda install -n scCloud -y -c anaconda numpy && \
-	conda install -n scCloud -y -c conda-forge fftw
-
-ENV PATH=/root/miniconda3/envs/scCloud/bin:$old_path
+ENV PATH=/root/miniconda3/envs/sccloud/bin:$old_path
 RUN	pip install numpy==1.16.3 && \
 	pip install Cython==0.29.7 && \
 	pip install docopt==0.6.2 && \
@@ -105,7 +106,7 @@ RUN	pip install numpy==1.16.3 && \
 	
 
 # Install scanpy environment
-RUN conda create -n scanpy -y pip
+RUN conda create -n scanpy python=3.7.3 -y
 ENV PATH=/root/miniconda3/envs/scanpy/bin:$old_path
 RUN pip install numpy==1.16.3 && \
 	pip install Cython==0.29.7 && \

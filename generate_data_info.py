@@ -72,6 +72,6 @@ def preprocess_data(in_file):
 	scc.write_output(adata_hvf, output_hvf_name2)
 
 if __name__ == '__main__':
-	extract_hvg()
+	extract_hvf()
 	preprocess_data(full_data_source)
 	preprocess_data(tiny_data_source)

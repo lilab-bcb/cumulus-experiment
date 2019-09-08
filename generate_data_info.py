@@ -55,7 +55,8 @@ def preprocess_data(in_file):
 	adata.var.drop(columns = ['highly_variable_features'], inplace = True)
 	df_join = adata.var.join(df_hvf)
 	df_join['highly_variable_features'].fillna(False, inplace = True)
-	adata_hvf = adata[:, df_join['highly_variable_features']].copy()
+	adata.var['highly_variable_features'] = df_join['highly_variable_features']
+	adata_hvf = adata[:, adata.var['highly_variable_features']].copy()
 
 	scc.write_output(adata, output_name1)
 	scc.write_output(adata_hvf, output_hvf_name1)

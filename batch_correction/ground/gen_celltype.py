@@ -1,6 +1,7 @@
 import sccloud as scc
 import numpy as np
 import pandas as pd
+import os, sys
 from sklearn.model_selection import train_test_split
 from lightgbm import LGBMClassifier
 
@@ -28,3 +29,6 @@ df_celltype.reset_index(inplace = True)
 df_celltype.rename(columns = {'index': 'cell_id'}, inplace = True)
 
 df_celltype.to_csv("../ground_cell_type.txt", index = False)
+
+if os.system("sccloud plot scatter --basis umap --attributes spectral_leiden_labels,cell_types {src} {outname}.celltype.umap.pdf".format(src = "ground_cell_types.h5ad", outname = os.path.splitext(data_location)[0])):
+	sys.exit(1)

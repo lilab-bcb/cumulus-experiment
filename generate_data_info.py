@@ -49,7 +49,7 @@ def preprocess_data(in_file):
 
 	print("Getting Highly Variable Feature Set...")
 	df_hvf = pd.read_csv(hvf_file)
-	df_hvf['highly_variable_featuress'] = [True] * df_hvf.shape[0]
+	df_hvf['highly_variable_features'] = [True] * df_hvf.shape[0]
 	df_hvf.set_index('index', inplace = True)
 	df_hvf.drop(columns = ['gene_ids'], inplace = True)
 	adata.var.drop(columns = ['highly_variable_features'], inplace = True)

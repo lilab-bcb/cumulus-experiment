@@ -3,10 +3,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from anndata import read_mtx
-from scipy.sparse import issparse
-import scCloud
-from scCloud.tools.diffusion_map import calculate_affinity_matrix
+import sccloud as scc
 from termcolor import cprint
 from sklearn.metrics import silhouette_score
 
@@ -27,7 +24,7 @@ def process_baseline():
 			sys.exit(1)
 
 	cprint("Loading processed data...", "green")
-	adata = scCloud.tools.read_input('./baseline/baseline_result.h5ad', mode = 'a')
+	adata = scc.read_input('./baseline/baseline_result.h5ad')
 
 	process_data(adata, method = 'baseline', processed = True)
 
@@ -40,7 +37,7 @@ def process_sccloud():
 			sys.exit(1)
 
 	cprint("Loading corrected data...", "green")
-	adata = scCloud.tools.read_input('./scCloud/tiny_sccloud_corrected.h5ad', mode = 'a')
+	adata = scc.read_input('./scCloud/tiny_sccloud_corrected.h5ad')
 
 	process_data(adata, method = 'scCloud', processed = True)
 
@@ -51,10 +48,7 @@ def process_mnn():
 		cprint("No corrected data are found!", "red")
 
 	cprint("Loading corrected data...", "green")
-	adata = scCloud.tools.read_input('./mnn/scanpy_mnn_corrected.h5ad', mode = 'a')
-
-	#cprint("Enforcing count matrix to be sparse...", "green")
-	#adata.X = sparse.csr_matrix(adata.X)
+	adata = scc.read_input('./mnn/scanpy_mnn_corrected.h5ad')
 
 	cprint("Correcting cell names...", "green")
 	adata.obs['cell_id'] = adata.obs.index.map(lambda s: s[:s.rfind('-')]).values
@@ -69,23 +63,8 @@ def process_seurat():
 		cprint("No corrected data are found!", "red")
 
 	cprint("Loading gene expression...", "green")
-	adata = read_mtx("./seurat/gene_expression.mtx")
-
-	#cprint("Enforce count matrix to be sparse...", "green")
-	#adata.X = sparse.csr_matrix(adata.X)
-	
-	cprint("Loading feature names...", "green")
-	df_features = pd.read_csv("./seurat/feature_names.txt", header = None)
-	adata.var['index'] = df_features[0].values
-	adata.var.set_index('index', inplace = True)
-
-	cprint("Loading sample names...", "green")
-	df_samples = pd.read_csv("./seurat/sample_names.txt", header = None)
-	adata.obs['index'] = df_samples[0].values
-	adata.obs.set_index('index', inplace = True)
+	adata = scc.read_input("./seurat/matrix.mtx", genome = 'GRCh38')
 	adata.obs['Channel'] = pd.Categorical(adata.obs.index.map(lambda s: s.split('-')[0]).values)
-	adata.uns['genome'] = 'GRCh38'
-
 
 	process_data(adata, method = 'seurat', output = "./seurat/seurat_result")
 
@@ -96,10 +75,7 @@ def process_combat():
 		cprint("No corrected data are found!", "red")
 
 	cprint("Loading corrected data...", "green")
-	adata = scCloud.tools.read_input('./combat/scanpy_combat_corrected.h5ad', mode = 'a')
-
-	#cprint("Enforce count matrix to be sparse...", "green")
-	#adata.X = sparse.csr_matrix(adata.X)
+	adata = scc.read_input('./combat/scanpy_combat_corrected.h5ad')
 
 	process_data(adata, method = 'combat', output = "./combat/scanpy_combat_result")
 
@@ -110,14 +86,14 @@ def process_bbknn():
 		cprint("No corredted data are found!", "red")
 
 	cprint("loading corrected data...", "green")
-	adata = scCloud.tools.read_input("./bbknn/scanpy_bbknn_corrected.h5ad", mode = 'a')
+	adata = scd.read_input("./bbknn/scanpy_bbknn_corrected.h5ad")
 
 	cprint("Clustering...", "green")
 	adata.uns['knn_indices'] = adata.uns['neighbors']['knn_indices'][:, 1:]
 	adata.uns['knn_distances'] = adata.uns['neighbors']['knn_distances'][:, 1:]
 
 	cprint("Computing UMAP...", "green")
-	scCloud.tools.run_umap(adata, 'X_pca')
+	scc.umap(adata)
 
 	cprint("For UMAP coordinates:", "yellow")
 	process_data(adata, method = 'bbknn', processed = True)
@@ -130,20 +106,16 @@ def process_data(data, method, output = None, processed = False):
 	if not processed:
 
 		cprint("Calculating PCA and KNN...", "green")
-		data_c = data.copy()
-		if issparse(data_c.X):
-			data_c.X = data_c.X.toarray()
-		scCloud.tools.run_pca(data_c)
-		data.obsm['X_pca'] = data_c.obsm['X_pca']
-		scCloud.tools.get_kNN(data, 'X_pca', K = 100, n_jobs = 8)
+		scc.run_pca(data)
+		scc.neighbors(data, n_jobs = 8)
 
 		cprint("Computing UMAP...", "green")
-		scCloud.tools.run_umap(data, 'X_pca')
+		scc.umap(data)
 
-		scCloud.tools.write_output(data, output)
+		scc.write_output(data, output)
 
 	cprint("Calculating kBET measures on UMAP coordinates...", "green")
-	kbet_stat, kbet_pvalue, kbet_ac_rate = scCloud.tools.calc_kBET(data, 'Channel', 'X_umap')
+	kbet_stat, kbet_pvalue, kbet_ac_rate = scc.calc_kBET(data, attr = 'Channel', rep = 'umap')
 	cprint("Mean statistics is {stat:.4f}; Mean p-value is {pvalue:.4f}; Mean accept rate is {rate:.4f}.".format(stat = kbet_stat, pvalue = kbet_pvalue, rate = kbet_ac_rate), "yellow")
 
 	cprint("Loading ground truth cell types...", "green")
@@ -162,8 +134,7 @@ def process_data(data, method, output = None, processed = False):
 	cprint("Mean Silhouette Score on UMAP = {:.4f}.".format(sil_score), "yellow")
 
 	cprint("Calculating kSIM on UMAP coordinates...", "green")
-	ksim_mean, ksim_ac_rate = scCloud.tools.calc_kSIM(data, 'cell_types', rep_key = 'X_umap')
-
+	ksim_mean, ksim_ac_rate = scc.calc_kSIM(data, attr = 'cell_types', rep = 'umap')
 	cprint("Mean kSIM = {mean:.4f}, with accept rate {rate:.4f}.".format(mean = ksim_mean, rate = ksim_ac_rate), "yellow")
 
 	measure_result.append((method, ksim_ac_rate, kbet_ac_rate))

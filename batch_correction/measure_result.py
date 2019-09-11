@@ -140,8 +140,8 @@ def process_data(data, method, output = None, processed = False):
 	measure_result.append((method, ksim_ac_rate, kbet_ac_rate))
 
 	cprint("Plotting UMAP for cells with cell types...", "green")
-	scCloud.tools.write_output(data, "{}_compare".format(celltypes_plot_dir + "/" + method))
-	if os.system("scCloud plot scatter --basis umap --attributes cell_types,Individual {name}_compare.h5ad {name}.celltypes.umap.pdf".format(name = celltypes_plot_dir + "/" + method)):
+	scc.write_output(data, "{}_compare".format(celltypes_plot_dir + "/" + method))
+	if os.system("sccloud plot scatter --basis umap --attributes cell_types,Individual {name}_compare.h5ad {name}.celltypes.umap.pdf".format(name = celltypes_plot_dir + "/" + method)):
 		sys.exit(1)
 
 def plot_scatter(precomputed = False):

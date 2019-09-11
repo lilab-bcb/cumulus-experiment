@@ -44,7 +44,7 @@ def calc_mnn():
 		cprint("{seq}. Processing {chan_name}...".format(seq = cnt, chan_name = chan), "yellow")
 	
 		print("Filtering genes using highly variable gene set")
-		adata.var.drop(columns = ['highly_variable_genes'], inplace = True)
+		adata.var.drop(columns = ['highly_variable_features'], inplace = True)
 		df_join = adata.var.join(df_hvg)
 		df_join['highly_variable_genes'].fillna(False, inplace = True)
 		adata_variable_genes = adata[:, df_join['highly_variable_genes']].copy()

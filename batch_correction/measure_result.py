@@ -87,8 +87,6 @@ def process_bbknn():
 
 	cprint("loading corrected data...", "green")
 	adata = scd.read_input("./bbknn/scanpy_bbknn_corrected.h5ad")
-
-	cprint("Clustering...", "green")
 	adata.uns['knn_indices'] = adata.uns['neighbors']['knn_indices'][:, 1:]
 	adata.uns['knn_distances'] = adata.uns['neighbors']['knn_distances'][:, 1:]
 

@@ -86,7 +86,7 @@ def process_bbknn():
 		cprint("No corredted data are found!", "red")
 
 	cprint("loading corrected data...", "green")
-	adata = scd.read_input("./bbknn/scanpy_bbknn_corrected.h5ad")
+	adata = scc.read_input("./bbknn/scanpy_bbknn_corrected.h5ad")
 	adata.uns['knn_indices'] = adata.uns['neighbors']['knn_indices'][:, 1:]
 	adata.uns['knn_distances'] = adata.uns['neighbors']['knn_distances'][:, 1:]
 

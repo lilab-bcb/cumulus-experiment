@@ -21,6 +21,7 @@ hvf.features <- as.character(unlist(df.hvf['index']))
 obj.list <- lapply(X = obj.list, FUN = function(x) {
 	x <- NormalizeData(x)
 	x[["RNA"]]@var.features <- hvf.features
+	return(x)
 })
 
 now <- Sys.time()

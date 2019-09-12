@@ -58,12 +58,22 @@ def process_mnn():
 
 def process_seurat():
 	cprint("For Seurat:", "red")
-	f_list = [f for f in os.listdir("./seurat") if f in ["gene_expression.mtx", "feature_names.txt", "sample_names.txt"]]
+	f_list = [f for f in os.listdir("./seurat") if f in ["gene_expression.mtx", "genes.txt", "barcodes.txt"]]
 	if len(f_list) != 3:
 		cprint("No corrected data are found!", "red")
 
 	cprint("Loading gene expression...", "green")
 	adata = scc.read_input("./seurat/matrix.mtx", genome = 'GRCh38')
+
+	cprint("Loading gene names...", "green")
+	df_genes = pd.read_csv("./seurat/genes.txt", header = None)
+	adata.var['index'] = df_genes[0].values
+	adata.var.set_index('index', inplace = True)
+
+	cprint("Loading barcode names...", "green")
+	df_barcodes = pd.read_csv("./seurat/barcodes.txt", header = None)
+	adata.obs['index'] = df_barcodes[0].values
+	adata.obs.set_index('index', inplace = True)
 	adata.obs['Channel'] = pd.Categorical(adata.obs.index.map(lambda s: s.split('-')[0]).values)
 
 	process_data(adata, method = 'seurat', output = "./seurat/seurat_result")

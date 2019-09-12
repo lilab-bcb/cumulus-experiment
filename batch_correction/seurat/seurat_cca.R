@@ -42,5 +42,5 @@ print("Saved CCA result to file.")
 X <- t(GetAssayData(ica.combined))
 writeMM(X, file = "matrix.mtx")
 
-write.table(X@Dimnames[[1]], file = "barcodes.tsv", row.names = FALSE, col.names = FALSE, quote = FALSE)
-write.table(X@Dimnames[[2]], file = "features.tsv", row.names = FALSE, col.names = FALSE, quote = FALSE)
+write.table(X@Dimnames[[1]], file = "barcodes.txt", row.names = FALSE, col.names = FALSE, quote = FALSE)
+write.table(X@Dimnames[[2]], file = "genes.txt", row.names = FALSE, col.names = FALSE, quote = FALSE)

@@ -87,8 +87,8 @@ def process_bbknn():
 
 	cprint("loading corrected data...", "green")
 	adata = scc.read_input("./bbknn/scanpy_bbknn_corrected.h5ad")
-	adata.uns['knn_indices'] = adata.uns['neighbors']['knn_indices'][:, 1:]
-	adata.uns['knn_distances'] = adata.uns['neighbors']['knn_distances'][:, 1:]
+	adata.uns['pca_knn_indices'] = adata.uns['neighbors']['knn_indices'][:, 1:]
+	adata.uns['pca_knn_distances'] = adata.uns['neighbors']['knn_distances'][:, 1:]
 
 	cprint("Computing UMAP...", "green")
 	scc.umap(adata)

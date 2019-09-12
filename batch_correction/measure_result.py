@@ -104,7 +104,7 @@ def process_data(data, method, output = None, processed = False):
 	if not processed:
 
 		cprint("Calculating PCA and KNN...", "green")
-		scc.run_pca(data)
+		scc.pca(data)
 		scc.neighbors(data, n_jobs = 8)
 
 		cprint("Computing UMAP...", "green")

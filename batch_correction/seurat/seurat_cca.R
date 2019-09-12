@@ -18,9 +18,10 @@ df.hvf <- read.csv(file = "../../hvf.txt")
 hvf.features <- as.character(unlist(df.hvf['index']))
 
 ## Create Seurat objects
-for (i in 1:length(obj.list)) {
-    obj.list[[i]][["RNA"]]@var.features <- hvg.features
-}
+obj.list <- lapply(X = obj.list, FUN = function(x) {
+	x <- NormalizeData(x)
+	x[["RNA"]]@var.features <- hvf.features
+})
 
 now <- Sys.time()
 ica.anchors <- FindIntegrationAnchors(object.list = seurat.obj.list)

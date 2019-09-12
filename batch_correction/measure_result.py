@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from anndata import read_mtx
 import sccloud as scc
 from termcolor import cprint
 from sklearn.metrics import silhouette_score
@@ -64,7 +65,7 @@ def process_seurat():
 		cprint("No corrected data are found!", "red")
 
 	cprint("Loading gene expression...", "green")
-	adata = scc.read_input("./seurat/matrix.mtx", genome = 'GRCh38')
+	adata = read_mtx("./seurat/matrix.mtx")
 
 	cprint("Loading gene names...", "green")
 	df_genes = pd.read_csv("./seurat/genes.txt", header = None)
@@ -76,6 +77,7 @@ def process_seurat():
 	adata.obs['index'] = df_barcodes[0].values
 	adata.obs.set_index('index', inplace = True)
 	adata.obs['Channel'] = pd.Categorical(adata.obs.index.map(lambda s: s.split('-')[0]).values)
+	adata.uns['genome'] = 'GRCh38'
 
 	process_data(adata, method = 'seurat', output = "./seurat/seurat_result")
 

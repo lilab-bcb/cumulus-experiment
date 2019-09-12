@@ -66,17 +66,16 @@ RUN conda update -n base -c defaults conda
 # Install scCloud environment
 RUN conda create -n sccloud python=3.7.3 -y
 
-RUN conda install -n sccloud -y -c anaconda mkl==2019.3 && \
-	conda install -n sccloud -y -c anaconda mkl_fft==1.0.12 && \
+RUN conda install -n sccloud -y -c anaconda mkl==2019.4 && \
+	conda install -n sccloud -y -c anaconda mkl_fft==1.0.14 && \
 	conda install -n sccloud -y -c anaconda mkl_random==1.0.2 && \
 	conda install -n sccloud -y -c anaconda blas==1.0 && \
-	conda install -n sccloud -y -c anaconda intel-openmp==2019.3 && \
-	conda install -n sccloud -y -c anaconda numpy==1.16.3 && \
-	conda install -n sccloud -y -c conda-forge fftw
+	conda install -n sccloud -y -c anaconda intel-openmp==2019.4 && \
+	conda install -n sccloud -y -c anaconda numpy==1.16.4 && \
+	conda install -n sccloud -y -c conda-forge fftw==3.3.8
 
 ENV PATH=/root/miniconda3/envs/sccloud/bin:$old_path
-RUN	pip install numpy==1.16.3 && \
-	pip install Cython==0.29.7 && \
+RUN	pip install Cython==0.29.13 && \
 	pip install docopt==0.6.2 && \
 	pip install fitsne==1.0.1 && \
 	pip install h5py==2.9.0 && \
@@ -84,60 +83,67 @@ RUN	pip install numpy==1.16.3 && \
 	pip install kiwisolver==1.1.0 && \
 	pip install leidenalg==0.7.0 && \
 	pip install lightgbm==2.2.1 && \
-	pip install llvmlite==0.28.0 && \
+	pip install llvmlite==0.29.0 && \
+	pip install matplotlib==3.1.1 && \
 	pip install natsort==6.0.0 && \
-	pip install numba==0.43.1 && \
-	pip install numexpr==2.6.9 && \
-	pip install pandas==0.24.2 && \
-	pip install pybind11==2.2.4 && \
+	pip install numba==0.45.1 && \
+	pip install numexpr==2.7.0 && \
+	pip install pandas==0.25.1 && \
+	pip install pybind11==2.3.0 && \
 	pip install pycparser==2.19 && \
-	pip install pyparsing==2.4.0 && \
+	pip install pyparsing==2.4.2 && \
 	pip install python-igraph==0.7.1.post6 && \
 	pip install scikit-learn==0.21.3 && \
 	pip install scikit-misc==0.1.1 && \
-	pip install scipy==1.2.1 && \
+	pip install scipy==1.2.2 && \
 	pip install six==1.12.0 && \
 	pip install statsmodels==0.10.1 && \
-	pip install tables==3.5.1 && \
-	pip install umap-learn==0.3.9 && \
+	pip install tables==3.5.2 && \
+	pip install umap-learn==0.3.10 && \
 	pip install anndata==0.6.22.post1 && \
 	pip install termcolor==1.1.0 && \
-	git clone https://github.com/klarman-cell-observatory/scCloudPy.git /opt/sccloud && cd /opt/sccloud && pip install -e .
-	
+	pip install sccloud==0.14.0rc3
 
 # Install scanpy environment
 RUN conda create -n scanpy python=3.7.3 -y
+
+RUN conda install -n scanpy -y -c anaconda mkl==2019.4 && \
+	conda install -n scanpy -y -c anaconda mkl_fft==1.0.14 && \
+	conda install -n scanpy -y -c anaconda mkl_random==1.0.2 && \
+	conda install -n scanpy -y -c anaconda blas==1.0 && \
+	conda install -n scanpy -y -c anaconda intel-openmp==2019.4 && \
+	conda install -n scanpy -y -c anaconda numpy==1.16.4
+
 ENV PATH=/root/miniconda3/envs/scanpy/bin:$old_path
-RUN pip install numpy==1.16.3 && \
-	pip install Cython==0.29.7 && \
+RUN pip install Cython==0.29.13 && \
 	pip install h5py==2.9.0 && \
 	pip install joblib==0.13.2 && \
 	pip install kiwisolver==1.1.0 && \
 	pip install lightgbm==2.2.1 && \
-	pip install llvmlite==0.28.0 && \
+	pip install llvmlite==0.29.0 && \
 	pip install matplotlib==3.0.3 && \
 	pip install natsort==6.0.0 && \
 	pip install networkx==2.3 && \
-	pip install numba==0.43.1 && \
-	pip install numexpr==2.6.9 && \
-	pip install pandas==0.24.2 && \
+	pip install numba==0.45.1 && \
+	pip install numexpr==2.7.0 && \
+	pip install pandas==0.25.1 && \
 	pip install patsy==0.5.1 && \
-	pip install pybind11==2.2.4 && \
+	pip install pybind11==2.3.0 && \
 	pip install python-igraph==0.7.1.post6 && \
 	pip install scikit-learn==0.21.3 && \
 	pip install scikit-misc==0.1.1 && \
-	pip install scipy==1.3.0 && \
+	pip install scipy==1.3.1 && \
 	pip install six==1.12.0 && \
 	pip install statsmodels==0.10.1 && \
-	pip install tables==3.5.1 && \
+	pip install tables==3.5.2 && \
 	pip install tqdm==4.32.2 && \
 	pip install anndata==0.6.22.post1 && \
-	git clone https://github.com/lilab-cbb/bbknn.git /opt/bbknn-1.3.4 && cd /opt/bbknn-1.3.4 && pip install -e . && \
-	pip install scanpy==1.4.4 && \
+	pip install bbknn==1.3.6 && \
+	pip install scanpy==1.4.4.post1 && \
 	pip install MulticoreTSNE==0.1 && \
-	pip install louvain==0.6.1 && \
+	git clone https://github.com/vtraag/louvain-igraph.git /opt/louvain && cd /opt/louvain && pip install -e . && \
 	pip install leidenalg==0.7.0 && \
-	pip install umap-learn==0.3.9 && \
+	pip install umap-learn==0.3.10 && \
 	pip install mnnpy==0.1.9.5 && \
 	pip install fa2==0.3.5 && \
 	pip install termcolor==1.1.0

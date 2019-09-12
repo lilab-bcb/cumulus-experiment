@@ -46,6 +46,7 @@ def process_mnn():
 	f_list = [f for f in os.listdir("./mnn") if f in ["scanpy_mnn_corrected.h5ad"]]
 	if len(f_list) != 1:
 		cprint("No corrected data are found!", "red")
+		sys.exit(1)
 
 	cprint("Loading corrected data...", "green")
 	adata = scc.read_input('./mnn/scanpy_mnn_corrected.h5ad')

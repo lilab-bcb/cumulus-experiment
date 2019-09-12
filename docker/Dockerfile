@@ -14,12 +14,9 @@ RUN apt-get update -qq && \
 		wget \
 		lsb-release \
 		libfftw3-dev \
-		libboost-iostreams-dev && \
+		libboost-iostreams-dev \
+		default-jdk && \
 	apt-get clean
-
-# Install Oracle JDK 12
-ADD jdk-12.0.1_linux-x64_bin.tar.gz /opt
-ENV PATH=/opt/jdk-12.0.1/bin:$PATH
 
 # Install R 3.6
 RUN wget http://security.ubuntu.com/ubuntu/pool/main/t/tzdata/tzdata_2019b-0ubuntu0.18.04_all.deb && \
@@ -33,11 +30,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD5
 
 ## INSTALL SEURAT ##
 ADD install.R /opt/install.R
-RUN wget https://github.com/satijalab/seurat/archive/v3.0.2.tar.gz && \
-	tar -zxvf v3.0.2.tar.gz && \
-	mv seurat-3.0.2/ /opt/seurat-3.0.2 && \
-	rm v3.0.2.tar.gz && \
-	Rscript /opt/install.R
+RUN Rscript /opt/install.R
 
 ## INSTALL FAST_TSNE for Seurat ##
 RUN wget http://www.fftw.org/fftw-3.3.8.tar.gz && \
@@ -138,7 +131,7 @@ RUN pip install Cython==0.29.13 && \
 	pip install tables==3.5.2 && \
 	pip install tqdm==4.32.2 && \
 	pip install anndata==0.6.22.post1 && \
-	pip install bbknn==1.3.6 && \
+	git clone https://github.com/lilab-bcb/bbknn.git /opt/bbknn && cd /opt/bbknn && pip install -e . && \
 	pip install scanpy==1.4.4.post1 && \
 	pip install MulticoreTSNE==0.1 && \
 	git clone https://github.com/vtraag/louvain-igraph.git /opt/louvain && cd /opt/louvain && pip install -e . && \

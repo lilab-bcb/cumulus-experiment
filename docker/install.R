@@ -1,3 +1,5 @@
 install.packages('devtools')
-install.packages('hdf5r')
-devtools::install('/opt/seurat-3.0.2')
+install.packages(c('hdf5r', 'leiden', 'uwot'))
+
+seurat.url <- "https://cran.r-project.org/src/contrib/Seurat_3.1.0.tar.gz"
+install.packages(seurat.url, repos = NULL, type = 'source')

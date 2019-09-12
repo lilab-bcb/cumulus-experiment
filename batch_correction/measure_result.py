@@ -96,7 +96,7 @@ def process_bbknn():
 	cprint("For UMAP coordinates:", "yellow")
 	process_data(adata, method = 'bbknn', processed = True)
 
-	scCloud.tools.write_output(adata, "./bbknn/scanpy_bbknn_result")
+	scc.write_output(adata, "./bbknn/scanpy_bbknn_result")
 
 
 def process_data(data, method, output = None, processed = False):

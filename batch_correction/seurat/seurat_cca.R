@@ -24,7 +24,7 @@ obj.list <- lapply(X = obj.list, FUN = function(x) {
 })
 
 now <- Sys.time()
-ica.anchors <- FindIntegrationAnchors(object.list = seurat.obj.list)
+ica.anchors <- FindIntegrationAnchors(object.list = obj.list)
 print("Computing Anchors using CCA:")
 print(Sys.time() - now)
 

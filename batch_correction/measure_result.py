@@ -58,7 +58,7 @@ def process_mnn():
 
 def process_seurat():
 	cprint("For Seurat:", "red")
-	f_list = [f for f in os.listdir("./seurat") if f in ["gene_expression.mtx", "genes.txt", "barcodes.txt"]]
+	f_list = [f for f in os.listdir("./seurat") if f in ["matrix.mtx", "genes.txt", "barcodes.txt"]]
 	if len(f_list) != 3:
 		cprint("No corrected data are found!", "red")
 

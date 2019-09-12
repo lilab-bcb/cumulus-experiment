@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import scanpy as sc
 import sys, time, os
-from bbknn import bbknn
 
 sc.settings.n_jobs = os.cpu_count()
 print("Using {} cores if possible.".format(sc.settings.n_jobs))
@@ -20,10 +19,11 @@ print("Highly variable gene set of size " + str(df_hvf.shape[0]))
 df_hvf['highly_variable_features'] = [True] * df_hvf.shape[0]
 df_hvf.set_index('index', inplace = True)
 df_hvf.drop(columns = ['gene_ids'], inplace = True)
-adata.var.drop(columns = ['highly_variable_genes'], inplace = True)
+adata.var.drop(columns = ['highly_variable_features'], inplace = True)
 df_join = adata.var.join(df_hvf)
 df_join['highly_variable_features'].fillna(False, inplace = True)
 adata_variable_genes = adata[:, df_join['highly_variable_features']].copy()
+assert(adata_variable_genes.shape[1] == df_hvf.shape[0])
 
 
 print("Combat to correct batch effects")

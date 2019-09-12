@@ -8,7 +8,7 @@ from mnnpy import mnn_correct
 rand_seed = 0
 
 src_file = "../../MantonBM_nonmix_tiny_filter_norm.h5ad"
-hvg_file = "../../hvf.txt"
+hvf_file = "../../hvf.txt"
 
 
 def calc_mnn():
@@ -31,11 +31,11 @@ def calc_mnn():
 
 
 	# Get highly variable genes.
-	df_hvg = pd.read_csv(hvg_file)
-	cprint("Highly variable gene set of size " + str(df_hvg.shape[0]), "yellow")
-	df_hvg.set_index('index', inplace = True)
-	df_hvg.drop(columns = ['gene_ids'], inplace = True)
-	df_hvg['highly_variable_genes'] = [True] * df_hvg.shape[0]
+	df_hvf = pd.read_csv(hvf_file)
+	cprint("Highly variable gene set of size " + str(df_hvf.shape[0]), "yellow")
+	df_hvf.set_index('index', inplace = True)
+	df_hvf.drop(columns = ['gene_ids'], inplace = True)
+	df_hvf['highly_variable_features'] = [True] * df_hvf.shape[0]
 
 	cnt = 0
 
@@ -46,8 +46,8 @@ def calc_mnn():
 		print("Filtering genes using highly variable gene set")
 		adata.var.drop(columns = ['highly_variable_features'], inplace = True)
 		df_join = adata.var.join(df_hvg)
-		df_join['highly_variable_genes'].fillna(False, inplace = True)
-		adata_variable_genes = adata[:, df_join['highly_variable_genes']].copy()
+		df_join['highly_variable_features'].fillna(False, inplace = True)
+		adata_variable_genes = adata[:, df_join['highly_variable_features']].copy()
 		adata_variable_genes.var.drop(columns = ['n_cells', 'percent_cells', 'robust'], inplace = True)
 
 		ad_dict[chan] = adata_variable_genes

@@ -12,8 +12,8 @@ n_cores = os.cpu_count()
 src_file = "../MantonBM_nonmix.h5sc"
 immune_gene_file = "immune_genes.txt"
 
-seurat_correct_name = "MantonBM_nonmix_seurat_corrected"
-sccloud_correct_name = "MantonBM_nonmix_sccloud_corrected"
+seurat_correct_name = "MantonBM_nonmix_seurat_hvf_corrected"
+sccloud_correct_name = "MantonBM_nonmix_sccloud_hvf_corrected"
 
 
 def get_hvf():
@@ -58,6 +58,21 @@ def compare_markers():
 	cprint("Find {} markers in scCloud HVF selection flavor.".format(marker_sccloud.shape[0]), "yellow")
 	pd.DataFrame({'gene': marker_sccloud}).to_csv("sccloud_markers.txt", header = False, index = False)
 
+	cprint("Processing common markers that both flavors find...", "green")
+	common_markers = np.intersect1d(marker_seurat, marker_sccloud, assume_unique = True)
+	cprint("{} markers are commonly found by both flavors.".format(common_markers.shape[0]), "yellow")
+	pd.DataFrame({'gene': common_markers}).to_csv("common_markers.txt", header = False, index = False)
+
+	cprint("Processing Seurat flavor specific markers...", "green")
+	seurat_specific = np.setdiff1d(marker_seurat, common_markers, assume_unique = True)
+	cprint("{} markers are Seurat flavor specific.".format(seurat_specific.shape[0]), "yellow")
+	pd.DataFrame({'gene': seurat_specific}).to_csv("seurat_specific.txt", header = False, index = False)
+
+	cprint("Processing scCloud flavor specific markers...", "green")
+	sccloud_specific = np.setdiff1d(marker_sccloud, common_markers, assume_unique = True)
+	cprint("{} markers are scCloud flavor specific.".format(sccloud_specific.shape[0]), "yellow")
+	pd.DataFrame({'gene': sccloud_specific}).to_csv("sccloud_specific.txt", header = False, index = False)
+
 def get_mutual_info():
 
 	cprint("Calculating AMI Score on Approximated Leiden Clustering Results between two methods...", "green")
@@ -65,8 +80,8 @@ def get_mutual_info():
 	adata = scc.read_input(seurat_correct_name + ".h5ad")
 	bdata = scc.read_input(sccloud_correct_name + ".h5ad")
 
-	mis = adjusted_mutual_info_score(adata.obs['louvain_labels'], bdata.obs['louvain_labels'], average_method = 'arithmetic')
-	cprint("AMI = {:.4f}".format(mis))
+	ami = adjusted_mutual_info_score(adata.obs['louvain_labels'], bdata.obs['louvain_labels'], average_method = 'arithmetic')
+	cprint("AMI = {:.4f}".format(ami))
 
 def plot_figures(file_name):
 	if os.system("sccloud plot scatter --basis fitsne --attributes louvain_labels {name}.h5ad {name}.fitsne.pdf".format(name = file_name)):

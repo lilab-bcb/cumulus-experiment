@@ -11,17 +11,19 @@ n_cores = os.cpu_count()
 
 markers = np.array(['CD3D', 'CD3E', 'CD3G', 'TRAC', 'CD4', 'CD8A', 'CD8B', 'RTKN2', 'TIGIT', 'FOXP3', 'IL2RA', 'CCR7', 'SELL', 'IL7R', 'TCF7', 'CD27', 'CD19', 'MS4A1', 'CD79A', 'CD79B', 'MZB1', 'HLA-DRA', 'HLA-DRB1', 'CD34', 'IGLL1', 'NCAM1', 'NKG7', 'KLRB1', 'KLRD1', 'KLRF1', 'KLRC1', 'KLRC2', 'KLRC3', 'KLRC4', 'FCGR3A', 'ITGAL', 'ITGAM', 'VCAN', 'FCN1', 'S100A8', 'S100A9', 'CD14', 'ASAH1', 'MS4A7', 'IFITM2', 'IFITM3', 'HLA-DPA1', 'HLA-DPB1', 'HLA-DQA1', 'HLA-DQB1', 'FCER1A', 'CLEC10A', 'CD1C', 'THBD', 'JCHAIN', 'LILRA4', 'GZMB', 'IL3RA', 'SERPINF1', 'ITM2C', 'IRF7', 'CD38', 'XBP1', 'SLAMF7', 'TNFRSF17', 'TNFRSF13B', 'IGHA1', 'IGHG1', 'KIT', 'CD59', 'THY1', 'SOX4', 'GYPA', 'HBB', 'HBA1', 'TFRC', 'ITGA4', 'ANK1', 'ICAM4', 'BCAM', 'SLC4A1', 'ACKR1', 'PF4', 'PPBP', 'GP5', 'CXCR4', 'SLAMF1', 'MPL', 'ITGA2B', 'FUT4', 'MPO', 'CSF3R', 'FCGR3B', 'CEACAM8'])
 
+src_file = "../MantonBM_nonmix.h5sc"
+
 seurat_correct_name = "MantonBM_nonmix_seurat_corrected"
 sccloud_correct_name = "MantonBM_nonmix_sccloud_corrected"
 
 
 def get_hvf():
 	cprint("Computing highly variable genes using Seurat method...", "green")
-	if os.system("sccloud cluster -p {jobs} --correct-batch-effect --select-hvf-flavor Seurat --louvain --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = seurat_correct_name)):
+	if os.system("sccloud cluster -p {jobs} --correct-batch-effect --select-hvf-flavor Seurat --louvain --fitsne --fle {src} {outname}".format(jobs = n_cores, src = src_file, outname = seurat_correct_name)):
 		sys.exit(1)
 
 	cprint("Computing highly variable genes using scCloud new method...", "green")
-	if os.system("sccloud cluster -p {jobs} --plot-hvf --correct-batch-effect --louvain --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_name)):
+	if os.system("sccloud cluster -p {jobs} --plot-hvf --correct-batch-effect --louvain --fitsne --fle {src} {outname}".format(jobs = n_cores, src = src_file, outname = sccloud_correct_name)):
 		sys.exit(1)
 
 

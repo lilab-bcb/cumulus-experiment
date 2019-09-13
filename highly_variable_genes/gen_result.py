@@ -13,34 +13,22 @@ markers = np.array(['CD3D', 'CD3E', 'CD3G', 'TRAC', 'CD4', 'CD8A', 'CD8B', 'RTKN
 
 seurat_correct_name = "MantonBM_nonmix_seurat_corrected"
 sccloud_correct_name = "MantonBM_nonmix_sccloud_corrected"
-sccloud_correct_alpha_one_name = "MantonBM_nonmix_sccloud_corrected_alpha_one"
 
 
-def get_hvg():
+def get_hvf():
 	cprint("Computing highly variable genes using Seurat method...", "green")
-	if os.system("sccloud cluster -p {jobs} --correct-batch-effect --select-hvf-flavor Seurat --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = seurat_correct_name)):
+	if os.system("sccloud cluster -p {jobs} --correct-batch-effect --select-hvf-flavor Seurat --louvain --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = seurat_correct_name)):
 		sys.exit(1)
 
 	cprint("Computing highly variable genes using scCloud new method...", "green")
-	if os.system("sccloud cluster -p {jobs} --plot-hvf --correct-batch-effect --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_name)):
+	if os.system("sccloud cluster -p {jobs} --plot-hvf --correct-batch-effect --louvain --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_name)):
 		sys.exit(1)
-
-	#cprint("Computing highly variable genes using scCloud new method with alpha = 1.0...", "green")
-	#if os.system("sccloud cluster -p {jobs} --correct-batch-effect --diffmap-alpha 1.0 --spectral-leiden --fitsne --fle ../MantonBM_nonmix_10x.h5sc {outname}".format(jobs = n_cores, outname = sccloud_correct_alpha_one_name)):
-	#	sys.exit(1)
-
-	#adata = scc.read_input(sccloud_corrected_alpha_one_name + '.h5ad', mode = 'a')
-	#bdata = scc.read_input(sccloud_correct_name + '.h5ad', mode = 'a')
-	#assert adata.obs.index.values == bdata.obs.index.values
-	#adata.obs['cell_types'] = bdata.obs['approx_leiden_labels']
-
-	#scc.write_output(adata, sccloud_corrected_alpha_one_name)
 
 
 def annotate_data(file_name):
 	cprint("Annotating Cells for {name}...".format(name = file_name), "green")
 
-	if os.system("sccloud de_analysis -p {jobs} --labels spectral_leiden_labels --t {name}.h5ad {name}.de.xlsx".format(jobs = n_cores, name = file_name)):
+	if os.system("sccloud de_analysis -p {jobs} --labels louvain_labels --t {name}.h5ad {name}.de.xlsx".format(jobs = n_cores, name = file_name)):
 		sys.exit(1)
 
 	if os.system("sccloud annotate_cluster {name}.h5ad {name}.anno.txt".format(name = file_name)):
@@ -49,35 +37,35 @@ def annotate_data(file_name):
 
 def compare_markers():
 
-	cprint("Processing Seurat HVG selection...", "green")
+	cprint("Processing Seurat HVF selection...", "green")
 
 	adata = scc.read_input(seurat_correct_name + ".h5ad", mode = 'a')
-	hvg_seurat = adata.var.loc[adata.var['highly_variable_genes']].index.values
-	cprint("{num} genes are marked as HVG in Seurat method.".format(num = hvg_seurat.shape[0]), "yellow")
-	pd.DataFrame({'gene': hvg_seurat}).to_csv("seurat_hvg.txt", header = False, index = False)
-	marker_seurat = np.intersect1d(hvg_seurat, markers, assume_unique = True)
-	cprint("Find {num} markers in Seurat HVG selection method.".format(num = marker_seurat.shape[0]), "yellow")
+	hvf_seurat = adata.var.loc[adata.var['highly_variable_features']].index.values
+	cprint("{num} genes are marked as HVF in Seurat method.".format(num = hvf_seurat.shape[0]), "yellow")
+	pd.DataFrame({'gene': hvf_seurat}).to_csv("seurat_hvf.txt", header = False, index = False)
+	marker_seurat = np.intersect1d(hvf_seurat, markers, assume_unique = True)
+	cprint("Find {num} markers in Seurat HVF selection method.".format(num = marker_seurat.shape[0]), "yellow")
 
-	cprint("Processing scCloud HVG selection...", "green")
+	cprint("Processing scCloud HVF selection...", "green")
 	adata = scc.read_input(sccloud_correct_name + ".h5ad", mode = 'a')
-	hvg_sccloud = adata.var.loc[adata.var['highly_variable_genes']].index.values
-	cprint("{num} genes are marked as HVG in scCloud method.".format(num = hvg_sccloud.shape[0]), "yellow")
-	pd.DataFrame({'gene': hvg_sccloud}).to_csv("sccloud_hvg.txt", header = False, index = False)
-	marker_sccloud = np.intersect1d(hvg_sccloud, markers, assume_unique = True)
-	cprint("Find {num} markers in scCloud HVG selection method.".format(num = marker_sccloud.shape[0]), "yellow")
+	hvf_sccloud = adata.var.loc[adata.var['highly_variable_features']].index.values
+	cprint("{num} genes are marked as HVF in scCloud method.".format(num = hvf_sccloud.shape[0]), "yellow")
+	pd.DataFrame({'gene': hvf_sccloud}).to_csv("sccloud_hvf.txt", header = False, index = False)
+	marker_sccloud = np.intersect1d(hvf_sccloud, markers, assume_unique = True)
+	cprint("Find {num} markers in scCloud HVF selection method.".format(num = marker_sccloud.shape[0]), "yellow")
 
 	common_markers = np.intersect1d(marker_seurat, marker_sccloud, assume_unique = True)
 	cprint("Among them, {num} markers are found by both methods.".format(num = common_markers.shape[0]), "yellow")
 	pd.DataFrame({'gene': common_markers}).to_csv("common_markers.txt", header = False, index = False)
 
 	# Compute set difference.
-	hvg_seurat_only = np.setdiff1d(marker_seurat, common_markers)
-	cprint("{num} markers are found by Seurat method only.".format(num = hvg_seurat_only.shape[0]), "yellow")
-	pd.DataFrame({'gene': hvg_seurat_only}).to_csv("seurat_only_marker.txt", header = False, index = False)
+	hvf_seurat_only = np.setdiff1d(marker_seurat, common_markers)
+	cprint("{num} markers are found by Seurat method only.".format(num = hvf_seurat_only.shape[0]), "yellow")
+	pd.DataFrame({'gene': hvf_seurat_only}).to_csv("seurat_only_marker.txt", header = False, index = False)
 
-	hvg_sccloud_only = np.setdiff1d(marker_sccloud, common_markers)
-	cprint("{num} markers are found by scCloud method only.".format(num = hvg_sccloud_only.shape[0]), "yellow")
-	pd.DataFrame({'gene': hvg_sccloud_only}).to_csv("sccloud_only_marker.txt", header = False, index = False)
+	hvf_sccloud_only = np.setdiff1d(marker_sccloud, common_markers)
+	cprint("{num} markers are found by scCloud method only.".format(num = hvf_sccloud_only.shape[0]), "yellow")
+	pd.DataFrame({'gene': hvf_sccloud_only}).to_csv("sccloud_only_marker.txt", header = False, index = False)
 
 	# Compute markers not covered by either method.
 	marker_uncovered = np.setdiff1d(markers, np.union1d(marker_seurat, marker_sccloud))
@@ -95,17 +83,14 @@ def get_mutual_info():
 	adata = scc.read_input(seurat_correct_name + ".h5ad", mode = 'a')
 	bdata = scc.read_input(sccloud_correct_name + ".h5ad", mode = 'a')
 
-	mis = adjusted_mutual_info_score(adata.obs['approx_leiden_labels'], bdata.obs['approx_leiden_labels'], average_method = 'arithmetic')
+	mis = adjusted_mutual_info_score(adata.obs['louvain_labels'], bdata.obs['louvain_labels'], average_method = 'arithmetic')
 	cprint("AMI = {:.4f}".format(mis))
 
 def plot_figures():
-	if os.system("sccloud plot scatter --basis fle --attributes spectral_leiden_labels {name}.h5ad {name}.fle.pdf".format(name = seurat_correct_name)):
+	if os.system("sccloud plot scatter --basis fle --attributes louvain_labels {name}.h5ad {name}.fle.pdf".format(name = seurat_correct_name)):
 		sys.exit(1)
 
-	if os.system("sccloud plot scatter --basis fle --attributes spectral_leiden_labels {name}.h5ad {name}.fle.pdf".format(name = sccloud_correct_name)):
-		sys.exit(1)
-
-	if os.system("sccloud plot scatter --basis fle --attributes cell_types {name}.h5ad {name}.celltypes.fle.pdf".format(name = sccloud_correct_alpha_one_name)):
+	if os.system("sccloud plot scatter --basis fle --attributes louvain_labels {name}.h5ad {name}.fle.pdf".format(name = sccloud_correct_name)):
 		sys.exit(1)
 
 
@@ -143,15 +128,15 @@ def plot_diffusion_coeffs():
 
 
 if __name__ == '__main__':
-	f_list = [f for f in os.listdir('.') if f in [seurat_correct_name + '.h5ad', sccloud_correct_name + '.h5ad', sccloud_correct_alpha_one_name + '.h5ad']]
-	if len(f_list) != 3:
-		get_hvg()
-		#annotate_data(seurat_correct_name)
-		#annotate_data(sccloud_correct_name)
+	f_list = [f for f in os.listdir('.') if f in [seurat_correct_name + '.h5ad', sccloud_correct_name + '.h5ad']]
+	if len(f_list) != 2:
+		get_hvf()
+		annotate_data(seurat_correct_name)
+		annotate_data(sccloud_correct_name)
 
-	#compare_markers()
-	#get_mutual_info()
+	compare_markers()
+	get_mutual_info()
 
-	#plot_figures()
+	plot_figures()
 
 	#plot_diffusion_coeffs()

@@ -47,7 +47,7 @@ def get_NN_sccloud(data, num_threads = 8, K = 100):
 	if len(f_list) == 0:
 		cprint("Use {} cores.".format(num_threads), "green")
 		cprint("Calculating KNN with scCloud algorithm...", "yellow")
-		from scCloud.tools.nearest_neighbors import calculate_nearest_neighbors
+		from sccloud.tools import calculate_nearest_neighbors
 		start_sccloud = time.time()
 		knn_indices, knn_distances = calculate_nearest_neighbors(data.obsm['X_pca'], num_threads, K = K, full_speed = True)
 		end_sccloud = time.time()
@@ -111,7 +111,6 @@ def get_NN_Seurat(data):
 	return knn_indices
 
 def calc_recall_for_one_datapoint(idx, knn_indices, baseline_indices, debug = False):
-	# Add self point initially.
 	num_correct = 0
 	num_total = baseline_indices.shape[1]
 
@@ -188,33 +187,23 @@ def plot_result(df_list):
 if __name__ == '__main__':
 
 	method = sys.argv[1]
-	assert method in ["scCloud", "others", "plot"]
+	assert method in ["brute", "scCloud", "seurat", "scanpy", "plot"]
 
 	n_cores = os.cpu_count()
 
-	if method == 'scCloud':
-		assert os.environ['CONDA_DEFAULT_ENV'] == 'scCloud'
+	if method in ['brute', 'scCloud', 'seurat', 'scanpy']:
+		import sccloud as scc
 
-		import scCloud
-		adata = scCloud.tools.read_input(data_source, mode = 'a')
+		adata = scc.read_input(data_source)
 
-		get_NN_brute(adata, num_threads = n_cores)
-		
-		get_NN_sccloud(adata, num_threads = n_cores)
-
-
-	elif method == 'others':
-		assert os.environ['CONDA_DEFAULT_ENV'] == 'scanpy-benchmark'
-
-		import scanpy as sc
-		adata = sc.read_h5ad(data_source)
-
-		# For scanpy
-		get_NN_scanpy(adata)
-
-		# For seurat
-		get_NN_Seurat(adata)
-
+		if method == 'brute':
+			get_NN_brute(adata, num_threads = n_cores)
+		elif method == 'scCloud':
+			get_NN_sccloud(adata, num_threads = n_cores)
+		elif method == 'scanpy':
+			get_NN_scanpy(adata)
+		else:
+			get_NN_Seurat(adata)
 
 	else:
 

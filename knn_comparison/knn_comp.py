@@ -49,7 +49,7 @@ def get_NN_sccloud(data, num_threads = 8, K = 100):
 		cprint("Calculating KNN with scCloud algorithm...", "yellow")
 		from sccloud.tools import calculate_nearest_neighbors
 		start_sccloud = time.time()
-		knn_indices, knn_distances = calculate_nearest_neighbors(data.obsm['X_pca'], num_threads, K = K, full_speed = True)
+		knn_indices, knn_distances = calculate_nearest_neighbors(data.obsm['X_pca'], K = K, n_jobs = num_threads, full_speed = True)
 		end_sccloud = time.time()
 		cprint("Finished!", "yellow")
 		cprint("Time used for scCloud: " + str_time(end_sccloud - start_sccloud) + ".", "yellow")

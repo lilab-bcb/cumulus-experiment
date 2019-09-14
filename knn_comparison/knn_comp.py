@@ -191,7 +191,7 @@ if __name__ == '__main__':
 
 	n_cores = os.cpu_count()
 
-	if method in ['brute', 'scCloud', 'seurat', 'scanpy']:
+	if method in ['brute', 'scCloud', 'seurat']:
 		import sccloud as scc
 
 		adata = scc.read_input(data_source)
@@ -200,10 +200,14 @@ if __name__ == '__main__':
 			get_NN_brute(adata, num_threads = n_cores)
 		elif method == 'scCloud':
 			get_NN_sccloud(adata, num_threads = n_cores)
-		elif method == 'scanpy':
-			get_NN_scanpy(adata)
 		else:
 			get_NN_Seurat(adata)
+
+	elif method == 'scanpy':
+		import scanpy as sc
+		
+		adata = sc.read_h5ad(data_source)
+		get_NN_scanpy(adata)
 
 	else:
 

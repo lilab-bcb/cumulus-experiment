@@ -1,6 +1,5 @@
 import os, sys
 import sccloud as scc
-import numpy as np
 from termcolor import cprint
 
 n_cores = os.cpu_count()
@@ -53,7 +52,7 @@ if __name__ == '__main__':
 	if (data_dst + '.h5ad') not in os.listdir('.'):
 		calc_and_plot()
 
-	adata = scCloud.tools.read_input(data_dst + '.h5ad', mode = 'a')
+	adata = scc.read_input(data_dst + '.h5ad')
 
 	measure_algorithms(adata)
 	#net_umap_phase_plots(adata)

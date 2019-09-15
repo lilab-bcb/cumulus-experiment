@@ -29,7 +29,7 @@ def measure_algorithms(adata):
 	cprint("Calculating kSIM measurements...", "green")
 
 	for basis in basis_list:
-		ksim, ac_rate = scc.calc_kSIM(adata, attr = 'spectral_leiden_labels', rep_key = basis, n_jobs = n_cores)
+		ksim, ac_rate = scc.calc_kSIM(adata, attr = 'spectral_leiden_labels', rep = basis, n_jobs = n_cores)
 		cprint("For {basis}, kSIM is {ksim:.4f}, accept rate is {ac_rate:.4f}.".format(basis = basis, ksim = ksim, ac_rate = ac_rate), "yellow")
 
 def net_umap_phase_plots(adata):

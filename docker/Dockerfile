@@ -14,9 +14,11 @@ RUN apt-get update -qq && \
 		wget \
 		lsb-release \
 		libfftw3-dev \
-		libboost-iostreams-dev \
-		default-jdk && \
+		libboost-iostreams-dev && \
 	apt-get clean
+
+## Install Oracle JDK 12.0.1 ##
+## TODO
 
 # Install R 3.6
 RUN wget http://security.ubuntu.com/ubuntu/pool/main/t/tzdata/tzdata_2019b-0ubuntu0.18.04_all.deb && \
@@ -28,24 +30,30 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD5
 	apt-get update && \
 	apt-get -y install r-base
 
+## Get Seurat 3.1.0 source code ##
+RUN wget https://cran.r-project.org/src/contrib/Seurat_3.1.0.tar.gz && \
+	tar -zxvf Seurat_3.1.0.tar.gz && \ 
+	mv Seurat /opt/software/seurat-3.1.0 && \
+	rm Seurat_3.1.0.tar.gz
+
 ## INSTALL SEURAT ##
-ADD install.R /opt/install.R
-RUN Rscript /opt/install.R
+ADD install.R /opt/software/install.R
+RUN Rscript /opt/software/install.R
 
 ## INSTALL FAST_TSNE for Seurat ##
 RUN wget http://www.fftw.org/fftw-3.3.8.tar.gz && \
 	tar -zxvf fftw-3.3.8.tar.gz && \
-	mv fftw-3.3.8/ /opt/fftw-3.3.8 && \
+	mv fftw-3.3.8/ /opt/software/fftw-3.3.8 && \
 	rm fftw-3.3.8.tar.gz && \
-	cd /opt/fftw-3.3.8 && \
+	cd /opt/software/fftw-3.3.8 && \
 	./configure && \
 	make && \
 	make install && \
-	git clone https://github.com/KlugerLab/FIt-SNE.git /opt/FIt-SNE && \
-	cd /opt/FIt-SNE && \
+	git clone https://github.com/KlugerLab/FIt-SNE.git /opt/software/FIt-SNE && \
+	cd /opt/software/FIt-SNE && \
 	g++ -std=c++11 -O3  src/sptree.cpp src/tsne.cpp src/nbodyfft.cpp  -o bin/fast_tsne -pthread -lfftw3 -lm
 
-ENV PATH=$PATH:/opt/FIt-SNE/bin
+ENV PATH=$PATH:/opt/software/FIt-SNE/bin
 
 # Install Python environment
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \

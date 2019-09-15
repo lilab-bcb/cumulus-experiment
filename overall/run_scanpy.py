@@ -11,9 +11,9 @@ sc.settings.n_jobs = os.cpu_count()
 sc.settings.verbosity = 4
 rand_seed = 0
 
-filter_norm_data = "../MantonBM_nonmix_10x_filter_norm.h5ad"
-hvg_file = "../hvg.txt"
-pca_data = "../MantonBM_nonmix_10x_filter_norm_pca.h5ad"
+filter_norm_data = "../MantonBM_nonmix_filter_norm.h5ad"
+hvf_file = "../hvf.txt"
+pca_data = "../MantonBM_nonmix_filter_norm_pca.h5ad"
 corrected_data = "../MantonBM_nonmix_corrected.h5ad"
 
 f = open("scanpy.log", "w")
@@ -30,14 +30,14 @@ f.write(logstr_hvg + '\n')
 
 
 print("Batch correction using BBKNN")
-df_hvg = pd.read_csv(hvg_file)
-df_hvg['highly_variable_genes'] = [True] * df_hvg.shape[0]
-df_hvg.set_index('index', inplace = True)
-df_hvg.drop(columns = ['gene_ids'], inplace = True)
+df_hvf = pd.read_csv(hvf_file)
+df_hvf['highly_variable_features'] = [True] * df_hvf.shape[0]
+df_hvf.set_index('index', inplace = True)
+df_hvf.drop(columns = ['gene_ids'], inplace = True)
 adata = sc.read_h5ad(pca_data)
 df_join = adata.var.join(df_hvg)
-df_join['highly_variable_genes'].fillna(False, inplace = True)
-adata_hvg = adata[:, df_join['highly_variable_genes']].copy()
+df_join['highly_variable_features'].fillna(False, inplace = True)
+adata_hvg = adata[:, df_join['highly_variable_features']].copy()
 start_bbknn = time.time()
 bbknn(adata_hvg, batch_key = 'Channel')
 end_bbknn = time.time()
@@ -48,10 +48,10 @@ f.write(logstr_batch + '\n')
 
 print("Running PCA")
 adata = sc.read_h5ad(corrected_data)
-adata_hvg = adata[:, adata.var['highly_variable_genes']].copy()
+adata_hvf = adata[:, adata.var['highly_variable_features']].copy()
 start_pca = time.time()
-sc.pp.scale(adata_hvg, max_value = 10)
-sc.tl.pca(adata_hvg, random_state = rand_seed)
+sc.pp.scale(adata_hvf, max_value = 10)
+sc.tl.pca(adata_hvf, random_state = rand_seed)
 end_pca = time.time()
 logstr_pca = "Time spent for PCA: {}.".format(timedelta(seconds = end_pca - start_pca))
 cprint(logstr_pca, "yellow")
@@ -71,8 +71,8 @@ f.write(logstr_nn + '\n')
 # Construct affinity matrix using KNN information from scCloud results.
 adata = sc.read_h5ad(corrected_data)
 n_cells = adata.shape[0]
-knn_indices = np.concatenate((np.arange(n_cells).reshape(-1, 1), adata.uns['knn_indices']), axis = 1)
-knn_distances = np.concatenate((np.zeros(n_cells).reshape(-1, 1), adata.uns['knn_distances']), axis = 1)
+knn_indices = np.concatenate((np.arange(n_cells).reshape(-1, 1), adata.uns['pca_knn_indices']), axis = 1)
+knn_distances = np.concatenate((np.zeros(n_cells).reshape(-1, 1), adata.uns['pca_knn_distances']), axis = 1)
 distances, connectivities = compute_connectivities_umap(knn_indices, knn_distances, n_obs = n_cells, n_neighbors = 100)
 adata.uns['neighbors'] = {}
 adata.uns['neighbors']['indices'] = knn_indices
@@ -125,10 +125,11 @@ cprint(logstr_df, "yellow")
 f.write(logstr_df + '\n')
 
 f.close()
+adata.write("scanpy_result.h5ad", compression = 'gzip')
 
-print("Computing FLE embedding")
-start_fle = time.time()
-sc.tl.draw_graph(adata, random_state = rand_seed, n_jobs = sc.settings.n_jobs, iterations = 5000)
-end_fle = time.time()
-logstr_fle = "Time spent for FLE: {}.".format(timedelta(seconds = end_fle - start_fle))
-cprint(logstr_fle, "yellow")
+#print("Computing FLE embedding")
+#start_fle = time.time()
+#sc.tl.draw_graph(adata, random_state = rand_seed, n_jobs = sc.settings.n_jobs, iterations = 5000)
+#end_fle = time.time()
+#logstr_fle = "Time spent for FLE: {}.".format(timedelta(seconds = end_fle - start_fle))
+#cprint(logstr_fle, "yellow")

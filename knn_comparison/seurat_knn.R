@@ -1,16 +1,29 @@
 library(RANN)
 library(parallel)
 library(R.utils)
+library(future.apply)
+
+source("/opt/software/seurat-3.1.0/R/clustering.R")
 
 n.cores <- detectCores()
 setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores if possible."))
 
 X <- read.table("x_pca.txt", header = FALSE)
-start_seurat <- Sys.time()
-my.knn <- nn2(data = X, k = 100, searchtype = "standard", eps = 0)
-end_seurat <- Sys.time()
-print("Time used for Seurat:")
-print(end_seurat - start_seurat)
 
-write.table(my.knn$nn.idx, "seurat_indices.txt", row.names = FALSE, col.names = FALSE)
+start_ann <- Sys.time()
+my.knn1 <- nn2(data = X, k = 100, searchtype = "standard", eps = 0)
+end_ann <- Sys.time()
+print("Time used for Seurat ANN:")
+print(end_ann - start_ann)
+
+write.table(my.knn1$nn.idx, "seurat_indices_ann.txt", row.names = FALSE, col.names = FALSE)
+
+Y <- as.matrix(X)
+start_annoy <- Sys.time()
+my.knn2 <- AnnoyNN(data = Y, k = 100)
+end_annoy <- Sys.time()
+print("Time used for Seurat AnnoyNN:")
+print(end_annoy - start_annoy)
+
+write.table(my.knn2$nn.idx, "seurat_indices_annoy.txt", row.names = FALSE, col.names = FALSE)

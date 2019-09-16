@@ -55,4 +55,4 @@ if __name__ == '__main__':
 	adata = scc.read_input(data_dst + '.h5ad')
 
 	measure_algorithms(adata)
-	#net_umap_phase_plots(adata)
+	net_umap_phase_plots(adata)

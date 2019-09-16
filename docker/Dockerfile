@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 
 # Install ssl, curl, ssh, and git
 RUN apt-get update -qq && \
-	apt-get install -y libssl-dev libcurl4-openssl-dev libssh2-1-dev libhdf5-dev gfortran vim emacs && \
+	apt-get install -y libssl-dev libcurl4-openssl-dev libssh2-1-dev libhdf5-dev gfortran && \
 	apt-get install --no-install-recommends -y \
 		build-essential \
 		automake \
@@ -18,7 +18,8 @@ RUN apt-get update -qq && \
 	apt-get clean
 
 ## Install Oracle JDK 12.0.1 ##
-## TODO
+ADD jdk-12.0.1_linux-x64_bin.tar.gz /opt/software
+ENV PATH=/opt/jdk-12.0.1/bin:$PATH
 
 # Install R 3.6
 RUN wget http://security.ubuntu.com/ubuntu/pool/main/t/tzdata/tzdata_2019b-0ubuntu0.18.04_all.deb && \
@@ -142,7 +143,7 @@ RUN pip install Cython==0.29.13 && \
 	git clone https://github.com/lilab-bcb/bbknn.git /opt/bbknn && cd /opt/bbknn && pip install -e . && \
 	pip install scanpy==1.4.4.post1 && \
 	pip install MulticoreTSNE==0.1 && \
-	git clone https://github.com/vtraag/louvain-igraph.git /opt/louvain && cd /opt/louvain && pip install -e . && \
+	pip install louvain==0.6.1 && \
 	pip install leidenalg==0.7.0 && \
 	pip install umap-learn==0.3.10 && \
 	pip install mnnpy==0.1.9.5 && \

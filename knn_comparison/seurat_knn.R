@@ -11,13 +11,13 @@ print(paste("Use", n.cores, "cores if possible."))
 
 X <- read.table("x_pca.txt", header = FALSE)
 
-start_ann <- Sys.time()
-my.knn1 <- nn2(data = X, k = 100, searchtype = "standard", eps = 0)
-end_ann <- Sys.time()
-print("Time used for Seurat ANN:")
-print(end_ann - start_ann)
+#start_ann <- Sys.time()
+#my.knn1 <- nn2(data = X, k = 100, searchtype = "standard", eps = 0)
+#end_ann <- Sys.time()
+#print("Time used for Seurat ANN:")
+#print(end_ann - start_ann)
 
-write.table(my.knn1$nn.idx, "seurat_indices_ann.txt", row.names = FALSE, col.names = FALSE)
+#write.table(my.knn1$nn.idx, "seurat_indices_ann.txt", row.names = FALSE, col.names = FALSE)
 
 Y <- as.matrix(X)
 start_annoy <- Sys.time()

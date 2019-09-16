@@ -91,7 +91,7 @@ def get_NN_scanpy(data, K = 100):
 	return knn_indices
 
 def get_NN_Seurat(data):
-	f_list = [f for f in os.listdir('.') if f == 'seurat_indices.txt']
+	f_list = [f for f in os.listdir('.') if f == 'seurat_indices_annoy.txt']
 
 	if len(f_list) == 0:
 		f_list = [f for f in os.listdir('.') if re.match('x_pca.txt', f)]
@@ -105,7 +105,7 @@ def get_NN_Seurat(data):
 		cprint("KNN calculation is finished!", "yellow")
 	
 	cprint("Loading calculated seurat results...", "yellow")
-	knn_indices = np.loadtxt('seurat_indices.txt').astype('int')
+	knn_indices = np.loadtxt('seurat_indices_annoy.txt').astype('int')
 	knn_indices -= 1
 	
 	return knn_indices
@@ -207,7 +207,7 @@ if __name__ == '__main__':
 
 	else:
 
-		f_list = [f for f in os.listdir('.') if f in ["baseline_indices.npy", "sccloud_indices.npy", "scanpy_indices.npy", "seurat_indices.txt"]]
+		f_list = [f for f in os.listdir('.') if f in ["baseline_indices.npy", "sccloud_indices.npy", "scanpy_indices.npy", "seurat_indices_annoy.txt"]]
 
 		if len(f_list) == 4:
 			df_list = []
@@ -225,7 +225,7 @@ if __name__ == '__main__':
 
 			# For seurat
 			knn_indices = get_NN_Seurat(None)
-			df_seurat = generate_knn_recall_dataframe('Seurat V3', knn_indices, baseline_indices)
+			df_seurat = generate_knn_recall_dataframe('Seurat Annoy', knn_indices, baseline_indices)
 			df_list.append(df_seurat)
 	
 			plot_result(df_list)

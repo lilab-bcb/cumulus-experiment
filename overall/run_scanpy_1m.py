@@ -118,7 +118,7 @@ f.write(logstr_tsne + '\n')
 
 print("Computing diffmap")
 start_df = time.time()
-sc.tl.diffmap(adata, n_comps = 50)
+sc.tl.diffmap(adata, n_comps = 100)
 end_df = time.time()
 logstr_df = "Time spent for diffmap: {}.".format(timedelta(seconds = end_df - start_df))
 cprint(logstr_df, "yellow")

@@ -15,33 +15,33 @@
 \section{270K Bone Marrow Dataset}
 
 \paragraph{}
-Seurat 3.0.2 \qquad vs \qquad SCANPY 1.4.4 \qquad vs \qquad scCloud 0.13.0
+Seurat 3.0.2 \qquad vs \qquad SCANPY 1.4.4 \qquad vs \qquad scCloud 0.14.0
 
 \begin{table}[H]
 	\centering
 	\begin{tabular}{|c|c|c|c|}
 		\hline
-		Analysis & Seurat v3 & SCANPY & scCloud\\
+		Analysis & Seurat v3 & SCANPY & scCloudPy\\
 		\hline \hline
 		HVG selection & 2 min 36 sec & 1 min 24 sec & \textbf{11 sec} \\
 		\hline
 		Batch correction & Failed after $\approx$ 24 h & 9 min 59 sec & \textbf{19 sec} \\
 		\hline
-		PCA & 5 min 29 sec & 15 sec & 18 sec \\
+		PCA & 5 min 29 sec & 15 sec & \textbf{11 sec} \\
 		\hline
 		Find K nearest neighbors &  1 h 20 min &  4 min 43 sec & \textbf{6 sec}\\
 		\hline
-		Diffusion map & N/A & 3 min 1 sec & \textbf{2 min 8 sec} \\
+		Diffusion map & N/A & 3 min 1 sec & \textbf{2 min 47 sec} \\
 		\hline
-		Louvain Clustering & 7 min 30 sec & 10 min 44 sec & \textbf{54 sec} \\
+		Louvain Clustering & 7 min 30 sec & 10 min 44 sec & \textbf{52 sec} \\
 		\hline 
-		Leiden Clustering & Failed due to large SNN graph & 29 min 9 sec & \textbf{50 sec}\\
+		Leiden Clustering & Failed due to large SNN graph & 29 min 9 sec & \textbf{47 sec}\\
 		\hline
 		t-SNE-based visualization & 3 min 3 sec & 16 min 12 sec & \textbf{2 min 49 sec}\\
 		\hline
-		UMAP-based visualization & 10 min 40 sec & 13 min 33 sec  & \textbf{2 min 29 sec}\\
+		UMAP-based visualization & 10 min 40 sec & 13 min 33 sec  & \textbf{2 min 24 sec}\\
 		\hline
-		FLE-based visualization & N/A & $\approx$ 14.8  h & \textbf{14 min 19 sec}\\
+		FLE-based visualization & N/A & $\approx$ 14.8  h & \textbf{15 min 20 sec}\\
 		\hline
 	\end{tabular}
 \end{table}
@@ -49,33 +49,33 @@ Seurat 3.0.2 \qquad vs \qquad SCANPY 1.4.4 \qquad vs \qquad scCloud 0.13.0
 \section{1M Mouse Neuron Dataset}
 
 \paragraph{}
-SCANPY 1.4.4 \qquad vs \qquad scCloud 0.13.0
+SCANPY 1.4.4 \qquad vs \qquad scCloud 0.14.0
 
 \begin{table}[H]
 	\centering
-	\begin{tabular}{|c|c|c|}
+	\begin{tabular}{|c|c|c|c|}
 		\hline
-		Analysis  & SCANPY & scCloud\\
+		Analysis  & Seurat v3 & SCANPY & scCloudPy\\
 		\hline \hline
-		HVG selection  & 4 min 38 sec  & \textbf{1 min 33 sec}  \\
-		\hline
-		Batch correction  & 1 h 45 min  & \textbf{35 sec}  \\
-		\hline
-		PCA   & 1 min 9 sec  & 1 min 25 sec  \\
-		\hline
-		Find K nearest neighbors  & 29 min 53 sec  & \textbf{1 min 29 sec}  \\
-		\hline
-		Diffusion map   & 20 min 21 sec  & \textbf{12 min 40 sec}  \\
-		\hline
-		Louvain Clustering  & 2 h 35 min  & \textbf{4 min 49 sec}  \\
-		\hline 
-		Leiden Clustering & 11 h 13 min  & \textbf{5 min 27 sec}  \\
-		\hline
-		t-SNE-based visualization  & 1 h 36 min  & \textbf{12 min 1 sec}  \\
-		\hline
-		UMAP-based visualization  & 1 h 18 min   & \textbf{11 min 48 sec}  \\
-		\hline
-		FLE-based visualization   & 3 d 17 h  & \textbf{1 h 33 min}  \\
+		HVG selection  & \multirow{10}{*}{Failed at loading} & 4 min 38 sec  & \textbf{1 min 50 sec}  \\
+		\cline{1-1}\cline{3-4}
+		Batch correction  & & 1 h 45 min  & \textbf{2 min 18 sec}  \\
+		\cline{1-1}\cline{3-4}
+		PCA   & & 1 min 9 sec  & \textbf{57 sec}  \\
+		\cline{1-1}\cline{3-4}
+		Find K nearest neighbors &  & 29 min 53 sec  & \textbf{1 min 28 sec}  \\
+		\cline{1-1}\cline{3-4}
+		Diffusion map   & & 20 min 21 sec  & \textbf{20 min 13 sec}  \\
+		\cline{1-1}\cline{3-4}
+		Louvain Clustering &  & 2 h 35 min  & \textbf{4 min 44 sec}  \\
+		\cline{1-1}\cline{3-4}
+		Leiden Clustering & & 11 h 13 min  & \textbf{4 min 14 sec}  \\
+		\cline{1-1}\cline{3-4}
+		t-SNE-based visualization  & & 1 h 36 min  & \textbf{11 min 48 sec}  \\
+		\cline{1-1}\cline{3-4}
+		UMAP-based visualization  & & 1 h 18 min   & \textbf{11 min 28 sec}  \\
+		\cline{1-1}\cline{3-4}
+		FLE-based visualization   & & 3 d 17 h  & \textbf{1 h 38 min}  \\
 		\hline
 	\end{tabular}
 \end{table}

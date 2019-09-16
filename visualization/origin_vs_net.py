@@ -12,7 +12,7 @@ def calc_and_plot():
 	cprint("Calculation with {jobs} cores.".format(jobs = n_cores), "green")
 	
 	if (data_dst + '.h5ad') not in os.listdir('.'):
-		if os.system("sccloud cluster -p {jobs} --correct-batch-effect --diffmap --louvain --fitsne --tsne --net-tsne --umap --net-umap --fle --net-fle {src} {outname}".format(jobs = n_cores, src = data_src, outname = data_dst)):
+		if os.system("sccloud cluster -p {jobs} --correct-batch-effect --diffmap --louvain --fitsne --tsne --net-tsne --umap --net-umap --fle --net-fle {src} {outname} > visualization.log".format(jobs = n_cores, src = data_src, outname = data_dst)):
 			sys.exit(1)
 
 	for basis in basis_list:

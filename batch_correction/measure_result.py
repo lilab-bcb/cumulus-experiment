@@ -132,7 +132,7 @@ def process_data(data, method, output = None, processed = False):
 	cprint("Loading ground truth cell types...", "green")
 	df_celltype = pd.read_csv("ground_cell_type.txt")
 	assert np.sum(df_celltype['cell_id'] != data.obs.index.values) == 0
-	data.obs['cell_types'] = pd.Categorical(df_celltype['cell_types'].values)
+	data.obs['Cluster'] = pd.Categorical(df_celltype['cell_types'].values)
 
 	# Set Individual
 	if method == 'mnn':
@@ -152,7 +152,7 @@ def process_data(data, method, output = None, processed = False):
 
 	cprint("Plotting UMAP for cells with cell types...", "green")
 	scc.write_output(data, "{}_compare".format(celltypes_plot_dir + "/" + method))
-	if os.system("sccloud plot scatter --basis umap --attributes cell_types,Individual {name}_compare.h5ad {name}.celltypes.umap.pdf".format(name = celltypes_plot_dir + "/" + method)):
+	if os.system("sccloud plot scatter --basis umap --attributes Cluster,Individual {name}_compare.h5ad {name}.cluster+individual.umap.pdf".format(name = celltypes_plot_dir + "/" + method)):
 		sys.exit(1)
 
 def plot_scatter(precomputed = False):

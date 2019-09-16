@@ -220,7 +220,7 @@ if __name__ == '__main__':
 
 			# For scanpy
 			knn_indices = get_NN_scanpy(None)
-			df_scanpy = generate_knn_recall_dataframe('Scanpy', knn_indices, baseline_indices)
+			df_scanpy = generate_knn_recall_dataframe('SCANPY', knn_indices, baseline_indices)
 			df_list.append(df_scanpy)
 
 			# For seurat

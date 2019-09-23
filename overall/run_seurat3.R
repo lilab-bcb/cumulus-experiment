@@ -44,13 +44,15 @@ save(adata, file = "seurat_pca.RData")
 
 print("Computing neighborhood graph:")
 n.pc <- dim(adata[["pca"]])[2]
+print(paste0("KNN using ", n.pc, " PCs."))
+write(paste0("KNN using ", n.pc, " PCs"), file = logfile, append = TRUE)
 now <- Sys.time()
-bdata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, compute.SNN = FALSE)
+bdata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy", compute.SNN = FALSE)
 logstr.knn <- Sys.time() - now
 print(logstr.knn)
 write(paste("KNN time:", logstr.knn, attr(logstr.knn, "units")), file = logfile, append = TRUE)
 
-adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, compute.SNN = TRUE)
+adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy", compute.SNN = TRUE)
 save(adata, file = "seurat_knn.RData")
 
 

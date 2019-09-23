@@ -19,7 +19,7 @@ RUN apt-get update -qq && \
 
 ## Install Oracle JDK 12.0.1 ##
 ADD jdk-12.0.1_linux-x64_bin.tar.gz /opt/software
-ENV PATH=/opt/jdk-12.0.1/bin:$PATH
+ENV PATH=/opt/software/jdk-12.0.1/bin:$PATH
 
 # Install R 3.6
 RUN wget http://security.ubuntu.com/ubuntu/pool/main/t/tzdata/tzdata_2019b-0ubuntu0.18.04_all.deb && \

@@ -104,7 +104,7 @@ RUN	pip install Cython==0.29.13 && \
 	pip install umap-learn==0.3.10 && \
 	pip install anndata==0.6.22.post1 && \
 	pip install termcolor==1.1.0 && \
-	pip install sccloud==0.14.0rc3
+	pip install sccloud==0.14.0
 
 # Install scanpy environment
 RUN conda create -n scanpy python=3.7.3 -y

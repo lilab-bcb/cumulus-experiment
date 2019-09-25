@@ -32,6 +32,7 @@ df_hvf['highly_variable_features'] = [True] * df_hvf.shape[0]
 df_hvf.set_index('index', inplace = True)
 df_hvf.drop(columns = ['gene_ids'], inplace = True)
 adata = sc.read_h5ad(pca_data)
+adata.var.drop(columns = ['highly_variable_features'], inplace = True)
 df_join = adata.var.join(df_hvf)
 df_join['highly_variable_features'].fillna(False, inplace = True)
 adata_hvf = adata[:, df_join['highly_variable_features']].copy()

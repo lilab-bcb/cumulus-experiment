@@ -3,7 +3,7 @@ import sccloud as scc
 from termcolor import cprint
 
 n_cores = os.cpu_count()
-data_src = "../MantonBM_nonmix.h5sc"
+data_src = "/projects/benchmark/MantonBM/MantonBM_nonmix.h5sc"
 data_dst = "MantonBM_nonmix_origin_vs_net"
 
 basis_list = ['fitsne', 'tsne', 'net_tsne', 'umap', 'net_umap', 'fle', 'net_fle']

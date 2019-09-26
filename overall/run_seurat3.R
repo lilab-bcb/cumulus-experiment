@@ -9,7 +9,7 @@ setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores."))
 
 ## Benchmark Highly Variable Gene selection. ##
-src.obj <- ReadH5AD("../MantonBM_nonmix_filter_norm.h5ad")
+src.obj <- ReadH5AD("/projects/benchmark/MantonBM/MantonBM_nonmix_filter_norm.h5ad")
 obj.list <- SplitObject(src.obj, split.by = "Channel")
 print("Finding Highly Variable Genes:")
 now <- Sys.time()
@@ -19,7 +19,7 @@ print(logstr.hvg)
 write(paste("HVG time:", logstr.hvg, attr(logstr.hvg, "units")), file = logfile)
 
 ## Benchmark Batch Correction. ##
-##src.obj <- ReadH5AD("../MantonBM_nonmix_10x_filter_norm_hvg.h5ad")
+##src.obj <- ReadH5AD("/projects/benchmark/MantonBM/MantonBM_nonmix_filter_norm_hvf.h5ad")
 ##VariableFeatures(src.obj) <- GetAssayData(src.obj)@Dimnames[[1]]
 ##obj.list <- SplitObject(src.obj, split.by = "Channel")
 ##now <- Sys.time()
@@ -30,7 +30,7 @@ write(paste("HVG time:", logstr.hvg, attr(logstr.hvg, "units")), file = logfile)
 
 
 ## Benchmark PCA.
-adata <- ReadH5AD("../MantonBM_nonmix_corrected_hvf.h5ad")
+adata <- ReadH5AD("/projects/benchmark/MantonBM/MantonBM_nonmix_corrected_hvf.h5ad")
 print("PCA time:")
 now <- Sys.time()
 adata <- ScaleData(adata, scale.max = 10, verbose = FALSE)

@@ -7,8 +7,8 @@ from mnnpy import mnn_correct
 
 rand_seed = 0
 
-src_file = "../../MantonBM_nonmix_tiny_filter_norm.h5ad"
-hvf_file = "../../hvf.txt"
+src_file = "/projects/benchmark/MantonBM/MantonBM_nonmix_tiny_filter_norm.h5ad"
+hvf_file = "/projects/benchmark/MantonBM/MantonBM_nonmix_hvf.txt"
 
 
 def calc_mnn():

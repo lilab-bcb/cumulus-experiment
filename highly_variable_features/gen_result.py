@@ -9,7 +9,7 @@ from sklearn.metrics import adjusted_mutual_info_score
 
 n_cores = os.cpu_count()
 
-src_file = "../MantonBM_nonmix.h5sc"
+src_file = "/projects/benchmark/MantonBM/MantonBM_nonmix.h5sc"
 immune_gene_file = "immune_genes.txt"
 
 seurat_correct_name = "MantonBM_nonmix_seurat_hvf_corrected"

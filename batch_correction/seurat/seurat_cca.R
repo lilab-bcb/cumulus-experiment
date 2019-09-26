@@ -10,11 +10,11 @@ n.cores <- detectCores()
 setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores."))
 
-src.obj <- ReadH5AD("../../MantonBM_nonmix_tiny_filter_norm.h5ad")
+src.obj <- ReadH5AD("/projects/benchmark/MantonBM/MantonBM_nonmix_tiny_filter_norm.h5ad")
 obj.list <- SplitObject(src.obj, split.by = "Channel")
 
 ## Read preset high variable features
-df.hvf <- read.csv(file = "../../hvf.txt")
+df.hvf <- read.csv(file = "/projects/benchmark/MantonBM/MantonBM_nonmix_hvf.txt")
 hvf.features <- as.character(unlist(df.hvf['index']))
 
 ## Create Seurat objects

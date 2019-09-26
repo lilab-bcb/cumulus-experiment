@@ -7,8 +7,8 @@ sc.settings.n_jobs = os.cpu_count()
 print("Using {} cores if possible.".format(sc.settings.n_jobs))
 rand_seed = 0
 
-src_file = "../../MantonBM_nonmix_tiny_filter_norm.h5ad"
-hvf_file = "../../hvf.txt"
+src_file = "/projects/benchmark/MantonBM/MantonBM_nonmix_tiny_filter_norm.h5ad"
+hvf_file = "/projects/benchmark/MantonBM/MantonBM_nonmix_hvf.txt"
 
 print("Reading ICA (bone marrow) tiny dataset")
 adata = sc.read_h5ad(src_file)

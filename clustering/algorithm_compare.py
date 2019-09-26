@@ -4,7 +4,7 @@ from termcolor import cprint
 from sklearn.metrics.cluster import adjusted_mutual_info_score
 
 n_cores = os.cpu_count()
-data_src = "../MantonBM_nonmix.h5sc"
+data_src = "/projects/benchmark/MantonBM/MantonBM_nonmix.h5sc"
 data_dst = "MantonBM_nonmix_clustering"
 
 label_list = ['louvain_labels', 'spectral_louvain_labels', 'leiden_labels', 'spectral_leiden_labels']

@@ -14,7 +14,7 @@ from termcolor import cprint
 from sccloud.tools import update_rep, W_from_rep
 from sccloud.tools.diffusion_map import calculate_normalized_affinity, calc_von_neumann_entropy, find_knee_point
 
-src_file = "../MantonBM_nonmix.h5sc"
+src_file = "/projects/benchmark/MantonBM/MantonBM_nonmix.h5sc"
 outname = "MantonBM_sccloud_output"
 
 def get_entropy(W: "csr_matrix", n_components: int = 100, solver: str = 'eigsh', random_state: int = 0, max_t: int = 5000):

@@ -15,7 +15,7 @@
 \section{270K Bone Marrow Dataset}
 
 \paragraph{}
-Seurat 3.0.2 \qquad vs \qquad SCANPY 1.4.4 \qquad vs \qquad scCloud 0.14.0
+Seurat 3.1.0 \qquad vs \qquad SCANPY 1.4.4.post1 \qquad vs \qquad scCloud 0.14.0
 
 \begin{table}[H]
 	\centering
@@ -23,25 +23,25 @@ Seurat 3.0.2 \qquad vs \qquad SCANPY 1.4.4 \qquad vs \qquad scCloud 0.14.0
 		\hline
 		Analysis & Seurat v3 & SCANPY & scCloudPy\\
 		\hline \hline
-		HVG selection & 2 min 36 sec & 1 min 24 sec & \textbf{11 sec} \\
+		HVG selection & 2 min 7 sec & 1 min 27 sec & \textbf{11 sec} \\
 		\hline
-		Batch correction & Failed after $\approx$ 24 h & 9 min 59 sec & \textbf{19 sec} \\
+		Batch correction & Failed after $\approx$ 24 h & 8 min 4 sec & \textbf{19 sec} \\
 		\hline
-		PCA & 5 min 29 sec & 15 sec & \textbf{11 sec} \\
+		PCA & 5 min 49 sec & 12 sec & \textbf{11 sec} \\
 		\hline
-		Find K nearest neighbors &  1 h 20 min &  4 min 43 sec & \textbf{6 sec}\\
+		Find K nearest neighbors &  4 min 14 sec &  5 min 55 sec & \textbf{6 sec}\\
 		\hline
-		Diffusion map & N/A & 3 min 1 sec & \textbf{2 min 47 sec} \\
+		Diffusion map & N/A & 4 min 8 sec & \textbf{2 min 47 sec} \\
 		\hline
-		Louvain Clustering & 7 min 30 sec & 10 min 44 sec & \textbf{52 sec} \\
+		Louvain Clustering & 7 min 26 sec & 23 min 48 sec & \textbf{52 sec} \\
 		\hline 
-		Leiden Clustering & Failed due to large SNN graph & 29 min 9 sec & \textbf{47 sec}\\
+		Leiden Clustering & Failed due to large SNN graph & 43 min 22 sec & \textbf{47 sec}\\
 		\hline
-		t-SNE-based visualization & 3 min 3 sec & 16 min 12 sec & \textbf{2 min 49 sec}\\
+		t-SNE-based visualization & 3 min 12 sec & 19 min 2 sec & \textbf{2 min 49 sec}\\
 		\hline
-		UMAP-based visualization & 10 min 40 sec & 13 min 33 sec  & \textbf{2 min 24 sec}\\
+		UMAP-based visualization & 8 min 58 sec & 12 min 9 sec  & \textbf{2 min 24 sec}\\
 		\hline
-		FLE-based visualization & N/A & $\approx$ 14.8  h & \textbf{15 min 20 sec}\\
+		FLE-based visualization & N/A & $\approx$ 18 h 29 min & \textbf{15 min 20 sec}\\
 		\hline
 	\end{tabular}
 \end{table}

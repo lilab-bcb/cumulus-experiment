@@ -17,58 +17,58 @@ pca_data = "/projects/benchmark/1M_Neurons/1M_neurons_filter_norm_pca.h5ad"
 corrected_data = "/projects/benchmark/1M_Neurons/1M_neurons_corrected.h5ad"
 
 
-print("Reading Mouse Neuron dataset")
-adata = sc.read_h5ad(filter_norm_data)
-print("Finding highly variable genes")
-start_hvf = time.time()
-sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=7, min_disp=0.5, n_top_genes = 2000, batch_key = 'Channel')
-end_hvf = time.time()
-logstr_hvf = "Time spent for HVG: {}.".format(timedelta(seconds = end_hvf - start_hvf))
-print(logstr_hvf)
-
-
-print("Batch correction using BBKNN")
-df_hvf = pd.read_csv(hvf_file)
-df_hvf['highly_variable_features'] = [True] * df_hvf.shape[0]
-df_hvf.set_index('index', inplace = True)
-df_hvf.drop(columns = ['gene_ids'], inplace = True)
-adata = sc.read_h5ad(pca_data)
-adata.var.drop(columns = ['highly_variable_features'], inplace = True)
-df_join = adata.var.join(df_hvf)
-df_join['highly_variable_features'].fillna(False, inplace = True)
-adata_hvf = adata[:, df_join['highly_variable_features']].copy()
-start_bbknn = time.time()
-bbknn(adata_hvf, batch_key = 'Channel')
-end_bbknn = time.time()
-logstr_batch = "Time spend for BBKNN batch correction: {}.".format(timedelta(seconds = end_bbknn - start_bbknn))
-print(logstr_batch)
-
-
-print("Running PCA")
-adata = sc.read_h5ad(corrected_data)
-adata_hvf = adata[:, adata.var['highly_variable_features']].copy()
-start_pca = time.time()
-sc.pp.scale(adata_hvf, max_value = 10)
-sc.tl.pca(adata_hvf, random_state = rand_seed)
-end_pca = time.time()
-logstr_pca = "Time spent for PCA: {}.".format(timedelta(seconds = end_pca - start_pca))
-print(logstr_pca)
-
-
-print("Computing neighborhood graph")
-adata = sc.read_h5ad(corrected_data)
-start_nn = time.time()
-sc.pp.neighbors(adata, n_neighbors = 100, random_state = rand_seed)
-end_nn = time.time()
-logstr_nn = "Time spent for knn: {}.".format(timedelta(seconds = end_nn - start_nn))
-print(logstr_nn)
+#print("Reading Mouse Neuron dataset")
+#adata = sc.read_h5ad(filter_norm_data)
+#print("Finding highly variable genes")
+#start_hvf = time.time()
+#sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=7, min_disp=0.5, n_top_genes = 2000, batch_key = 'Channel')
+#end_hvf = time.time()
+#logstr_hvf = "Time spent for HVG: {}.".format(timedelta(seconds = end_hvf - start_hvf))
+#print(logstr_hvf)
+#
+#
+#print("Batch correction using BBKNN")
+#df_hvf = pd.read_csv(hvf_file)
+#df_hvf['highly_variable_features'] = [True] * df_hvf.shape[0]
+#df_hvf.set_index('index', inplace = True)
+#df_hvf.drop(columns = ['gene_ids'], inplace = True)
+#adata = sc.read_h5ad(pca_data)
+#adata.var.drop(columns = ['highly_variable_features'], inplace = True)
+#df_join = adata.var.join(df_hvf)
+#df_join['highly_variable_features'].fillna(False, inplace = True)
+#adata_hvf = adata[:, df_join['highly_variable_features']].copy()
+#start_bbknn = time.time()
+#bbknn(adata_hvf, batch_key = 'Channel')
+#end_bbknn = time.time()
+#logstr_batch = "Time spend for BBKNN batch correction: {}.".format(timedelta(seconds = end_bbknn - start_bbknn))
+#print(logstr_batch)
+#
+#
+#print("Running PCA")
+#adata = sc.read_h5ad(corrected_data)
+#adata_hvf = adata[:, adata.var['highly_variable_features']].copy()
+#start_pca = time.time()
+#sc.pp.scale(adata_hvf, max_value = 10)
+#sc.tl.pca(adata_hvf, random_state = rand_seed)
+#end_pca = time.time()
+#logstr_pca = "Time spent for PCA: {}.".format(timedelta(seconds = end_pca - start_pca))
+#print(logstr_pca)
+#
+#
+#print("Computing neighborhood graph")
+#adata = sc.read_h5ad(corrected_data)
+#start_nn = time.time()
+#sc.pp.neighbors(adata, n_neighbors = 100, random_state = rand_seed)
+#end_nn = time.time()
+#logstr_nn = "Time spent for knn: {}.".format(timedelta(seconds = end_nn - start_nn))
+#print(logstr_nn)
 
 
 # Construct affinity matrix using KNN information from scCloud results.
 adata = sc.read_h5ad(corrected_data)
 n_cells = adata.shape[0]
-knn_indices = np.concatenate((np.arange(n_cells).reshape(-1, 1), adata.uns['knn_indices']), axis = 1)
-knn_distances = np.concatenate((np.zeros(n_cells).reshape(-1, 1), adata.uns['knn_distances']), axis = 1)
+knn_indices = np.concatenate((np.arange(n_cells).reshape(-1, 1), adata.uns['pca_knn_indices']), axis = 1)
+knn_distances = np.concatenate((np.zeros(n_cells).reshape(-1, 1), adata.uns['pca_knn_distances']), axis = 1)
 distances, connectivities = compute_connectivities_umap(knn_indices, knn_distances, n_obs = n_cells, n_neighbors = 100)
 adata.uns['neighbors'] = {}
 adata.uns['neighbors']['indices'] = knn_indices

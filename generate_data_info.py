@@ -17,7 +17,7 @@ def extract_hvf(input_file):
 	scc.qc_metrics(adata)
 	scc.filter_data(adata)
 	scc.log_norm(adata)
-	scc.highly_variable_features(adata, consider_batch = True, n_jobs = 8)
+	scc.highly_variable_features(adata, consider_batch = True)
 	scc.correct_batch(adata, features = "highly_variable_features")
 
 	# Extract highly variable gene set to file.
@@ -27,7 +27,7 @@ def extract_hvf(input_file):
 
 	# PCA and KNN
 	scc.pca(adata)
-	scc.neighbors(adata, n_jobs = 20)
+	scc.neighbors(adata)
 	scc.write_output(adata, fname_prefix + "_corrected")
 
 	bdata = adata[:, adata.var['highly_variable_features']].copy()
@@ -48,7 +48,7 @@ def preprocess_data(in_file):
 	scc.log_norm(adata)
 
 	print("Getting Highly Variable Feature Set...")
-	df_hvf = pd.read_csv(hvf_file)
+	df_hvf = pd.read_csv(os.path.splitext(in_file)[0] + "_hvf.txt")
 	df_hvf['highly_variable_features'] = [True] * df_hvf.shape[0]
 	df_hvf.set_index('index', inplace = True)
 	df_hvf.drop(columns = ['gene_ids'], inplace = True)

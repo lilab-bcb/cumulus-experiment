@@ -3,16 +3,17 @@ import sccloud as scc
 import pandas as pd
 from termcolor import cprint
 
-full_data_source = "MantonBM_nonmix.h5sc"
-tiny_data_source = "MantonBM_nonmix_tiny.h5sc"
+bm_full_data_source = "/projects/benchmark/MantonBM/MantonBM_nonmix.h5sc"
+bm_tiny_data_source = "/projects/benchmark/MantonBM/MantonBM_nonmix_tiny.h5sc"
+neuron_data_source = "/projects/benchmark/1M_Neurons/1M_neurons.h5"
 
-hvf_file = "hvf.txt"
+def extract_hvf(input_file):
 
-def extract_hvf():
+	fname_prefix = os.path.splitext(input_file)[0]
 
 	# Run correction.
-	cprint("Running scCloud batch correction on full data...", "green")
-	adata = scc.read_input(full_data_source)
+	cprint("Extracting HVGs from {}...".format(input_file), "green")
+	adata = scc.read_input(input_file)
 	scc.qc_metrics(adata)
 	scc.filter_data(adata)
 	scc.log_norm(adata)
@@ -21,17 +22,17 @@ def extract_hvf():
 
 	# PCA and KNN
 	scc.pca(adata)
-	scc.neighbors(adata, n_jobs = 8)
+	scc.neighbors(adata, n_jobs = 20)
 
 	# Extract highly variable gene set to file.
 	cprint("Extracting highly variable features to file...", "green")
 	df_hvf = adata.var.loc[adata.var["highly_variable_features"]][["gene_ids"]]
-	df_hvf.to_csv(hvf_file, index_label = "index")
+	df_hvf.to_csv(fname_prefix + "_hvf.txt", index_label = "index")
 
-	scc.write_output(adata, "MantonBM_nonmix_corrected")
+	scc.write_output(adata, fname_prefix + "_corrected")
 
 	bdata = adata[:, adata.var['highly_variable_features']].copy()
-	scc.write_output(bdata, "MantonBM_nonmix_corrected_hvg")
+	scc.write_output(bdata, fname_prefix + "_corrected_hvf")
 
 def preprocess_data(in_file):
 
@@ -73,6 +74,8 @@ def preprocess_data(in_file):
 	scc.write_output(adata_hvf, output_hvf_name2)
 
 if __name__ == '__main__':
-	extract_hvf()
+	extract_hvf(bm_full_data_source)
+	extract_hvf(neuron_data_source)
 	preprocess_data(full_data_source)
 	preprocess_data(tiny_data_source)
+	preprocess_data(neuron_data_source)

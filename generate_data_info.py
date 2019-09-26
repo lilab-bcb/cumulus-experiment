@@ -20,15 +20,14 @@ def extract_hvf(input_file):
 	scc.highly_variable_features(adata, consider_batch = True, n_jobs = 8)
 	scc.correct_batch(adata, features = "highly_variable_features")
 
-	# PCA and KNN
-	scc.pca(adata)
-	scc.neighbors(adata, n_jobs = 20)
-
 	# Extract highly variable gene set to file.
 	cprint("Extracting highly variable features to file...", "green")
 	df_hvf = adata.var.loc[adata.var["highly_variable_features"]][["gene_ids"]]
 	df_hvf.to_csv(fname_prefix + "_hvf.txt", index_label = "index")
 
+	# PCA and KNN
+	scc.pca(adata)
+	scc.neighbors(adata, n_jobs = 20)
 	scc.write_output(adata, fname_prefix + "_corrected")
 
 	bdata = adata[:, adata.var['highly_variable_features']].copy()

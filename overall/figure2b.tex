@@ -39,7 +39,7 @@ Seurat 3.1.0 \qquad vs \qquad SCANPY 1.4.4.post1 \qquad vs \qquad scCloud 0.14.0
 		\hline
 		t-SNE-based visualization & 3 min 12 sec & 19 min 2 sec & \textbf{2 min 49 sec}\\
 		\hline
-		UMAP-based visualization & 8 min 58 sec & 12 min 9 sec  & \textbf{2 min 24 sec}\\
+		UMAP-based visualization & 8 min 58 sec & 5 min 49 sec  & \textbf{2 min 24 sec}\\
 		\hline
 		FLE-based visualization & N/A & $\approx$ 18 h 29 min & \textbf{15 min 20 sec}\\
 		\hline
@@ -49,7 +49,7 @@ Seurat 3.1.0 \qquad vs \qquad SCANPY 1.4.4.post1 \qquad vs \qquad scCloud 0.14.0
 \section{1M Mouse Neuron Dataset}
 
 \paragraph{}
-SCANPY 1.4.4 \qquad vs \qquad scCloud 0.14.0
+SCANPY 1.4.4.post1 \qquad vs \qquad scCloud 0.14.0
 
 \begin{table}[H]
 	\centering
@@ -57,25 +57,25 @@ SCANPY 1.4.4 \qquad vs \qquad scCloud 0.14.0
 		\hline
 		Analysis  & Seurat v3 & SCANPY & scCloudPy\\
 		\hline \hline
-		HVG selection  & \multirow{10}{*}{Failed at loading} & 4 min 38 sec  & \textbf{1 min 50 sec}  \\
+		HVG selection  & \multirow{10}{*}{Failed at loading} & 3 min 43 sec  & \textbf{1 min 50 sec}  \\
 		\cline{1-1}\cline{3-4}
-		Batch correction  & & 1 h 45 min  & \textbf{2 min 18 sec}  \\
+		Batch correction  & & 1 h 26 min  & \textbf{2 min 18 sec}  \\
 		\cline{1-1}\cline{3-4}
-		PCA   & & 1 min 9 sec  & \textbf{57 sec}  \\
+		PCA   & & 57 sec  & 57 sec  \\
 		\cline{1-1}\cline{3-4}
-		Find K nearest neighbors &  & 29 min 53 sec  & \textbf{1 min 28 sec}  \\
+		Find K nearest neighbors &  & 29 min 43 sec  & \textbf{1 min 28 sec}  \\
 		\cline{1-1}\cline{3-4}
-		Diffusion map   & & 20 min 21 sec  & \textbf{20 min 13 sec}  \\
+		Diffusion map   & & 28 min 4 sec  & \textbf{20 min 13 sec}  \\
 		\cline{1-1}\cline{3-4}
-		Louvain Clustering &  & 2 h 35 min  & \textbf{4 min 44 sec}  \\
+		Louvain Clustering &  & 1 h 41 min  & \textbf{4 min 44 sec}  \\
 		\cline{1-1}\cline{3-4}
-		Leiden Clustering & & 11 h 13 min  & \textbf{4 min 14 sec}  \\
+		Leiden Clustering & & 15 h 59 min  & \textbf{4 min 14 sec}  \\
 		\cline{1-1}\cline{3-4}
-		t-SNE-based visualization  & & 1 h 36 min  & \textbf{11 min 48 sec}  \\
+		t-SNE-based visualization  & & 1 h 39 min  & \textbf{11 min 48 sec}  \\
 		\cline{1-1}\cline{3-4}
-		UMAP-based visualization  & & 1 h 18 min   & \textbf{11 min 28 sec}  \\
+		UMAP-based visualization  & & \textcolor{red}{1 h 14 min}   & \textbf{11 min 28 sec}  \\
 		\cline{1-1}\cline{3-4}
-		FLE-based visualization   & & 3 d 17 h  & \textbf{1 h 38 min}  \\
+		FLE-based visualization   & & $\approx$ 3 d 20 h  & \textbf{1 h 38 min}  \\
 		\hline
 	\end{tabular}
 \end{table}

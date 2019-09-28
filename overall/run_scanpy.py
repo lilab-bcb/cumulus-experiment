@@ -13,8 +13,8 @@ rand_seed = 0
 filter_norm_data = "/projects/benchmark/MantonBM/MantonBM_nonmix_filter_norm.h5ad"
 hvf_file = "/projects/benchmark/MantonBM/MantonBM_nonmix_hvf.txt"
 pca_data = "/projects/benchmark/MantonBM/MantonBM_nonmix_filter_norm_pca.h5ad"
-corrected_data = "/projects/benchmark/MantonBM/MantonBM_nonmix_corrected.h5ad"
-
+#corrected_data = "/projects/benchmark/MantonBM/MantonBM_nonmix_corrected.h5ad"
+corrected_data = "../MantonBM_nonmix_corrected.h5ad"
 
 #print("Reading ICA (bone marrow) dataset")
 #adata = sc.read_h5ad(filter_norm_data)
@@ -66,9 +66,9 @@ corrected_data = "/projects/benchmark/MantonBM/MantonBM_nonmix_corrected.h5ad"
 # Construct affinity matrix using KNN information from scCloud results.
 adata = sc.read_h5ad(corrected_data)
 n_cells = adata.shape[0]
-knn_indices = np.concatenate((np.arange(n_cells).reshape(-1, 1), adata.uns['pca_knn_indices']), axis = 1)
-knn_distances = np.concatenate((np.zeros(n_cells).reshape(-1, 1), adata.uns['pca_knn_distances']), axis = 1)
-distances, connectivities = compute_connectivities_umap(knn_indices, knn_distances, n_obs = n_cells, n_neighbors = 100)
+knn_indices = np.concatenate((np.arange(n_cells).reshape(-1, 1), adata.uns['pca_knn_indices'][:, 0:14]), axis = 1)
+knn_distances = np.concatenate((np.zeros(n_cells).reshape(-1, 1), adata.uns['pca_knn_distances'][:, 0:14]), axis = 1)
+distances, connectivities = compute_connectivities_umap(knn_indices, knn_distances, n_obs = n_cells, n_neighbors = 15)
 adata.uns['neighbors'] = {}
 adata.uns['neighbors']['indices'] = knn_indices
 adata.uns['neighbors']['distances'] = distances

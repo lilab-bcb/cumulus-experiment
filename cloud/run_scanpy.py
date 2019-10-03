@@ -15,6 +15,7 @@ output_file = "scanpy_analysis_result.h5ad"
 print("Reading ICA (bone marrow) dataset")
 adata = sc.read_10x_h5(input_file, genome = 'GRCh38')
 adata.var_names_make_unique()
+adata.obs['Channel'] = adata.obs.index.map(lambda s: s.split('-')[0]).astype('category')
 
 sc.pp.filter_cells(adata, min_genes = 500)
 sc.pp.filter_cells(adata, max_genes = 6000)

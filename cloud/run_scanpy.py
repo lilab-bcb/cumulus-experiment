@@ -1,4 +1,4 @@
-import os, sys, time
+import os, sys, time, math
 import numpy as np
 import pandas as pd
 import scanpy as sc
@@ -23,7 +23,7 @@ sc.pp.filter_cells(adata, min_genes = 500)
 sc.pp.filter_cells(adata, max_genes = 6000)
 
 num_cells = adata.shape[0]
-sc.pp.filter_genes(adata, min_cells = num_cells * 0.0005)
+sc.pp.filter_genes(adata, min_cells = math.floor(num_cells * 0.0005))
 
 mito_genes = adata.var_names.str.startswith('MT-')
 adata.obs['percent_mito'] = np.sum(adata[:, mito_genes].X, axis = 1).A1 / np.sum(adata.X, axis = 1).A1

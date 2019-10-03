@@ -1,0 +1,15 @@
+{
+	"cumulus.input_file" : "gs://fc-e7760257-20a8-46ae-8358-93a83f02a0ba/MantonBM_nonmix/count_matrix.csv",
+	"cumulus.output_name" : "gs://fc-e7760257-20a8-46ae-8358-93a83f02a0ba/MantonBM_nonmix_out_32/exp32_out",
+	"cumulus.num_cpu" : 32,
+	"cumulus.correct_batch_effect" : true,
+	"cumulus.minimum_number_of_genes" : 0,
+	"cumulus.knn_full_speed" : true,
+	"cumulus.run_louvain" : false,
+	"cumulus.run_spectral_louvain" : true,
+	"cumulus.run_net_umap" : true,
+	"cumulus.cluster_labels" : "spectral_louvain_labels",
+	"cumulus.auc" : false,
+	"cumulus.fisher" : false,
+	"cumulus.annotate_cluster" : true
+}

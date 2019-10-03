@@ -43,16 +43,16 @@ print("Time spent for HVG: {}.".format(timedelta(seconds = end_hvg - start_hvg))
 
 adata = adata[:, adata.var['highly_variable']]
 
-start_bbknn = time.time()
-bbknn(adata, batch_key = 'Channel')
-end_bbknn = time.time()
-print("Time spent for BBKNN: {}.".format(timedelta(seconds = end_bbknn - start_bbknn)))
-
 start_pca = time.time()
 sc.pp.scale(adata, max_value = 10)
 sc.tl.pca(adata, n_comps = 50, random_state = rand_seed)
 end_pca = time.time()
 print("Time spent for PCA: {}.".format(timedelta(seconds = end_pca - start_pca)))
+
+start_bbknn = time.time()
+bbknn(adata, batch_key = 'Channel')
+end_bbknn = time.time()
+print("Time spent for BBKNN: {}.".format(timedelta(seconds = end_bbknn - start_bbknn)))
 
 start_louvain = time.time()
 sc.tl.louvain(adata, resolution = 1.3, random_state = rand_seed)

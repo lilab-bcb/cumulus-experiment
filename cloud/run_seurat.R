@@ -31,7 +31,7 @@ bm.list <- lapply(X = bm.list, FUN = function(x) {
 write(paste("HVG time:", hvg.time, attr(hvg.time, "units")), file = logfile)
 
 now <- Sys.time()
-bm.anchors <- FindIntegrationAnchors(object.list = bm.list, dims = 1:20, anchor.features = 2000, verbose = debug.mode)
+bm.anchors <- FindIntegrationAnchors(object.list = bm.list, dims = 1:20, verbose = debug.mode)
 bm.combined <- IntegrateData(anchorset = bm.anchors, dims = 1:20, verbose = debug.mode)
 logstr.cca <- Sys.time() - now
 write(paste("Batch Correction time:", logstr.cca, attr(logstr.cca, "units")), file = logfile, append = TRUE)

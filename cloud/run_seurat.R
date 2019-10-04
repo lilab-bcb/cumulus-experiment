@@ -18,17 +18,16 @@ n.cells <- dim(bm.data)[2]
 bm <- CreateSeuratObject(bm.data, project = "MantonBM", min.cells = floor(n.cells * 0.0005), min.features = 500)
 bm[["percent.mt"]] <- PercentageFeatureSet(bm, pattern = "^MT-")
 bm <- subset(bm, subset = nFeature_RNA >= 500 & nFeature_RNA < 6000 & percent.mt < 10)
+bm <- NormalizeData(x, normalization.method = "LogNormalize", scale.factor = 1e5, verbose = debug.mode)
 
 bm.list <- SplitObject(bm)
-hvg.time <- 0
+
+now <- Sys.time()
 bm.list <- lapply(X = bm.list, FUN = function(x) {
-	x <- NormalizeData(x, normalization.method = "LogNormalize", scale.factor = 1e5, verbose = debug.mode)
-	now <- Sys.time()
 	x <- FindVariableFeatures(x, selection.method = "vst", mean.cutoff = c(0.0125, 7), dispersion.cutoff = c(0.5, Inf), nfeatures = 2000, verbose = debug.mode)
-	stop <- Sys.time() - now
-	hvg.time <- hvg.time + stop - now
 })
-write(paste("HVG time:", hvg.time, attr(hvg.time, "units")), file = logfile)
+logstr.hvg <- Sys.time() - now
+write(paste("HVG time:", logstr.hvg, attr(logstr.hvg, "units")), file = logfile)
 
 now <- Sys.time()
 bm.anchors <- FindIntegrationAnchors(object.list = bm.list, dims = 1:20, verbose = debug.mode)

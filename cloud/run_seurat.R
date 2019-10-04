@@ -10,7 +10,7 @@ logfile <- "seurat.log"
 setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores for tSNE."))
 
-plan("multiprocess", workers = 32)
+plan("multiprocess", workers = n.cores)
 plan()
 
 bm.data <- Read10X_h5("/projects/benchmark/MantonBM/MantonBM_nonmix_10x.h5")

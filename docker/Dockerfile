@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 
 # Install ssl, curl, ssh, and git
 RUN apt-get update -qq && \
-	apt-get install -y libssl-dev libcurl4-openssl-dev libssh2-1-dev libhdf5-dev gfortran && \
+	apt-get install -y libssl-dev libcurl4-openssl-dev libssh2-1-dev libhdf5-dev gfortran vim emacs && \
 	apt-get install --no-install-recommends -y \
 		build-essential \
 		automake \
@@ -22,9 +22,9 @@ ADD jdk-12.0.1_linux-x64_bin.tar.gz /opt/software
 ENV PATH=/opt/software/jdk-12.0.1/bin:$PATH
 
 # Install R 3.6
-RUN wget http://security.ubuntu.com/ubuntu/pool/main/t/tzdata/tzdata_2019b-0ubuntu0.18.04_all.deb && \
-	dpkg -i tzdata_2019b-0ubuntu0.18.04_all.deb && \
-	rm tzdata_2019b-0ubuntu0.18.04_all.deb
+RUN wget http://security.ubuntu.com/ubuntu/pool/main/t/tzdata/tzdata_2019c-0ubuntu0.18.04_all.deb && \
+	dpkg -i tzdata_2019c-0ubuntu0.18.04_all.deb && \
+	rm tzdata_2019c-0ubuntu0.18.04_all.deb
 
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 && \
 	echo "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/" > /etc/apt/sources.list.d/cran.list && \
@@ -65,18 +65,18 @@ ARG old_path=$PATH
 
 RUN conda update -n base -c defaults conda
 
-# Install scCloud environment
-RUN conda create -n sccloud python=3.7.3 -y
+# Install pegasus environment
+RUN conda create -n pegasus-env python=3.7.3 -y
 
-RUN conda install -n sccloud -y -c anaconda mkl==2019.4 && \
-	conda install -n sccloud -y -c anaconda mkl_fft==1.0.14 && \
-	conda install -n sccloud -y -c anaconda mkl_random==1.0.2 && \
-	conda install -n sccloud -y -c anaconda blas==1.0 && \
-	conda install -n sccloud -y -c anaconda intel-openmp==2019.4 && \
-	conda install -n sccloud -y -c anaconda numpy==1.16.4 && \
-	conda install -n sccloud -y -c conda-forge fftw==3.3.8
+RUN conda install -n pegasus-env -y -c anaconda mkl==2019.4 && \
+	conda install -n pegasus-env -y -c anaconda mkl_fft==1.0.14 && \
+	conda install -n pegasus-env -y -c anaconda mkl_random==1.0.2 && \
+	conda install -n pegasus-env -y -c anaconda blas==1.0 && \
+	conda install -n pegasus-env -y -c anaconda intel-openmp==2019.4 && \
+	conda install -n pegasus-env -y -c anaconda numpy==1.16.4 && \
+	conda install -n pegasus-env -y -c conda-forge fftw==3.3.8
 
-ENV PATH=/root/miniconda3/envs/sccloud/bin:$old_path
+ENV PATH=/root/miniconda3/envs/pegasus-env/bin:$old_path
 RUN	pip install Cython==0.29.13 && \
 	pip install docopt==0.6.2 && \
 	pip install fitsne==1.0.1 && \
@@ -104,19 +104,20 @@ RUN	pip install Cython==0.29.13 && \
 	pip install umap-learn==0.3.10 && \
 	pip install anndata==0.6.22.post1 && \
 	pip install termcolor==1.1.0 && \
-	pip install sccloud==0.14.0
+	pip install hnswlib==0.3.2.0 && \
+	pip install pegasuspy==0.15.0
 
 # Install scanpy environment
-RUN conda create -n scanpy python=3.7.3 -y
+RUN conda create -n scanpy-env python=3.7.3 -y
 
-RUN conda install -n scanpy -y -c anaconda mkl==2019.4 && \
-	conda install -n scanpy -y -c anaconda mkl_fft==1.0.14 && \
-	conda install -n scanpy -y -c anaconda mkl_random==1.0.2 && \
-	conda install -n scanpy -y -c anaconda blas==1.0 && \
-	conda install -n scanpy -y -c anaconda intel-openmp==2019.4 && \
-	conda install -n scanpy -y -c anaconda numpy==1.16.4
+RUN conda install -n scanpy-env -y -c anaconda mkl==2019.4 && \
+	conda install -n scanpy-env -y -c anaconda mkl_fft==1.0.14 && \
+	conda install -n scanpy-env -y -c anaconda mkl_random==1.0.2 && \
+	conda install -n scanpy-env -y -c anaconda blas==1.0 && \
+	conda install -n scanpy-env -y -c anaconda intel-openmp==2019.4 && \
+	conda install -n scanpy-env -y -c anaconda numpy==1.16.4
 
-ENV PATH=/root/miniconda3/envs/scanpy/bin:$old_path
+ENV PATH=/root/miniconda3/envs/scanpy-env/bin:$old_path
 RUN pip install Cython==0.29.13 && \
 	pip install h5py==2.9.0 && \
 	pip install joblib==0.13.2 && \
@@ -151,3 +152,6 @@ RUN pip install Cython==0.29.13 && \
 	pip install termcolor==1.1.0
 
 ENV PATH=$old_path
+
+# Add experiment scripts
+RUN git clone https://github.com/lilab-bcb/cumulus-experiment.git /experiment

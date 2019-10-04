@@ -1,3 +1,3 @@
-docker build -t sccloud-experiment .
-docker tag sccloud-experiment sccloud/sccloud-experiment
-docker push sccloud/sccloud-experiment
+docker build --no-cache -t cumulus-experiment .
+docker tag cumulus-experiment cumulusprod/cumulus-experiment
+docker push cumulusprod/cumulus-experiment

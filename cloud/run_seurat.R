@@ -21,9 +21,9 @@ bm <- subset(bm, subset = nFeature_RNA >= 500 & nFeature_RNA < 6000 & percent.mt
 
 bm.list <- SplitObject(bm)
 
-bm.list <- lapply(X = bm.list, FUN = function(x)) {
+bm.list <- lapply(X = bm.list, FUN = function(x) {
 	x <- NormalizeData(x, normalization.method = "LogNormalize", scale.factor = 1e5, verbose = debug.mode)
-}
+})
 
 now <- Sys.time()
 bm.list <- lapply(X = bm.list, FUN = function(x) {

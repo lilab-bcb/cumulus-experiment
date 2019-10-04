@@ -1,0 +1,51 @@
+\documentclass[10pt]{article}
+\usepackage[hmargin=1in, top=0.5in, bottom = 0.85in, centering]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage[labelformat=simple]{subcaption}
+\usepackage{parskip}
+\usepackage{mathtools}
+\usepackage{color}
+
+
+\begin{document}
+
+\section{270K Bone Marrow Dataset}
+
+\paragraph{}
+Seurat 3.1.0 \qquad vs \qquad SCANPY 1.4.4.post1 \qquad vs \qquad Pegasus 0.15.0
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		Analysis & Seurat v3 & SCANPY & Pegasus\\
+		\hline \hline
+		HVG selection & 2 min 7 sec & 1 min 27 sec & \textbf{11 sec} \\
+		\hline
+		Batch correction & Failed after $\approx$ 24 h & 8 min 4 sec & \textbf{19 sec} \\
+		\hline
+		PCA & 5 min 49 sec & 12 sec & \textbf{11 sec} \\
+		\hline
+		Find K nearest neighbors &  4 min 14 sec &  5 min 55 sec & \textbf{6 sec}\\
+		\hline
+		Diffusion map & N/A & 4 min 8 sec & \textbf{2 min 47 sec} \\
+		\hline
+		Louvain-like Clustering & 7 min 26 sec & 23 min 48 sec & \textbf{1 min 15 sec} \\
+		\hline 
+		Leiden-like Clustering & Failed due to large SNN graph & 43 min 22 sec & \textbf{1 min 9 sec}\\
+		\hline
+		t-SNE-based visualization & 3 min 12 sec & 19 min 2 sec & \textbf{2 min 49 sec}\\
+		\hline
+		UMAP-based visualization & 8 min 58 sec & 5 min 49 sec  & \textbf{2 min 24 sec}\\
+		\hline
+		FLE-based visualization & N/A & $\approx$ 18 h 29 min & \textbf{15 min 20 sec}\\
+		\hline
+	\end{tabular}
+\end{table}
+
+
+
+\end{document}

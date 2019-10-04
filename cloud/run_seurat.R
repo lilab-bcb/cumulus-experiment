@@ -18,7 +18,7 @@ n.cells <- dim(bm.data)[2]
 bm <- CreateSeuratObject(bm.data, project = "MantonBM", min.cells = floor(n.cells * 0.0005), min.features = 500)
 bm[["percent.mt"]] <- PercentageFeatureSet(bm, pattern = "^MT-")
 bm <- subset(bm, subset = nFeature_RNA >= 500 & nFeature_RNA < 6000 & percent.mt < 10)
-bm <- NormalizeData(x, normalization.method = "LogNormalize", scale.factor = 1e5, verbose = debug.mode)
+bm <- NormalizeData(bm, normalization.method = "LogNormalize", scale.factor = 1e5, verbose = debug.mode)
 
 bm.list <- SplitObject(bm)
 

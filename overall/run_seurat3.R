@@ -19,7 +19,6 @@ print("Finding Highly Variable Genes:")
 now <- Sys.time()
 features <- SelectIntegrationFeatures(obj.list, nfeatures = 2000, fvf.nfeatures = 2000, selection.method = "vst", mean.cutoff = c(0.0125, 7), dispersion.cutoff = c(0.5, Inf))
 logstr.hvgsif <- Sys.time() - now
-print(logstr.hvgsif)
 write(paste("HVG + SIF time:", logstr.hvgsif, attr(logstr.hvgsif, "units")), file = logfile)
 
 src.obj <- ReadH5AD("/projects/benchmark/MantonBM/MantonBM_nonmix_filter_norm.h5ad")
@@ -31,7 +30,7 @@ obj.list <- lapply(X = obj.list, FUN = function(x) {
 })
 logstr.hvg <- Sys.time() - now
 print(logstr.hvg)
-write(paste("HVG only time:", logstr.hvg, attr(logstr.hvg, "units")), file = logfile)
+write(paste("HVG only time:", logstr.hvg, attr(logstr.hvg, "units")), file = logfile, append = TRUE)
 
 ## Benchmark Batch Correction. ##
 ##src.obj <- ReadH5AD("/projects/benchmark/MantonBM/MantonBM_nonmix_filter_norm_hvf.h5ad")

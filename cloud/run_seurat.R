@@ -4,13 +4,13 @@ library(parallel)
 library(future)
 
 seed <- 0
-debug.mode <- TRUE
+debug.mode <- FALSE
 n.cores <- detectCores()
 logfile <- "seurat.log"
 setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores for tSNE."))
 
-options(future.globals.maxSize = 20 * 1024^3)  # 10 GB
+options(future.globals.maxSize = 20 * 1024^3)  # 20 GB
 plan("multiprocess", workers = n.cores)
 plan()
 
@@ -73,4 +73,4 @@ bm.markers <- FindAllMarkers(bm.combined, test.use = "t", random.seed = seed, ve
 logstr.de <- Sys.time() - now
 write(paste("DE time:", logstr.de, attr(logstr.de, "units")), file = logfile, append = TRUE)
 
-save(bm.combined, bm.markers, file = "seurat_result.RData")
+save(bm.combined, bm.markers, file = "seurat_analysis_result.RData")

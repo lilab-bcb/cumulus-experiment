@@ -5,9 +5,11 @@ import scanpy as sc
 from bbknn import bbknn
 from datetime import timedelta
 
-sc.settings.n_jobs = 32
+sc.settings.n_jobs = os.cpu_count()
 sc.settings.verbosity = 4
 rand_seed = 0
+
+print("Use {} cores.".format(sc.settings.n_jobs))
 
 input_file = "/projects/benchmark/MantonBM/MantonBM_nonmix_10x.h5"
 output_file = "scanpy_analysis_result.h5ad"

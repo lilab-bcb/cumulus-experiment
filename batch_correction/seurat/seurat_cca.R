@@ -15,6 +15,7 @@ plan()
 
 src.obj <- ReadH5AD("/projects/benchmark/MantonBM/MantonBM_nonmix_tiny_filter_norm.h5ad")
 obj.list <- SplitObject(src.obj, split.by = "Channel")
+print(paste0("After splitting, there are ", length(obj.list), " batches."))
 
 ## Read preset high variable features
 df.hvf <- read.csv(file = "/projects/benchmark/MantonBM/MantonBM_nonmix_hvf.txt")

@@ -4,11 +4,14 @@ library(R.utils)
 library(Matrix)
 library(hash)
 library(stringi)
+library(future)
 
 seed <- 0
 n.cores <- detectCores()
-setOption('mc.cores', n.cores)
-print(paste("Use", n.cores, "cores."))
+
+options(future.globals.maxSize = 20 * 1024^3)  # 20 GB
+plan("multiprocess", workers = n.cores)
+plan()
 
 src.obj <- ReadH5AD("/projects/benchmark/MantonBM/MantonBM_nonmix_tiny_filter_norm.h5ad")
 obj.list <- SplitObject(src.obj, split.by = "Channel")

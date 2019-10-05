@@ -67,10 +67,12 @@ bm.combined <- RunUMAP(bm.combined, reduction = "pca", dims = 1:50, seed.use = s
 logstr.umap <- Sys.time() - now
 write(paste("UMAP time:", logstr.umap, attr(logstr.umap, "units")), file = logfile, append = TRUE)
 
+save(bm.combined, file = "seurat_pipeline_result.RData")
+
 DefaultAssay(bm.combined) <- "RNA"
 now <- Sys.time()
 bm.markers <- FindAllMarkers(bm.combined, test.use = "t", random.seed = seed, verbose = debug.mode)
 logstr.de <- Sys.time() - now
 write(paste("DE time:", logstr.de, attr(logstr.de, "units")), file = logfile, append = TRUE)
 
-save(bm.combined, bm.markers, file = "seurat_analysis_result.RData")
+save(bm.markers, file = "seurat_de_analysis_result.RData")

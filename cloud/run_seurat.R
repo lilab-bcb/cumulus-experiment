@@ -4,14 +4,14 @@ library(parallel)
 library(future)
 
 seed <- 0
-debug.mode <- FALSE
+debug.mode <- TRUE
 n.cores <- detectCores()
 logfile <- "seurat.log"
 setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores for tSNE."))
 
-options(future.globals.maxSize = 20 * 1024^3)  # 20 GB
-plan("multiprocess", workers = n.cores)
+options(future.globals.maxSize = 50 * 1024^3)  # 20 GB
+plan("multiprocess", workers = 1)
 plan()
 
 bm.data <- Read10X_h5("/projects/benchmark/MantonBM/MantonBM_nonmix_10x.h5")
@@ -35,11 +35,18 @@ write(paste("HVG time:", logstr.hvg, attr(logstr.hvg, "units")), file = logfile)
 
 now <- Sys.time()
 bm.anchors <- FindIntegrationAnchors(object.list = bm.list, dims = 1:20, verbose = debug.mode)
+logstr.anchor <- Sys.time() - now
+write(paste("Finding Anchors t ime:", logstr.anchor, attr(logstr.anchor, "units")), file = logfile, append = TRUE)
+
+save(bm.anchors, bm.list, file = "seurat_anchor_result.RData")
+
+now <- Sys.time()
 bm.combined <- IntegrateData(anchorset = bm.anchors, dims = 1:20, verbose = debug.mode)
 logstr.cca <- Sys.time() - now
-write(paste("Batch Correction time:", logstr.cca, attr(logstr.cca, "units")), file = logfile, append = TRUE)
+write(paste("CCA time:", logstr.cca, attr(logstr.cca, "units")), file = logfile, append = TRUE)
 
 DefaultAssay(bm.combined) <- "integrated"
+save(bm.combined, file = "seurat_cca_result.RData")
 
 now <- Sys.time()
 bm.combined <- ScaleData(bm.combined, scale.max = 10, verbose = debug.mode)

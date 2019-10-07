@@ -5,6 +5,7 @@
 	"cumulus.correct_batch_effect" : true,
 	"cumulus.minimum_number_of_genes" : 0,
 	"cumulus.knn_full_speed" : true,
+	"cumulus.run_diffmap" : true,
 	"cumulus.run_louvain" : false,
 	"cumulus.run_spectral_louvain" : true,
 	"cumulus.run_net_umap" : true,

@@ -1,1 +1,1 @@
-sccutil fc_run -m cumulus/cumulus/2 -w manton-ica-1m/manton-ica-1m --bucket-folder MantonBM_nonmix/inputs -i inputs_32cpu.json
+alto fc_run -m cumulus/cumulus/2 -w manton-ica-1m/manton-ica-1m --bucket-folder MantonBM_nonmix/inputs -i inputs_32cpu.json

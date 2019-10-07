@@ -48,6 +48,9 @@ write(paste("Integration time:", logstr.cca, attr(logstr.cca, "units")), file = 
 DefaultAssay(bm.combined) <- "integrated"
 save(bm.combined, file = "seurat_corrected_result.RData")
 
+plan("multiprocess", workers = n.cores)
+plan()
+
 now <- Sys.time()
 bm.combined <- ScaleData(bm.combined, scale.max = 10, verbose = debug.mode)
 bm.combined <- RunPCA(bm.combined, npcs = 50, seed.use = seed, verbose = debug.mode)

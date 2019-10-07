@@ -1,0 +1,49 @@
+\documentclass[10pt]{article}
+\usepackage[hmargin=1in, top=0.5in, bottom = 0.85in, centering]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage[labelformat=simple]{subcaption}
+\usepackage{parskip}
+\usepackage{mathtools}
+\usepackage{color}
+
+
+\begin{document}
+
+\section{270K Bone Marrow Dataset on Cloud}
+
+\paragraph{}
+Seurat 3.1.0 \qquad vs \qquad SCANPY 1.4.4.post1 \qquad vs \qquad Cumulus 0.10.0
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		Analysis & Seurat v3 & SCANPY & Cumulus\\
+		\hline \hline
+		Count matrix aggregation & N/A & N/A & \\
+		\hline
+		HVG selection &  & $1$ min $46$ sec  &  \\
+		\hline
+		Batch correction &  & $14$ min $34$ sec  &  \\
+		\hline
+		PCA &  & $26$ sec  &  \\
+		\hline
+		Find K nearest neighbors &   & --   & \\
+		\hline
+		Diffusion map &  & --  &  \\
+		\hline
+		Louvain-like clustering &  & $1$ h $7$ min  &  \\
+		\hline
+		t-SNE-based visualization &  & $21$ min $47$ sec  & \\
+		\hline
+		UMAP-based visualization &  & $17$ min $25$ sec   & \\
+		\hline
+		DE analysis \& Annotation & & $2$ min & \\
+		\hline
+	\end{tabular}
+\end{table}
+
+\end{document}

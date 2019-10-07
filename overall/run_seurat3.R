@@ -60,7 +60,7 @@ n.pc <- dim(adata[["pca"]])[2]
 print(paste0("KNN using ", n.pc, " PCs."))
 write(paste0("KNN using ", n.pc, " PCs"), file = logfile, append = TRUE)
 now <- Sys.time()
-bdata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy")
+adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy")
 logstr.knn <- Sys.time() - now
 print(logstr.knn)
 write(paste("KNN time:", logstr.knn, attr(logstr.knn, "units")), file = logfile, append = TRUE)

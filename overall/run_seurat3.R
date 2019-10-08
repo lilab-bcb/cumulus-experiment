@@ -71,11 +71,26 @@ plan()
 ##logstr.louvain <- Sys.time() - now
 ##write(paste("Louvain time:", logstr.louvain, attr(logstr.louvain, "units")), file = logfile, append = TRUE)
 
+source("/opt/software/seurat-3.1.0/R/clustering.R")
 load("seurat_knn.RData")
 graph.name <- "RNA_snn"
 print("Finding Clusters using Leiden:")
 now <- Sys.time()
-clustering.results <- FindClusters(adata[["RNA_snn"]], resolution = 1.3, algorithm = "leiden", method = "igraph", random.seed = seed)
+#clustering.results <- FindClusters(adata[["RNA_snn"]], resolution = 1.3, algorithm = "leiden", method = "igraph", random.seed = seed)
+input <- graph_from_adjacency_matrix(adjmatrix = adata[["RNA_snn"]])
+ids <- leiden(
+	object = input, 
+	partition_type = "RBConfigurationVertexPartition",
+    initial_membership = NULL,
+    weights = NULL,
+    node_sizes = NULL,
+    resolution_parameter = 1.3,
+    seed = seed,
+    n_iterations = 10
+)
+names(x = ids) <- colnames(x = adata[["RNA_snn"]])
+ids <- GroupSingletons(ids = ids, SNN = adata[["RNA_snn"]], group.singletons = TRUE, verbose = TRUE)
+clustering.results[, paste0("res.", 1.3)] <- factor(x = ids)
 colnames(x = clustering.results) <- paste0("RNA_snn", "_", colnames(x = clustering.results))
 adata <- AddMetaData(object = adata, metadata = clustering.results)
 Idents(object = adata) <- colnames(x = clustering.results)[ncol(x = clustering.results)]

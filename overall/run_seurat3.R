@@ -72,6 +72,7 @@ plan()
 ##write(paste("Louvain time:", logstr.louvain, attr(logstr.louvain, "units")), file = logfile, append = TRUE)
 
 load("seurat_knn.RData")
+library(Seurat)
 source("/opt/software/seurat-3.1.0/R/clustering.R")
 print("Finding Clusters using Leiden:")
 now <- Sys.time()

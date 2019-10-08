@@ -54,18 +54,15 @@ plan()
 ##write(paste("PCA time:", logstr.pca, attr(logstr.pca, "units")), file = logfile, append = TRUE)
 ##rm(adata)
 
-load("MantonBM_nonmix.RData")
-print("Computing neighborhood graph:")
-n.pc <- dim(adata[["pca"]])[2]
-print(paste0("KNN using ", n.pc, " PCs."))
-write(paste0("KNN using ", n.pc, " PCs"), file = logfile, append = TRUE)
-now <- Sys.time()
-adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy")
-logstr.knn <- Sys.time() - now
-print(logstr.knn)
-write(paste("KNN time:", logstr.knn, attr(logstr.knn, "units")), file = logfile, append = TRUE)
-
-save(adata, file = "seurat_knn.RData")
+##load("MantonBM_nonmix.RData")
+##print("Computing neighborhood graph:")
+##n.pc <- dim(adata[["pca"]])[2]
+##write(paste0("KNN using ", n.pc, " PCs"), file = logfile, append = TRUE)
+##now <- Sys.time()
+##adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy")
+##logstr.knn <- Sys.time() - now
+##write(paste("KNN time:", logstr.knn, attr(logstr.knn, "units")), file = logfile, append = TRUE)
+##rm(adata)
 
 ##print("Finding Clusters:")
 ##now <- Sys.time()
@@ -74,19 +71,19 @@ save(adata, file = "seurat_knn.RData")
 ##print(logstr.cluster)
 ##write(paste("Clustering time:", logstr.cluster, attr(logstr.cluster, "units")), file = logfile, append = TRUE)
 ##
-##print("Computing UMAP embedding:")
-##now <- Sys.time()
-##adata <- RunUMAP(adata, n.neighbors = 15, min.dist = 0.5, seed.use = seed, dims = 1:n.pc)
-##logstr.umap <- Sys.time() - now
-##print(logstr.umap)
-##write(paste("UMAP time:", logstr.umap, attr(logstr.umap, "units")), file = logfile, append = TRUE)
-##
-##
-##print("Computing FItSNE embedding:")
-##now <- Sys.time()
-##adata <- RunTSNE(adata, seed.use = seed, tsne.method = "FIt-SNE", dims = 1:n.pc)
-##logstr.tsne <- Sys.time() - now
-##print(logstr.tsne)
-##write(paste("TSNE time:", logstr.tsne, attr(logstr.tsne, "units")), file = logfile, append = TRUE)
-##
+load("MantonBM_nonmix.RData")
+n.pc <- dim(adata[["pca"]])[2]
+print("Computing UMAP embedding:")
+now <- Sys.time()
+adata <- RunUMAP(adata, reduction = "pca", n.neighbors = 15, min.dist = 0.5, seed.use = seed, dims = 1:n.pc)
+logstr.umap <- Sys.time() - now
+write(paste("UMAP time:", logstr.umap, attr(logstr.umap, "units")), file = logfile, append = TRUE)
+
+print("Computing FIt-SNE embedding:")
+now <- Sys.time()
+adata <- RunTSNE(adata, reduction = "pca", seed.use = seed, tsne.method = "FIt-SNE", dims = 1:n.pc)
+logstr.tsne <- Sys.time() - now
+print(logstr.tsne)
+write(paste("TSNE time:", logstr.tsne, attr(logstr.tsne, "units")), file = logfile, append = TRUE)
+
 ##save(adata, file = "seurat_result.RData")

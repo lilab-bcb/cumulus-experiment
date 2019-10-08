@@ -11,7 +11,7 @@ setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores for tSNE."))
 
 options(future.globals.maxSize = 50 * 1024^3)  # 20 GB
-plan("multiprocess", workers = 1)
+plan("multiprocess", workers = 8)
 plan()
 
 bm.data <- Read10X_h5("/projects/benchmark/MantonBM/MantonBM_nonmix_10x.h5")
@@ -79,10 +79,10 @@ write(paste("UMAP time:", logstr.umap, attr(logstr.umap, "units")), file = logfi
 
 save(bm.combined, file = "seurat_pipeline_result.RData")
 
-DefaultAssay(bm.combined) <- "RNA"
-now <- Sys.time()
-bm.markers <- FindAllMarkers(bm.combined, test.use = "t", random.seed = seed, verbose = debug.mode)
-logstr.de <- Sys.time() - now
-write(paste("DE time:", logstr.de, attr(logstr.de, "units")), file = logfile, append = TRUE)
-
-save(bm.markers, file = "seurat_de_analysis_result.RData")
+##DefaultAssay(bm.combined) <- "RNA"
+##now <- Sys.time()
+##bm.markers <- FindAllMarkers(bm.combined, test.use = "t", random.seed = seed, verbose = debug.mode)
+##logstr.de <- Sys.time() - now
+##write(paste("DE time:", logstr.de, attr(logstr.de, "units")), file = logfile, append = TRUE)
+##
+##save(bm.markers, file = "seurat_de_analysis_result.RData")

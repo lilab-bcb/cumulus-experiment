@@ -54,15 +54,15 @@ plan()
 ##write(paste("PCA time:", logstr.pca, attr(logstr.pca, "units")), file = logfile, append = TRUE)
 ##rm(adata)
 
-load("MantonBM_nonmix.RData")
-print("Computing neighborhood graph:")
-n.pc <- dim(adata[["pca"]])[2]
-write(paste0("KNN using ", n.pc, " PCs"), file = logfile, append = TRUE)
-now <- Sys.time()
-adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy")
-logstr.knn <- Sys.time() - now
-write(paste("KNN time:", logstr.knn, attr(logstr.knn, "units")), file = logfile, append = TRUE)
-rm(adata)
+##load("MantonBM_nonmix.RData")
+##print("Computing neighborhood graph:")
+##n.pc <- dim(adata[["pca"]])[2]
+##write(paste0("KNN using ", n.pc, " PCs"), file = logfile, append = TRUE)
+##now <- Sys.time()
+##adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy")
+##logstr.knn <- Sys.time() - now
+##write(paste("KNN time:", logstr.knn, attr(logstr.knn, "units")), file = logfile, append = TRUE)
+##rm(adata)
 
 ##print("Finding Clusters using Louvain:")
 ##now <- Sys.time()
@@ -70,6 +70,7 @@ rm(adata)
 ##logstr.louvain <- Sys.time() - now
 ##write(paste("Louvain time:", logstr.louvain, attr(logstr.louvain, "units")), file = logfile, append = TRUE)
 
+load("seurat_knn.RData")
 print("Finding Clusters using Leiden:")
 now <- Sys.time()
 adata <- FindClusters(adata[["RNA_snn"]], resolution = 1.3, algorithm = "leiden", method = "igraph", random.seed = seed)

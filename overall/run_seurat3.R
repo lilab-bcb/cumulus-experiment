@@ -9,6 +9,7 @@ logfile <- "seurat.log"
 setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores for tSNE."))
 
+options(future.globals.maxSize = 10 * 1024^3)  # 10 GB
 plan("multiprocess", workers = n.cores)
 plan()
 

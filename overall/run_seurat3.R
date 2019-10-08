@@ -72,9 +72,17 @@ plan()
 ##write(paste("Louvain time:", logstr.louvain, attr(logstr.louvain, "units")), file = logfile, append = TRUE)
 
 load("seurat_knn.RData")
+graph.name <- "RNA_snn"
 print("Finding Clusters using Leiden:")
 now <- Sys.time()
-adata <- FindClusters(adata[["RNA_snn"]], resolution = 1.3, algorithm = "leiden", method = "igraph", random.seed = seed)
+clustering.results <- FindClusters(adata[["RNA_snn"]], resolution = 1.3, algorithm = "leiden", method = "igraph", random.seed = seed)
+colnames(x = clustering.results) <- paste0("RNA_snn", "_", colnames(x = clustering.results))
+adata <- AddMetaData(object = adata, metadata = clustering.results)
+Idents(object = adata) <- colnames(x = clustering.results)[ncol(x = clustering.results)]
+levels <- levels(x = adata)
+Idents(object = adata) <- factor(x = Idents(object = adata), levels = sort(x = levels))
+adata[['seurat_clusters']] <- Idents(object = adata)
+adata <- LogSeuratCommand(adata)
 logstr.leiden <- Sys.time() - now
 write(paste("Leiden time:", logstr.leiden, attr(logstr.leiden, "units")), file = logfile, append = TRUE)
 

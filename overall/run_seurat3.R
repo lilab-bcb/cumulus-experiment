@@ -71,12 +71,8 @@ plan()
 ##logstr.louvain <- Sys.time() - now
 ##write(paste("Louvain time:", logstr.louvain, attr(logstr.louvain, "units")), file = logfile, append = TRUE)
 
-source("/opt/software/seurat-3.1.0/R/clustering.R")
-#' @importFrom leiden leiden
-#' @importFrom igraph graph_from_adjacency_matrix graph_from_adj_list
-
 load("seurat_knn.RData")
-graph.name <- "RNA_snn"
+source("/opt/software/seurat-3.1.0/R/clustering.R")
 print("Finding Clusters using Leiden:")
 now <- Sys.time()
 #clustering.results <- FindClusters(adata[["RNA_snn"]], resolution = 1.3, algorithm = "leiden", method = "igraph", random.seed = seed)

@@ -54,36 +54,44 @@ plan()
 ##write(paste("PCA time:", logstr.pca, attr(logstr.pca, "units")), file = logfile, append = TRUE)
 ##rm(adata)
 
-##load("MantonBM_nonmix.RData")
-##print("Computing neighborhood graph:")
-##n.pc <- dim(adata[["pca"]])[2]
-##write(paste0("KNN using ", n.pc, " PCs"), file = logfile, append = TRUE)
-##now <- Sys.time()
-##adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy")
-##logstr.knn <- Sys.time() - now
-##write(paste("KNN time:", logstr.knn, attr(logstr.knn, "units")), file = logfile, append = TRUE)
-##rm(adata)
+load("MantonBM_nonmix.RData")
+print("Computing neighborhood graph:")
+n.pc <- dim(adata[["pca"]])[2]
+write(paste0("KNN using ", n.pc, " PCs"), file = logfile, append = TRUE)
+now <- Sys.time()
+adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy")
+logstr.knn <- Sys.time() - now
+write(paste("KNN time:", logstr.knn, attr(logstr.knn, "units")), file = logfile, append = TRUE)
+rm(adata)
 
-##print("Finding Clusters:")
+##print("Finding Clusters using Louvain:")
 ##now <- Sys.time()
 ##adata <- FindClusters(adata, resolution = 1.3, random.seed = seed, algorithm = "louvain")
-##logstr.cluster <- Sys.time() - now
-##print(logstr.cluster)
-##write(paste("Clustering time:", logstr.cluster, attr(logstr.cluster, "units")), file = logfile, append = TRUE)
-##
-load("MantonBM_nonmix.RData")
-n.pc <- dim(adata[["pca"]])[2]
-print("Computing UMAP embedding:")
-now <- Sys.time()
-adata <- RunUMAP(adata, reduction = "pca", n.neighbors = 15, min.dist = 0.5, seed.use = seed, dims = 1:n.pc)
-logstr.umap <- Sys.time() - now
-write(paste("UMAP time:", logstr.umap, attr(logstr.umap, "units")), file = logfile, append = TRUE)
+##logstr.louvain <- Sys.time() - now
+##write(paste("Louvain time:", logstr.louvain, attr(logstr.louvain, "units")), file = logfile, append = TRUE)
 
-print("Computing FIt-SNE embedding:")
+print("Finding Clusters using Leiden:")
 now <- Sys.time()
-adata <- RunTSNE(adata, reduction = "pca", seed.use = seed, tsne.method = "FIt-SNE", dims = 1:n.pc)
-logstr.tsne <- Sys.time() - now
-print(logstr.tsne)
-write(paste("TSNE time:", logstr.tsne, attr(logstr.tsne, "units")), file = logfile, append = TRUE)
+adata <- FindClusters(adata[["RNA_snn"]], resolution = 1.3, algorithm = "leiden", method = "igraph", random.seed = seed)
+logstr.leiden <- Sys.time() - now
+write(paste("Leiden time:", logstr.leiden, attr(logstr.leiden, "units")), file = logfile, append = TRUE)
+
+save(adata, file = "seurat_leiden.RData")
+
+##
+##load("MantonBM_nonmix.RData")
+##n.pc <- dim(adata[["pca"]])[2]
+##print("Computing UMAP embedding:")
+##now <- Sys.time()
+##adata <- RunUMAP(adata, reduction = "pca", n.neighbors = 15, min.dist = 0.5, seed.use = seed, dims = 1:n.pc)
+##logstr.umap <- Sys.time() - now
+##write(paste("UMAP time:", logstr.umap, attr(logstr.umap, "units")), file = logfile, append = TRUE)
+##
+##print("Computing FIt-SNE embedding:")
+##now <- Sys.time()
+##adata <- RunTSNE(adata, reduction = "pca", seed.use = seed, tsne.method = "FIt-SNE", dims = 1:n.pc)
+##logstr.tsne <- Sys.time() - now
+##print(logstr.tsne)
+##write(paste("TSNE time:", logstr.tsne, attr(logstr.tsne, "units")), file = logfile, append = TRUE)
 
 ##save(adata, file = "seurat_result.RData")

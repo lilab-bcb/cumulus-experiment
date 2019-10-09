@@ -74,6 +74,12 @@ plan()
 load("seurat_knn.RData")
 library(Seurat)
 source("/opt/software/seurat-3.1.0/R/clustering.R")
+library(leiden)
+library(igraph)
+
+plan("multiprocess", workers = n.cores)
+plan()
+
 print("Finding Clusters using Leiden:")
 now <- Sys.time()
 #clustering.results <- FindClusters(adata[["RNA_snn"]], resolution = 1.3, algorithm = "leiden", method = "igraph", random.seed = seed)
@@ -108,7 +114,7 @@ save(adata, file = "seurat_leiden.RData")
 ##n.pc <- dim(adata[["pca"]])[2]
 ##print("Computing UMAP embedding:")
 ##now <- Sys.time()
-##adata <- RunUMAP(adata, reduction = "pca", n.neighbors = 15, min.dist = 0.5, seed.use = seed, dims = 1:n.pc)
+##adata <- RunUMAP(adata, reduction = "pca", umap.method = "umap-learn", n.neighbors = 15, min.dist = 0.5, seed.use = seed, dims = 1:n.pc)
 ##logstr.umap <- Sys.time() - now
 ##write(paste("UMAP time:", logstr.umap, attr(logstr.umap, "units")), file = logfile, append = TRUE)
 ##

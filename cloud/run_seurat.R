@@ -13,7 +13,7 @@ n.cores <- detectCores()
 setOption('mc.cores', n.cores)
 write(paste("Use", n.cores, "cores for tSNE."), file = logfile)
 
-options(future.globals.maxSize = 5 * 1024^3)
+options(future.globals.maxSize = 20 * 1024^3)
 plan("multiprocess", workers = n.cores)
 plan()
 write(paste("Use", nbrOfWorkers(), "cores."), file = logfile, append = TRUE)

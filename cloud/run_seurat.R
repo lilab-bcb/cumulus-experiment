@@ -3,18 +3,22 @@ library(R.utils)
 library(parallel)
 library(future)
 
+src_file <- "/projects/benchmark/MantonBM/MantonBM_nonmix_10x.h5"
+dst_folder <- "./"
 seed <- 0
 debug.mode <- TRUE
+logfile <- paste0(dst_folder, "seurat.log")
+
 n.cores <- detectCores()
-logfile <- "seurat.log"
 setOption('mc.cores', n.cores)
-print(paste("Use", n.cores, "cores for tSNE."))
+write(paste("Use", n.cores, "cores for tSNE."), file = logfile)
 
-options(future.globals.maxSize = 50 * 1024^3)  # 20 GB
-plan("multiprocess", workers = 8)
+options(future.globals.maxSize = 5 * 1024^3)
+plan("multiprocess", workers = n.cores)
 plan()
+write(paste("Use", nbrOfWorkers(), "cores."), file = logfile, append = TRUE)
 
-bm.data <- Read10X_h5("/projects/benchmark/MantonBM/MantonBM_nonmix_10x.h5")
+bm.data <- Read10X_h5(src_file)
 n.cells <- dim(bm.data)[2]
 bm <- CreateSeuratObject(bm.data, project = "MantonBM", min.cells = floor(n.cells * 0.0005), min.features = 500)
 bm[["percent.mt"]] <- PercentageFeatureSet(bm, pattern = "^MT-")
@@ -31,14 +35,19 @@ bm.list <- lapply(X = bm.list, FUN = function(x) {
 	x <- FindVariableFeatures(x, selection.method = "vst", mean.cutoff = c(0.0125, 7), dispersion.cutoff = c(0.5, Inf), nfeatures = 2000, verbose = debug.mode)
 })
 logstr.hvg <- Sys.time() - now
-write(paste("HVG time:", logstr.hvg, attr(logstr.hvg, "units")), file = logfile)
+write(paste("HVG time:", logstr.hvg, attr(logstr.hvg, "units")), file = logfile, append = TRUE)
+
+plan("multiprocess", workers = 15)
+plan()
+write(paste("Use", nbrOfWorkers(), "cores."), file = logfile, append = TRUE)
 
 now <- Sys.time()
 bm.anchors <- FindIntegrationAnchors(object.list = bm.list, dims = 1:20, verbose = debug.mode)
 logstr.anchor <- Sys.time() - now
 write(paste("Find Anchors time:", logstr.anchor, attr(logstr.anchor, "units")), file = logfile, append = TRUE)
 
-save(bm.anchors, bm.list, file = "seurat_anchor_result.RData")
+save(bm.anchors, file = paste0(dst_folder, "seurat_anchor_result.RData"))
+rm(bm.list)
 
 now <- Sys.time()
 bm.combined <- IntegrateData(anchorset = bm.anchors, dims = 1:20, verbose = debug.mode)
@@ -46,10 +55,13 @@ logstr.cca <- Sys.time() - now
 write(paste("Integration time:", logstr.cca, attr(logstr.cca, "units")), file = logfile, append = TRUE)
 
 DefaultAssay(bm.combined) <- "integrated"
-save(bm.combined, file = "seurat_corrected_result.RData")
+
+save(bm.combined, file = paste0(dst_folder, "seurat_corrected_result.RData"))
+rm(bm.anchors)
 
 plan("multiprocess", workers = n.cores)
 plan()
+write(paste("Use", nbrOfWorkers(), "cores."), file = logfile, append = TRUE)
 
 now <- Sys.time()
 bm.combined <- ScaleData(bm.combined, scale.max = 10, verbose = debug.mode)
@@ -73,16 +85,16 @@ logstr.tsne <- Sys.time() - now
 write(paste("TSNE time:", logstr.tsne, attr(logstr.tsne, "units")), file = logfile, append = TRUE)
 
 now <- Sys.time()
-bm.combined <- RunUMAP(bm.combined, reduction = "pca", dims = 1:50, seed.use = seed, verbose = debug.mode)
+bm.combined <- RunUMAP(bm.combined, reduction = "pca", umap.method = "umap-learn", metric = "correlation", n.neighbors = 15, dims = 1:50, seed.use = seed, verbose = debug.mode)
 logstr.umap <- Sys.time() - now
 write(paste("UMAP time:", logstr.umap, attr(logstr.umap, "units")), file = logfile, append = TRUE)
 
-save(bm.combined, file = "seurat_pipeline_result.RData")
+DefaultAssay(bm.combined) <- "RNA"
+save(bm.combined, file = paste0(dst_folder, "seurat_pipeline_result.RData"))
 
-##DefaultAssay(bm.combined) <- "RNA"
-##now <- Sys.time()
-##bm.markers <- FindAllMarkers(bm.combined, test.use = "t", random.seed = seed, verbose = debug.mode)
-##logstr.de <- Sys.time() - now
-##write(paste("DE time:", logstr.de, attr(logstr.de, "units")), file = logfile, append = TRUE)
-##
-##save(bm.markers, file = "seurat_de_analysis_result.RData")
+now <- Sys.time()
+bm.markers <- FindAllMarkers(bm.combined, test.use = "t", random.seed = seed, verbose = debug.mode)
+logstr.de <- Sys.time() - now
+write(paste("DE time:", logstr.de, attr(logstr.de, "units")), file = logfile, append = TRUE)
+
+save(bm.markers, file = paste0(dst_folder, "seurat_de_analysis_result.RData"))

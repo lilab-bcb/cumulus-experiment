@@ -3,8 +3,8 @@ library(R.utils)
 library(parallel)
 library(future)
 
-src_file <- "/projects/benchmark/MantonBM/MantonBM_nonmix_10x.h5"
-dst_folder <- "./"
+src_file <- "/data/MantonBM_nonmix_10x.h5"
+dst_folder <- "/data/"
 seed <- 0
 debug.mode <- TRUE
 logfile <- paste0(dst_folder, "seurat.log")

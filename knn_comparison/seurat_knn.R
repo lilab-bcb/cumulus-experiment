@@ -27,3 +27,4 @@ print("Time used for Seurat AnnoyNN:")
 print(end_annoy - start_annoy)
 
 write.table(my.knn2$nn.idx, "seurat_indices_annoy.txt", row.names = FALSE, col.names = FALSE)
+save(my.knn2, file = "seurat_knn_result.RData")

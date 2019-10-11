@@ -85,6 +85,11 @@ write(paste("iGraph time:", logstr.graph, attr(logstr.graph, "units")), file = l
 print("Graph is constructed!")
 now <- Sys.time()
 clustering.results <- FindClusters(input, method = "igraph", algorithm = "leiden", random.seed = seed)
+logstr.leiden <- Sys.time() - now
+write(paste("Leiden time:", logstr.leiden, attr(logstr.leiden, "units")), file = logfile, append = TRUE)
+
+print("Leiden is finished!")
+now <- Sys.time()
 colnames(x = clustering.results) <- paste0("RNA_snn", "_", colnames(x = clustering.results))
 adata <- AddMetaData(object = adata, metadata = clustering.results)
 Idents(object = adata) <- colnames(x = clustering.results)[ncol(x = clustering.results)]
@@ -92,8 +97,8 @@ levels <- levels(x = adata)
 Idents(object = adata) <- factor(x = Idents(object = adata), levels = sort(x = levels))
 adata[['seurat_clusters']] <- Idents(object = adata)
 adata <- LogSeuratCommand(adata)
-logstr.leiden <- Sys.time() - now
-write(paste("Leiden time:", logstr.leiden, attr(logstr.leiden, "units")), file = logfile, append = TRUE)
+logstr.postprocess <- Sys.time() - now
+write(paste("Postprocess time:", logstr.postprocess, attr(logstr.postprocess, "units")), file = logfile, append = TRUE)
 
 save(adata, file = "seurat_leiden.RData")
 

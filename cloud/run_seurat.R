@@ -13,7 +13,7 @@ n.cores <- detectCores()
 setOption('mc.cores', n.cores)
 write(paste("Use", n.cores, "cores for tSNE."), file = logfile)
 
-options(future.globals.maxSize = 20 * 1024^3)
+options(future.globals.maxSize = 50 * 1024^3)
 plan("multiprocess", workers = n.cores)
 plan()
 write(paste("Use", nbrOfWorkers(), "cores."), file = logfile, append = TRUE)
@@ -37,7 +37,7 @@ bm.list <- lapply(X = bm.list, FUN = function(x) {
 logstr.hvg <- Sys.time() - now
 write(paste("HVG time:", logstr.hvg, attr(logstr.hvg, "units")), file = logfile, append = TRUE)
 
-plan("multiprocess", workers = 15)
+plan("multiprocess", workers = 10)
 plan()
 write(paste("Use", nbrOfWorkers(), "cores."), file = logfile, append = TRUE)
 

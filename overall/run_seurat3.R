@@ -73,30 +73,18 @@ plan()
 
 load("seurat_knn.RData")
 library(Seurat)
-source("/opt/software/seurat-3.1.0/R/clustering.R")
-library(leiden)
 library(igraph)
-
-plan("multiprocess", workers = n.cores)
-plan()
 
 print("Finding Clusters using Leiden:")
 now <- Sys.time()
 #clustering.results <- FindClusters(adata[["RNA_snn"]], resolution = 1.3, algorithm = "leiden", method = "igraph", random.seed = seed)
 input <- graph_from_adjacency_matrix(adjmatrix = adata[["RNA_snn"]])
-ids <- leiden(
-	object = input, 
-	partition_type = "RBConfigurationVertexPartition",
-    initial_membership = NULL,
-    weights = NULL,
-    node_sizes = NULL,
-    resolution_parameter = 1.3,
-    seed = seed,
-    n_iterations = 10
-)
-names(x = ids) <- colnames(x = adata[["RNA_snn"]])
-ids <- GroupSingletons(ids = ids, SNN = adata[["RNA_snn"]], group.singletons = TRUE, verbose = TRUE)
-clustering.results[, paste0("res.", 1.3)] <- factor(x = ids)
+logstr.graph <- Sys.time() - now
+write(paste("iGraph time:", logstr.graph, attr(logstr.graph, "units")), file = logfile)
+
+print("Graph is constructed!")
+now <- Sys.time()
+clustering.results <- FindClusters(input, method = "igraph", algorithm = "leiden", random.seed = seed)
 colnames(x = clustering.results) <- paste0("RNA_snn", "_", colnames(x = clustering.results))
 adata <- AddMetaData(object = adata, metadata = clustering.results)
 Idents(object = adata) <- colnames(x = clustering.results)[ncol(x = clustering.results)]
@@ -114,7 +102,7 @@ save(adata, file = "seurat_leiden.RData")
 ##n.pc <- dim(adata[["pca"]])[2]
 ##print("Computing UMAP embedding:")
 ##now <- Sys.time()
-##adata <- RunUMAP(adata, reduction = "pca", umap.method = "umap-learn", n.neighbors = 15, min.dist = 0.5, seed.use = seed, dims = 1:n.pc)
+##adata <- RunUMAP(adata, reduction = "pca", umap.method = "umap-learn", metric = "correlation", n.neighbors = 15, min.dist = 0.5, seed.use = seed, dims = 1:n.pc)
 ##logstr.umap <- Sys.time() - now
 ##write(paste("UMAP time:", logstr.umap, attr(logstr.umap, "units")), file = logfile, append = TRUE)
 ##

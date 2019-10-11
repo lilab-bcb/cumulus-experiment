@@ -73,6 +73,8 @@ plan()
 
 load("seurat_knn.RData")
 library(Seurat)
+source("/opt/software/seurat-3.1.0/R/clustering.R")
+library(leiden)
 library(igraph)
 
 print("Finding Clusters using Leiden:")
@@ -84,12 +86,24 @@ write(paste("iGraph time:", logstr.graph, attr(logstr.graph, "units")), file = l
 
 print("Graph is constructed!")
 now <- Sys.time()
-clustering.results <- FindClusters(input, method = "igraph", algorithm = "leiden", random.seed = seed)
+ids <- leiden(
+	object = input,
+	partition_type = "RBConfigurationVertexPartition",
+	initial_membership = NULL,
+	weights = NULL,
+	node_sizes = NULL,
+	resolution_parameter = 1.3,
+	seed = seed,
+	n_iterations = 10
+)
 logstr.leiden <- Sys.time() - now
 write(paste("Leiden time:", logstr.leiden, attr(logstr.leiden, "units")), file = logfile, append = TRUE)
 
 print("Leiden is finished!")
 now <- Sys.time()
+names(x = ids) <- colnames(x = adata[["RNA_snn"]])
+ids <- GroupSingletons(ids = ids, SNN = adata[["RNA_snn"]], group.singletons = TRUE, verbose = TRUE)
+clustering.results[, paste0("res.", 1.3)] <- factor(x = ids)
 colnames(x = clustering.results) <- paste0("RNA_snn", "_", colnames(x = clustering.results))
 adata <- AddMetaData(object = adata, metadata = clustering.results)
 Idents(object = adata) <- colnames(x = clustering.results)[ncol(x = clustering.results)]

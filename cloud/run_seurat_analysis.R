@@ -1,5 +1,5 @@
 dst_folder <- "/data/"
-load(file = paste0(dst_folder), "seurat_corrected_result.RData")
+load(file = paste0(dst_folder, "seurat_corrected_result.RData"))
 
 library(Seurat)
 library(R.utils)

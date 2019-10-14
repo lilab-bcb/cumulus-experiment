@@ -6,8 +6,8 @@ library(future.apply)
 source("/opt/software/seurat-3.1.0/R/clustering.R")
 
 n.cores <- detectCores()
-setOption('mc.cores', n.cores)
-print(paste("Use", n.cores, "cores if possible."))
+plan("multiprocess", workers = n.cores)
+plan()
 
 X <- read.table("x_pca.txt", header = FALSE)
 

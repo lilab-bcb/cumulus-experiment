@@ -23,27 +23,49 @@ Seurat 3.1.0 \qquad vs \qquad SCANPY 1.4.4.post1 \qquad vs \qquad Cumulus 0.10.0
 		\hline
 		Analysis & Seurat v3 & SCANPY & Cumulus\\
 		\hline \hline
-		Count matrix aggregation & N/A & N/A & \\
+		Count matrix aggregation & N/A & N/A & $6$ sec   \\
 		\hline
-		HVG selection &  & $1$ min $46$ sec  &  \\
+		HVG selection & $1$ min $6$ sec & $1$ min $46$ sec  & $15$ sec   \\
 		\hline
-		Batch correction &  & $14$ min $34$ sec  &  \\
+		Batch correction & $22$ h $34$ min  & $14$ min $34$ sec  & $25$ sec  \\
 		\hline
-		PCA &  & $26$ sec  &  \\
+		PCA & $9$ min $13$ sec  & $26$ sec  & $16$ sec  \\
 		\hline
-		Find K nearest neighbors &   & --   & \\
+		Find K nearest neighbors & $8$ min $43$ sec   & --   & $13$ sec  \\
 		\hline
-		Diffusion map &  & --  &  \\
+		Louvain-like clustering & $39$ min $50$ sec  & $1$ h $7$ min  & $1$ min $48$ sec   \\
 		\hline
-		Louvain-like clustering &  & $1$ h $7$ min  &  \\
+		t-SNE-based visualization & $3$ min $7$ sec  & $21$ min $47$ sec  & $2$ min $40$ sec  \\
 		\hline
-		t-SNE-based visualization &  & $21$ min $47$ sec  & \\
+		UMAP-based visualization & $17$ min $33$ sec  & $17$ min $25$ sec   & $3$ min $7$ sec  \\
 		\hline
-		UMAP-based visualization &  & $17$ min $25$ sec   & \\
-		\hline
-		DE analysis \& Annotation & & $2$ min & \\
+		DE analysis \& Annotation & $2$ h $15$ min & $2$ min & $2$ min $4$ sec  \\
+		\hline \hline
+		\textbf{Overall} & $26$ h $8$ min & $2$ h $5$ min & $10$ min $54$ sec ($37$ min)  \\
 		\hline
 	\end{tabular}
 \end{table}
+
+\paragraph{}
+The benchmark was taking on Google Cloud server with 32 CPUs (Intel Broadwell platform) and 120GB memory. Cumulus was done via Terra workflow, while SCANPY and Seurat v3 were through VM instances.
+
+\begin{itemize}
+	\item
+	For Seurat v3, Batch correction step was done with 2 cores using R \textit{future} package. This is because the benchmark failed when assigning 10, 15, 20, or 32 cores. So we decide to set it to 2 to make sure it can finish.
+	\par
+	Besides, the batch correction was on 8 individuals, not the original 63 batches. This is because taking 63 batches for correction would fail due to limit of R vector length.
+\par
+For all the other steps, the benchmark was done under 32 cores using R \textit{future} package. Besides, t-SNE-based visualization step used 32 cores which was set by \textit{mc.cores}, not \textit{future}.
+
+	\item
+	SCANPY benchmark uses BBKNN for batch correction. That's why it doesn't have the ``Find K nearest neighbors" step stat.
+
+	\item
+	Cumulus has 2 overall time results. $37$ minutes is the overall time including IO, and Terra's pre- and postprocessing, while $10$ min $54$ sec is the time spent on analysis.
+\end{itemize}
+\paragraph{}
+
+
+
 
 \end{document}

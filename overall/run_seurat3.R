@@ -60,16 +60,16 @@ print("Computing neighborhood graph:")
 n.pc <- dim(adata[["pca"]])[2]
 write(paste0("KNN using ", n.pc, " PCs"), file = logfile, append = TRUE)
 now <- Sys.time()
-adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy")
+adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy", compute.SNN = FALSE)
 logstr.knn <- Sys.time() - now
 write(paste("KNN time:", logstr.knn, attr(logstr.knn, "units")), file = logfile, append = TRUE)
-rm(adata)
+#rm(adata)
 
-print("Finding Clusters using Louvain:")
-now <- Sys.time()
-adata <- FindClusters(adata, resolution = 1.3, random.seed = seed, algorithm = "louvain")
-logstr.louvain <- Sys.time() - now
-write(paste("Louvain time:", logstr.louvain, attr(logstr.louvain, "units")), file = logfile, append = TRUE)
+#print("Finding Clusters using Louvain:")
+#now <- Sys.time()
+#adata <- FindClusters(adata, resolution = 1.3, random.seed = seed, algorithm = "louvain")
+#logstr.louvain <- Sys.time() - now
+#write(paste("Louvain time:", logstr.louvain, attr(logstr.louvain, "units")), file = logfile, append = TRUE)
 
 ##load("seurat_knn.RData")
 ##library(Seurat)

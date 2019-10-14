@@ -55,66 +55,66 @@ plan()
 ##write(paste("PCA time:", logstr.pca, attr(logstr.pca, "units")), file = logfile, append = TRUE)
 ##rm(adata)
 
-##load("MantonBM_nonmix.RData")
-##print("Computing neighborhood graph:")
-##n.pc <- dim(adata[["pca"]])[2]
-##write(paste0("KNN using ", n.pc, " PCs"), file = logfile, append = TRUE)
+load("MantonBM_nonmix.RData")
+print("Computing neighborhood graph:")
+n.pc <- dim(adata[["pca"]])[2]
+write(paste0("KNN using ", n.pc, " PCs"), file = logfile, append = TRUE)
+now <- Sys.time()
+adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy")
+logstr.knn <- Sys.time() - now
+write(paste("KNN time:", logstr.knn, attr(logstr.knn, "units")), file = logfile, append = TRUE)
+rm(adata)
+
+print("Finding Clusters using Louvain:")
+now <- Sys.time()
+adata <- FindClusters(adata, resolution = 1.3, random.seed = seed, algorithm = "louvain")
+logstr.louvain <- Sys.time() - now
+write(paste("Louvain time:", logstr.louvain, attr(logstr.louvain, "units")), file = logfile, append = TRUE)
+
+##load("seurat_knn.RData")
+##library(Seurat)
+##source("/opt/software/seurat-3.1.0/R/clustering.R")
+##library(leiden)
+##library(igraph)
+
+##print("Finding Clusters using Leiden:")
 ##now <- Sys.time()
-##adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy")
-##logstr.knn <- Sys.time() - now
-##write(paste("KNN time:", logstr.knn, attr(logstr.knn, "units")), file = logfile, append = TRUE)
-##rm(adata)
-
-##print("Finding Clusters using Louvain:")
+###clustering.results <- FindClusters(adata[["RNA_snn"]], resolution = 1.3, algorithm = "leiden", method = "igraph", random.seed = seed)
+##input <- graph_from_adjacency_matrix(adjmatrix = adata[["RNA_snn"]])
+##logstr.graph <- Sys.time() - now
+##write(paste("iGraph time:", logstr.graph, attr(logstr.graph, "units")), file = logfile)
+##
+##print("Graph is constructed!")
 ##now <- Sys.time()
-##adata <- FindClusters(adata, resolution = 1.3, random.seed = seed, algorithm = "louvain")
-##logstr.louvain <- Sys.time() - now
-##write(paste("Louvain time:", logstr.louvain, attr(logstr.louvain, "units")), file = logfile, append = TRUE)
-
-load("seurat_knn.RData")
-library(Seurat)
-source("/opt/software/seurat-3.1.0/R/clustering.R")
-library(leiden)
-library(igraph)
-
-print("Finding Clusters using Leiden:")
-now <- Sys.time()
-#clustering.results <- FindClusters(adata[["RNA_snn"]], resolution = 1.3, algorithm = "leiden", method = "igraph", random.seed = seed)
-input <- graph_from_adjacency_matrix(adjmatrix = adata[["RNA_snn"]])
-logstr.graph <- Sys.time() - now
-write(paste("iGraph time:", logstr.graph, attr(logstr.graph, "units")), file = logfile)
-
-print("Graph is constructed!")
-now <- Sys.time()
-ids <- leiden(
-	object = input,
-	partition_type = "RBConfigurationVertexPartition",
-	initial_membership = NULL,
-	weights = NULL,
-	node_sizes = NULL,
-	resolution_parameter = 1.3,
-	seed = seed,
-	n_iterations = 10
-)
-logstr.leiden <- Sys.time() - now
-write(paste("Leiden time:", logstr.leiden, attr(logstr.leiden, "units")), file = logfile, append = TRUE)
-
-print("Leiden is finished!")
-now <- Sys.time()
-names(x = ids) <- colnames(x = adata[["RNA_snn"]])
-ids <- GroupSingletons(ids = ids, SNN = adata[["RNA_snn"]], group.singletons = TRUE, verbose = TRUE)
-clustering.results[, paste0("res.", 1.3)] <- factor(x = ids)
-colnames(x = clustering.results) <- paste0("RNA_snn", "_", colnames(x = clustering.results))
-adata <- AddMetaData(object = adata, metadata = clustering.results)
-Idents(object = adata) <- colnames(x = clustering.results)[ncol(x = clustering.results)]
-levels <- levels(x = adata)
-Idents(object = adata) <- factor(x = Idents(object = adata), levels = sort(x = levels))
-adata[['seurat_clusters']] <- Idents(object = adata)
-adata <- LogSeuratCommand(adata)
-logstr.postprocess <- Sys.time() - now
-write(paste("Postprocess time:", logstr.postprocess, attr(logstr.postprocess, "units")), file = logfile, append = TRUE)
-
-save(adata, file = "seurat_leiden.RData")
+##ids <- leiden(
+##	object = input,
+##	partition_type = "RBConfigurationVertexPartition",
+##	initial_membership = NULL,
+##	weights = NULL,
+##	node_sizes = NULL,
+##	resolution_parameter = 1.3,
+##	seed = seed,
+##	n_iterations = 10
+##)
+##logstr.leiden <- Sys.time() - now
+##write(paste("Leiden time:", logstr.leiden, attr(logstr.leiden, "units")), file = logfile, append = TRUE)
+##
+##print("Leiden is finished!")
+##now <- Sys.time()
+##names(x = ids) <- colnames(x = adata[["RNA_snn"]])
+##ids <- GroupSingletons(ids = ids, SNN = adata[["RNA_snn"]], group.singletons = TRUE, verbose = TRUE)
+##clustering.results[, paste0("res.", 1.3)] <- factor(x = ids)
+##colnames(x = clustering.results) <- paste0("RNA_snn", "_", colnames(x = clustering.results))
+##adata <- AddMetaData(object = adata, metadata = clustering.results)
+##Idents(object = adata) <- colnames(x = clustering.results)[ncol(x = clustering.results)]
+##levels <- levels(x = adata)
+##Idents(object = adata) <- factor(x = Idents(object = adata), levels = sort(x = levels))
+##adata[['seurat_clusters']] <- Idents(object = adata)
+##adata <- LogSeuratCommand(adata)
+##logstr.postprocess <- Sys.time() - now
+##write(paste("Postprocess time:", logstr.postprocess, attr(logstr.postprocess, "units")), file = logfile, append = TRUE)
+##
+##save(adata, file = "seurat_leiden.RData")
 
 ##
 ##load("MantonBM_nonmix.RData")

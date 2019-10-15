@@ -1,1 +1,0 @@
-Rscript --max-vsize=100G run_seurat.R

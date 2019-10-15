@@ -41,27 +41,27 @@ def get_NN_brute(data, num_threads = 8, K = 100):
 
 	return knn_indices
 
-def get_NN_sccloud(data, num_threads = 8, K = 100):
-	f_list = [f for f in os.listdir('.') if f == 'sccloud_indices.npy']
+def get_NN_pegasus(data, num_threads = 8, K = 100):
+	f_list = [f for f in os.listdir('.') if f == 'pegasus_indices.npy']
 
 	if len(f_list) == 0:
 		cprint("Use {} cores.".format(num_threads), "green")
-		cprint("Calculating KNN with scCloud algorithm...", "yellow")
+		cprint("Calculating KNN with Pegasus algorithm...", "yellow")
 		from sccloud.tools import calculate_nearest_neighbors
 		start_sccloud = time.time()
 		knn_indices, knn_distances = calculate_nearest_neighbors(data.obsm['X_pca'], K = K, n_jobs = num_threads, full_speed = True)
 		end_sccloud = time.time()
 		cprint("Finished!", "yellow")
-		cprint("Time used for scCloud: " + str_time(end_sccloud - start_sccloud) + ".", "yellow")
+		cprint("Time used for Pegasus: " + str_time(end_sccloud - start_sccloud) + ".", "yellow")
 
 		# Add self points.
 		n_sample = knn_indices.shape[0]
 		knn_indices = np.concatenate((np.arange(n_sample).reshape(-1, 1), knn_indices), axis = 1)
-		np.save('sccloud_indices.npy', knn_indices)
+		np.save('pegasus_indices.npy', knn_indices)
 		cprint("Results are saved!", "yellow")
 	else:
-		cprint("Loading pre-calculated scCloud results...", "yellow")
-		knn_indices = np.load('sccloud_indices.npy')
+		cprint("Loading pre-calculated Pegasus results...", "yellow")
+		knn_indices = np.load('pegasus_indices.npy')
 
 	return knn_indices
 
@@ -156,7 +156,7 @@ def plot_result(df_list):
 
 	# boxplot for kNN recall
 	flierprops = dict(markersize = 0.1)
-	ax = sns.boxplot(x = "method", y = "recall", data = df, order = ["scCloudPy", "SCANPY", "Seurat V3"], linewidth = 0.5, flierprops = flierprops)
+	ax = sns.boxplot(x = "method", y = "recall", data = df, order = ["Pegasus", "SCANPY", "Seurat V3"], linewidth = 0.5, flierprops = flierprops)
 	#ax = sns.stripplot(x = "method", y = "recall", data = df, jitter = True, size = 1)
 	ax.set(ylabel = 'Recall', xlabel = '')
 	vals = ax.get_yticks()
@@ -176,7 +176,7 @@ def plot_result(df_list):
 
 	df_time = df_time.loc[df_time['method'] != 'baseline']
 
-	ax = sns.barplot(x = 'method', y = 'minutes', data = df_time, order = ['scCloudPy', 'SCANPY', 'Seurat V3'])
+	ax = sns.barplot(x = 'method', y = 'minutes', data = df_time, order = ['Pegasus', 'SCANPY', 'Seurat V3'])
 	ax.set(ylabel = 'Total Time in minutes', xlabel = '')
 	ax.get_figure().savefig("knn_time.pdf")
 	cprint("Barplot of total time is generated!", "yellow")
@@ -187,19 +187,19 @@ def plot_result(df_list):
 if __name__ == '__main__':
 
 	method = sys.argv[1]
-	assert method in ["brute", "scCloud", "seurat", "scanpy", "plot"]
+	assert method in ["brute", "pegasus", "seurat", "scanpy", "plot"]
 
 	n_cores = os.cpu_count()
 
-	if method in ['brute', 'scCloud', 'seurat', 'scanpy']:
-		import sccloud as scc
+	if method in ['brute', 'pegasus', 'seurat', 'scanpy']:
+		import pegasus as pg
 
-		adata = scc.read_input(data_source)
+		adata = pg.read_input(data_source)
 
 		if method == 'brute':
 			get_NN_brute(adata, num_threads = n_cores)
-		elif method == 'scCloud':
-			get_NN_sccloud(adata, num_threads = n_cores)
+		elif method == 'pegasus':
+			get_NN_pegasus(adata, num_threads = n_cores)
 		elif method == 'scanpy':
 			get_NN_scanpy(adata)
 		else:
@@ -207,7 +207,7 @@ if __name__ == '__main__':
 
 	else:
 
-		f_list = [f for f in os.listdir('.') if f in ["baseline_indices.npy", "sccloud_indices.npy", "scanpy_indices.npy", "seurat_indices_annoy.txt"]]
+		f_list = [f for f in os.listdir('.') if f in ["baseline_indices.npy", "pegasus_indices.npy", "scanpy_indices.npy", "seurat_indices_annoy.txt"]]
 
 		if len(f_list) == 4:
 			df_list = []
@@ -215,7 +215,7 @@ if __name__ == '__main__':
 
 			# For scCloud
 			knn_indices = get_NN_sccloud(None)
-			df_sccloud = generate_knn_recall_dataframe('scCloudPy', knn_indices, baseline_indices)
+			df_sccloud = generate_knn_recall_dataframe('Pegasus', knn_indices, baseline_indices)
 			df_list.append(df_sccloud)
 
 			# For scanpy

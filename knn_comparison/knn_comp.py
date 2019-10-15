@@ -156,7 +156,7 @@ def plot_result(df_list):
 
 	# boxplot for kNN recall
 	flierprops = dict(markersize = 0.1)
-	ax = sns.boxplot(x = "method", y = "recall", data = df, order = ["Pegasus", "SCANPY", "Seurat V3"], linewidth = 0.5, flierprops = flierprops)
+	ax = sns.boxplot(x = "method", y = "recall", data = df, order = ["Seurat V3", "SCANPY", "Pegasus"], linewidth = 0.5, flierprops = flierprops)
 	#ax = sns.stripplot(x = "method", y = "recall", data = df, jitter = True, size = 1)
 	ax.set(ylabel = 'Recall', xlabel = '')
 	vals = ax.get_yticks()
@@ -176,7 +176,7 @@ def plot_result(df_list):
 
 	df_time = df_time.loc[df_time['method'] != 'baseline']
 
-	ax = sns.barplot(x = 'method', y = 'minutes', data = df_time, order = ['Pegasus', 'SCANPY', 'Seurat V3'])
+	ax = sns.barplot(x = 'method', y = 'minutes', data = df_time, order = ['Seurat V3', 'SCANPY', 'Pegasus'])
 	ax.set(ylabel = 'Total Time in minutes', xlabel = '')
 	ax.get_figure().savefig("knn_time.pdf")
 	cprint("Barplot of total time is generated!", "yellow")

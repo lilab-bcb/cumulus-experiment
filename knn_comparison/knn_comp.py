@@ -47,12 +47,12 @@ def get_NN_pegasus(data, num_threads = 8, K = 100):
 	if len(f_list) == 0:
 		cprint("Use {} cores.".format(num_threads), "green")
 		cprint("Calculating KNN with Pegasus algorithm...", "yellow")
-		from sccloud.tools import calculate_nearest_neighbors
-		start_sccloud = time.time()
+		from pegasus.tools import calculate_nearest_neighbors
+		start_pegasus = time.time()
 		knn_indices, knn_distances = calculate_nearest_neighbors(data.obsm['X_pca'], K = K, n_jobs = num_threads, full_speed = True)
-		end_sccloud = time.time()
+		end_pegasus = time.time()
 		cprint("Finished!", "yellow")
-		cprint("Time used for Pegasus: " + str_time(end_sccloud - start_sccloud) + ".", "yellow")
+		cprint("Time used for Pegasus: " + str_time(end_pegasus - start_pegasus) + ".", "yellow")
 
 		# Add self points.
 		n_sample = knn_indices.shape[0]
@@ -215,8 +215,8 @@ if __name__ == '__main__':
 
 			# For pegasus
 			knn_indices = get_NN_pegasus(None)
-			df_sccloud = generate_knn_recall_dataframe('Pegasus', knn_indices, baseline_indices)
-			df_list.append(df_sccloud)
+			df_pegasus = generate_knn_recall_dataframe('Pegasus', knn_indices, baseline_indices)
+			df_list.append(df_pegasus)
 
 			# For scanpy
 			knn_indices = get_NN_scanpy(None)

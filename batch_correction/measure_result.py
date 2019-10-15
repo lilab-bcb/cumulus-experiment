@@ -141,11 +141,11 @@ def process_data(data, method, output = None, processed = False):
 		data.obs['Individual'] = pd.Categorical(data.obs['Channel'].apply(lambda s: s.split('_')[0][8:]))
 
 	cprint("Calculating Mean Silhouette Score on UMAP coordinates...", "green")
-	sil_score = silhouette_score(data.obsm['X_umap'], data.obs['cell_types'])
+	sil_score = silhouette_score(data.obsm['X_umap'], data.obs['Cluster'])
 	cprint("Mean Silhouette Score on UMAP = {:.4f}.".format(sil_score), "yellow")
 
 	cprint("Calculating kSIM on UMAP coordinates...", "green")
-	ksim_mean, ksim_ac_rate = pg.calc_kSIM(data, attr = 'cell_types', rep = 'umap')
+	ksim_mean, ksim_ac_rate = pg.calc_kSIM(data, attr = 'Cluster', rep = 'umap')
 	cprint("Mean kSIM = {mean:.4f}, with accept rate {rate:.4f}.".format(mean = ksim_mean, rate = ksim_ac_rate), "yellow")
 
 	measure_result.append((method, ksim_ac_rate, kbet_ac_rate))

@@ -54,14 +54,14 @@ corrected_data = "/projects/benchmark/MantonBM/MantonBM_nonmix_corrected.h5ad"
 ##logstr_pca = "Time spent for PCA: {}.".format(timedelta(seconds = end_pca - start_pca))
 ##print(logstr_pca)
 
-print("Computing KNN")
-adata = sc.read_h5ad(corrected_data)
-rs = RandomState(rand_seed)
-start_knn = time.time()
-knn_indices, knn_distances, _ = nearest_neighbors(adata.obsm['X_pca'], n_neighbors = 100, random_state = rs, metric = 'euclidean', metric_kwds = {}, angular = False, verbose = False)
-end_knn = time.time()
-logstr_knn = "Time spent for KNN: {}.".format(timedelta(seconds = end_knn - start_knn))
-print(logstr_knn)
+##print("Computing KNN")
+##adata = sc.read_h5ad(corrected_data)
+##rs = RandomState(rand_seed)
+##start_knn = time.time()
+##knn_indices, knn_distances, _ = nearest_neighbors(adata.obsm['X_pca'], n_neighbors = 100, random_state = rs, metric = 'euclidean', metric_kwds = {}, angular = False, verbose = False)
+##end_knn = time.time()
+##logstr_knn = "Time spent for KNN: {}.".format(timedelta(seconds = end_knn - start_knn))
+##print(logstr_knn)
 
 # Construct affinity matrix using KNN information from scCloud results.
 ##adata = sc.read_h5ad(corrected_data)
@@ -118,11 +118,13 @@ print(logstr_knn)
 ##
 ##adata.write("scanpy_mantonbm_result_no_fle.h5ad", compression = 'gzip')
 ##
-##print("Computing FLE embedding")
-##start_fle = time.time()
-##sc.tl.draw_graph(adata, random_state = rand_seed, n_jobs = sc.settings.n_jobs, iterations = 500)
-##end_fle = time.time()
-##logstr_fle = "Time spent for FLE with {iters} iterations: {time}.".format(iters = 500, time = timedelta(seconds = end_fle - start_fle))
-##print(logstr_fle)
-##
-##adata.write("scanpy_result.h5ad", compression = 'gzip')
+
+adata = sc.read_h5ad("scanpy_mantonbm_result_no_fle.h5ad")
+print("Computing FLE embedding")
+start_fle = time.time()
+sc.tl.draw_graph(adata, random_state = rand_seed, iterations = 5000)
+end_fle = time.time()
+logstr_fle = "Time spent for FLE: {}.".format(timedelta(seconds = end_fle - start_fle))
+print(logstr_fle)
+
+adata.write("scanpy_result.h5ad", compression = 'gzip')

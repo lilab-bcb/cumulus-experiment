@@ -10,7 +10,21 @@ from sklearn.metrics import silhouette_score
 
 method_list = ["baseline", "pegasus", "seurat", "mnn", "combat", "bbknn"]
 
-celltypes_plot_dir = "celltypes_plot"
+figure_index = {'baseline' : 'B',
+                'pegasus'  : 'C',
+                'combat'   : 'D',
+                'mnn'      : 'E',
+                'bbknn'    : 'F',
+                'seurat'   : 'G'
+               }
+
+method_print_name = {'baseline' : 'Baseline',
+					 'pegasus'  : 'Pegasus',
+					 'combat'   : 'ComBat',
+					 'mnn'      : 'MNN',
+					 'bbknn'    : 'BBKNN',
+					 'seurat'   : 'Seurat v3'
+}
 
 measure_result = []
 
@@ -148,11 +162,11 @@ def process_data(data, method, output = None, processed = False):
 	ksim_mean, ksim_ac_rate = pg.calc_kSIM(data, attr = 'Cluster', rep = 'umap')
 	cprint("Mean kSIM = {mean:.4f}, with accept rate {rate:.4f}.".format(mean = ksim_mean, rate = ksim_ac_rate), "yellow")
 
-	measure_result.append((method, ksim_ac_rate, kbet_ac_rate))
+	measure_result.append((method_print_name[method], ksim_ac_rate, kbet_ac_rate))
 
 	cprint("Plotting UMAP for cells with cell types...", "green")
-	pg.write_output(data, "{}_compare".format(celltypes_plot_dir + "/" + method))
-	if os.system("pegasus plot scatter --basis umap --attributes Cluster,Individual {name}_compare.h5ad {name}.cluster+individual.umap.pdf".format(name = celltypes_plot_dir + "/" + method)):
+	pg.write_output(data, "{}_compare".format(method))
+	if os.system("pegasus plot scatter --basis umap --attributes Cluster,Individual {name}_compare.h5ad Figure_S2{idx}.pdf".format(name = method, idx = figure_index[method])):
 		sys.exit(1)
 
 def plot_scatter(precomputed = False):
@@ -175,23 +189,21 @@ def plot_scatter(precomputed = False):
 	ax = sns.scatterplot(x = 'kSIM', y = 'kBET', hue = 'method', data = df_measure, legend = False)
 	for line in range(0, df_measure.shape[0]):
 		x_pos = df_measure.kSIM[line] + 0.003
-		if df_measure.method[line] == 'combat':
+		if df_measure.method[line] in ['Baseline', 'ComBat']:
 			x_pos = df_measure.kSIM[line] - 0.003
 		y_pos = df_measure.kBET[line]
-		alignment = 'right' if df_measure.method[line] == 'combat' else 'left'
+		alignment = 'right' if df_measure.method[line] in ['Baseline', 'ComBat'] else 'left'
 		ax.text(x_pos, y_pos, df_measure.method[line], horizontalalignment = alignment, size = 'medium', color = 'black')
 	plt.xlabel('kSIM accept rate')
 	plt.ylabel('kBET accept rate')
 
 
-	plt.savefig("Figure_2B.pdf")
+	plt.savefig("Figure_2A.pdf")
 	plt.close()
 
 
 
 if __name__ == "__main__":
-	if not os.path.exists(celltypes_plot_dir):
-		os.mkdir(celltypes_plot_dir)
 
 	method = sys.argv[1]
 	assert method in method_list or method == 'all' or method == 'plot'

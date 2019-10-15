@@ -4,11 +4,11 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from anndata import read_mtx
-import sccloud as scc
+import pegasus as pg
 from termcolor import cprint
 from sklearn.metrics import silhouette_score
 
-method_list = ["baseline", "scCloud", "seurat", "mnn", "combat", "bbknn"]
+method_list = ["baseline", "pegasus", "seurat", "mnn", "combat", "bbknn"]
 
 celltypes_plot_dir = "celltypes_plot"
 
@@ -17,30 +17,30 @@ measure_result = []
 measure_precomputed_file = "correction_benchmark.txt"
 
 def process_baseline():
-	cprint("For scCloud with no batch correction:", "red")
+	cprint("For pegasus with no batch correction:", "red")
 	f_list = [f for f in os.listdir("./baseline") if f in ["baseline_result.h5ad"]]
 	if len(f_list) != 1:
-		cprint("No processed data are found! Processing data using scCloud without batch correction...", "green")
+		cprint("No processed data are found! Processing data using pegasus without batch correction...", "green")
 		if os.system("cd ./baseline/ && python run_baseline.py && cd .."):
 			sys.exit(1)
 
 	cprint("Loading processed data...", "green")
-	adata = scc.read_input('./baseline/baseline_result.h5ad')
+	adata = pg.read_input('./baseline/baseline_result.h5ad')
 
 	process_data(adata, method = 'baseline', processed = True)
 
-def process_sccloud():
-	cprint("For scCloud:", "red")
-	f_list = [f for f in os.listdir("./scCloud") if f in ["tiny_sccloud_corrected.h5ad"]]
+def process_pegasus():
+	cprint("For pegasus:", "red")
+	f_list = [f for f in os.listdir("./pegasus") if f in ["tiny_pegasus_corrected.h5ad"]]
 	if len(f_list) != 1:
-		cprint("No corrected data are found! Correcting data using scCloud...", "green")
-		if os.system("cd ./scCloud/ && python run_sccloud_batch_correct.py && cd .."):
+		cprint("No corrected data are found! Correcting data using pegasus...", "green")
+		if os.system("cd ./pegasus/ && python run_pegasus_batch_correct.py && cd .."):
 			sys.exit(1)
 
 	cprint("Loading corrected data...", "green")
-	adata = scc.read_input('./scCloud/tiny_sccloud_corrected.h5ad')
+	adata = pg.read_input('./pegasus/tiny_pegasus_corrected.h5ad')
 
-	process_data(adata, method = 'scCloud', processed = True)
+	process_data(adata, method = 'pegasus', processed = True)
 
 def process_mnn():
 	cprint("For MNN:", "red")
@@ -50,7 +50,7 @@ def process_mnn():
 		sys.exit(1)
 
 	cprint("Loading corrected data...", "green")
-	adata = scc.read_input('./mnn/scanpy_mnn_corrected.h5ad')
+	adata = pg.read_input('./mnn/scanpy_mnn_corrected.h5ad')
 
 	cprint("Correcting cell names...", "green")
 	adata.obs['cell_id'] = adata.obs.index.map(lambda s: s[:s.rfind('-')]).values
@@ -88,7 +88,7 @@ def process_combat():
 		cprint("No corrected data are found!", "red")
 
 	cprint("Loading corrected data...", "green")
-	adata = scc.read_input('./combat/scanpy_combat_corrected.h5ad')
+	adata = pg.read_input('./combat/scanpy_combat_corrected.h5ad')
 
 	process_data(adata, method = 'combat', output = "./combat/scanpy_combat_result")
 
@@ -99,17 +99,17 @@ def process_bbknn():
 		cprint("No corredted data are found!", "red")
 
 	cprint("loading corrected data...", "green")
-	adata = scc.read_input("./bbknn/scanpy_bbknn_corrected.h5ad")
+	adata = pg.read_input("./bbknn/scanpy_bbknn_corrected.h5ad")
 	adata.uns['pca_knn_indices'] = adata.uns['neighbors']['knn_indices'][:, 1:]
 	adata.uns['pca_knn_distances'] = adata.uns['neighbors']['knn_distances'][:, 1:]
 
 	cprint("Computing UMAP...", "green")
-	scc.umap(adata)
+	pg.umap(adata)
 
 	cprint("For UMAP coordinates:", "yellow")
 	process_data(adata, method = 'bbknn', processed = True)
 
-	scc.write_output(adata, "./bbknn/scanpy_bbknn_result")
+	pg.write_output(adata, "./bbknn/scanpy_bbknn_result")
 
 
 def process_data(data, method, output = None, processed = False):
@@ -117,16 +117,16 @@ def process_data(data, method, output = None, processed = False):
 	if not processed:
 
 		cprint("Calculating PCA and KNN...", "green")
-		scc.pca(data, features = "highly_variable_features" if "highly_variable_features" in data.var else None)
-		scc.neighbors(data, n_jobs = 8)
+		pg.pca(data, features = "highly_variable_features" if "highly_variable_features" in data.var else None)
+		pg.neighbors(data, n_jobs = 8)
 
 		cprint("Computing UMAP...", "green")
-		scc.umap(data)
+		pg.umap(data)
 
-		scc.write_output(data, output)
+		pg.write_output(data, output)
 
 	cprint("Calculating kBET measures on UMAP coordinates...", "green")
-	kbet_stat, kbet_pvalue, kbet_ac_rate = scc.calc_kBET(data, attr = 'Channel', rep = 'umap')
+	kbet_stat, kbet_pvalue, kbet_ac_rate = pg.calc_kBET(data, attr = 'Channel', rep = 'umap')
 	cprint("Mean statistics is {stat:.4f}; Mean p-value is {pvalue:.4f}; Mean accept rate is {rate:.4f}.".format(stat = kbet_stat, pvalue = kbet_pvalue, rate = kbet_ac_rate), "yellow")
 
 	cprint("Loading ground truth cell types...", "green")
@@ -145,14 +145,14 @@ def process_data(data, method, output = None, processed = False):
 	cprint("Mean Silhouette Score on UMAP = {:.4f}.".format(sil_score), "yellow")
 
 	cprint("Calculating kSIM on UMAP coordinates...", "green")
-	ksim_mean, ksim_ac_rate = scc.calc_kSIM(data, attr = 'cell_types', rep = 'umap')
+	ksim_mean, ksim_ac_rate = pg.calc_kSIM(data, attr = 'cell_types', rep = 'umap')
 	cprint("Mean kSIM = {mean:.4f}, with accept rate {rate:.4f}.".format(mean = ksim_mean, rate = ksim_ac_rate), "yellow")
 
 	measure_result.append((method, ksim_ac_rate, kbet_ac_rate))
 
 	cprint("Plotting UMAP for cells with cell types...", "green")
-	scc.write_output(data, "{}_compare".format(celltypes_plot_dir + "/" + method))
-	if os.system("sccloud plot scatter --basis umap --attributes Cluster,Individual {name}_compare.h5ad {name}.cluster+individual.umap.pdf".format(name = celltypes_plot_dir + "/" + method)):
+	pg.write_output(data, "{}_compare".format(celltypes_plot_dir + "/" + method))
+	if os.system("pegasus plot scatter --basis umap --attributes Cluster,Individual {name}_compare.h5ad {name}.cluster+individual.umap.pdf".format(name = celltypes_plot_dir + "/" + method)):
 		sys.exit(1)
 
 def plot_scatter(precomputed = False):
@@ -199,8 +199,8 @@ if __name__ == "__main__":
 	if method == 'baseline' or method == 'all':
 		process_baseline()
 
-	if method == 'scCloud' or method == 'all':
-		process_sccloud()
+	if method == 'pegasus' or method == 'all':
+		process_pegasus()
 
 	if method == 'seurat' or method == 'all':
 		process_seurat()

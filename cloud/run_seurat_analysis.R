@@ -1,17 +1,12 @@
-dst_folder <- "/data/"
-load(file = paste0(dst_folder, "seurat_corrected_result.RData"))
-
 library(Seurat)
 library(R.utils)
 library(parallel)
 library(future)
 
-src_file <- "/data/MantonBM_nonmix_10x.h5"
 dst_folder <- "/data/"
 seed <- 0
 debug.mode <- TRUE
 logfile <- paste0(dst_folder, "seurat_analysis.log")
-
 
 n.cores <- detectCores()
 setOption('mc.cores', n.cores)
@@ -21,6 +16,9 @@ options(future.globals.maxSize = 50 * 1024^3)
 plan("multiprocess", workers = n.cores)
 plan()
 write(paste("Use", nbrOfWorkers(), "cores."), file = logfile, append = TRUE)
+
+## Load batch corrected data
+load(file = paste0(dst_folder, "seurat_corrected_result.RData"))
 
 now <- Sys.time()
 bm.combined <- ScaleData(bm.combined, scale.max = 10, verbose = debug.mode)

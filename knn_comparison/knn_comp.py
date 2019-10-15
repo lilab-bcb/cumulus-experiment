@@ -156,7 +156,7 @@ def plot_result(df_list):
 
 	# boxplot for kNN recall
 	flierprops = dict(markersize = 0.1)
-	ax = sns.boxplot(x = "method", y = "recall", data = df, order = ["Seurat V3", "SCANPY", "Pegasus"], linewidth = 0.5, flierprops = flierprops)
+	ax = sns.boxplot(x = "method", y = "recall", data = df, order = ["Seurat v3", "SCANPY", "Pegasus"], linewidth = 0.5, flierprops = flierprops)
 	#ax = sns.stripplot(x = "method", y = "recall", data = df, jitter = True, size = 1)
 	ax.set(ylabel = 'Recall', xlabel = '')
 	vals = ax.get_yticks()
@@ -176,7 +176,7 @@ def plot_result(df_list):
 
 	df_time = df_time.loc[df_time['method'] != 'baseline']
 
-	ax = sns.barplot(x = 'method', y = 'minutes', data = df_time, order = ['Seurat V3', 'SCANPY', 'Pegasus'])
+	ax = sns.barplot(x = 'method', y = 'minutes', data = df_time, order = ['Seurat v3', 'SCANPY', 'Pegasus'])
 	ax.set(ylabel = 'Total Time in minutes', xlabel = '')
 	ax.get_figure().savefig("knn_time.pdf")
 	cprint("Barplot of total time is generated!", "yellow")
@@ -225,7 +225,7 @@ if __name__ == '__main__':
 
 			# For seurat
 			knn_indices = get_NN_Seurat(None)
-			df_seurat = generate_knn_recall_dataframe('Seurat V3', knn_indices, baseline_indices)
+			df_seurat = generate_knn_recall_dataframe('Seurat v3', knn_indices, baseline_indices)
 			df_list.append(df_seurat)
 	
 			plot_result(df_list)

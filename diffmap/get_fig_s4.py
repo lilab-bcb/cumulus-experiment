@@ -14,8 +14,13 @@ from termcolor import cprint
 from pegasus.tools import update_rep, W_from_rep
 from pegasus.tools.diffusion_map import calculate_normalized_affinity, calc_von_neumann_entropy, find_knee_point
 
-src_name = "../MantonBM_nonmix_pegasus"
+src_file = "/projects/benchmark/MantonBM/MantonBM_nonmix.h5sc"
+pegasus_src = "../MantonBM_nonmix_pegasus"
 outname = "MantonBM_pegasus_output"
+n_cores = os.cpu_count()
+
+palette_diffmap = "#c5b0d5,#ff7f0e,#8c564b,#ff9896,#1f77b4,#dbdb8d,#e377c2,#2ca02c,#9edae5,#aec7e8,#ffbb78,#98df8a,#d62728,#9467bd,#c49c94,#f7b6d2,#bcbd22,#17becf,#ad494a,#8c6d31,#000000"
+anno_str = "anno_louvain:louvain_labels:1. CD4+ Naive T cells;2. CD14+ Monocytes;3. T helper cells;4. Naive B cells;5. Cytotoxic T cells;6. CD8+ Naive T cells;7. NK cells;8. Cytotoxic T cells;9. Erythrocytes;10. Memory B cells;11. CD14+ Monocytes;12. Pre B cells;13. HSCs;14. cDCs;15. CD16+ Monocytes;16. Pro B cells;17. pDCs;18. Plasma cells;19. Erythrocytes;20. Megakaryocytes;21. MSCs"
 
 def get_entropy(W: "csr_matrix", n_components: int = 100, solver: str = 'eigsh', random_state: int = 0, max_t: int = 5000):
     cprint("Calculate coordinates:", "yellow")
@@ -63,13 +68,35 @@ def plot_curve(t_arr, entropy_arr, knee_pt):
     ax.get_figure().savefig("Figure_S4B.pdf")
     plt.close()
 
+def gen_fig_s4a():
+    ndc_list = [(15, 'left'), (50, 'center'), (100, 'right')]
+    
+    for ndc, position in ndc_list:
+        if os.system("pegasus cluster -p {jobs} --correct-batch-effect --diffmap-ndc {num} --diffmap-maxt -1 --louvain --fle {src} MantonBM_nonmix_ndc_{num}_t_neg_one".format(jobs = n_cores, num = ndc, src = src_file)):
+            sys.exit(1)
+
+        if os.system('pegasus annotate_cluster --annotation "{anno}" MantonBM_nonmix_ndc_{num}_t_neg_one'.format(anno = anno_str, num = ndc)):
+            sys.exit(1)
+
+        if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" MantonBM_nonmix_ndc_{num}_t_neg_one.h5ad Figure_S4A_{pos}.pdf'.format(palettes = palette_diffmap, pos = position)):
+            sys.exit(1)
+
+
 def gen_fig_s4b():
     rep = update_rep("pca")
-    adata = pg.read_input("{}.h5ad".format(src_name))
+    adata = pg.read_input("{}.h5ad".format(pegasus_src))
     t_arr, entropy_arr, knee_pt = get_entropy(W_from_rep(adata, rep))
     plot_curve(t_arr, entropy_arr, knee_pt)
 
+def gen_fig_2b():
+    if os.system("cp Figure_S4A_right.pdf Figure_2B_left.pdf"):
+        sys.exit(1)
+
+    if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad Figure_2B_right.pdf'.format(palettes = palette_diffmap, src = pegasus_src)):
+        sys.exit(1)
 
 if __name__ == '__main__':
-
+    gen_fig_s4a()
     gen_fig_s4b()
+    gen_fig_2b()
+    

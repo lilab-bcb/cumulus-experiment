@@ -80,18 +80,32 @@ def run_pegasus_process():
 		sys.exit(1)
 
 	label_list = ['louvain', 'leiden', 'spectral_louvain', 'spectral_leiden']
-	for label in label_list:
+	anno_str_louvain = "1. CD4+ Naive T cells;2. CD14+ Monocytes;3. T helper cells;4. Naive B cells;5. Cytotoxic T cells;6. CD8+ Naive T cells;7. NK cells;8. Cytotoxic T cells;9. Erythrocytes;10. Memory B cells;11. CD14+ Monocytes;12. Pre B cells;13. HSCs;14. cDCs;15. CD16+ Monocytes;16. Pro B cells;17. pDCs;18. Plasma cells;19. Erythrocytes;20. Megakaryocytes;21. MSCs"
+	anno_str_leiden = "1. CD4+ Naive T cells;2. CD14+ Monocytes;3. B cells;4. T helper cells;5. Cytotoxic T cells;6. CD8+ Naive T cells;7. NK cells;8. Cytotoxic T cells;9. CD14+ Monocytes;10. Erythrocytes;11. Pre B cells;12. HSCs;13. cDCs;14. CD16+ Monocytes;15. Pro B cells;16. pDCs;17. Plasma cells;18. Erythrocytes;19. ;20. Megakaryocytes;21. MSCs"
+	anno_str_spectral_louvain = "1. CD4+ Naive T cells;2. CD14+ Monocytes;3. T helper cells;4. Cytotoxic T cells;5. Naive B cells;6. CD8+ Naive T cells;7. NK cells;8. Cytotoxic T cells;9. CD14+ Monocytes;10. Memory B cells;11. Erythrocytes;12. Pre B cells;13. HSCs;14. cDCs;15. CD16+ Monocytes;16. Pro B cells;17. pDCs;18. Plasma cells;19. Erythrocytes;20. Megakaryocytes;21. MSCs"
+	anno_str_spectral_leiden = "1. CD4+ Naive T cells;2. CD14+ Monocytes;3. T helper cells;4. Naive B cells;5. Cytotoxic T cells;6. CD8+ Naive T cells;7. NK cells;8. Cytotoxic T cells;9. Memory B cells;10. CD14+ Monocytes;11. Erythrocytes;12. Pre B cells;13. HSCs;14. cDCs;15. CD16+ Monocytes;16. Pro B cells;17. pDCs;18. Plasma cells;19. Erythrocytes;20. Megakaryocytes;21. MSCs"
+	
+	label_list = [('louvain', anno_str_louvain), ('leiden', anno_str_leiden), ('spectral_louvain', anno_str_spectral_louvain), ('spectral_leiden', anno_str_spectral_leiden)]
+
+	for label, anno_str in label_list:
 		if os.system("pegasus de_analysis -p {jobs} --labels {label}_labels --result-key de_res_{label} --t {src}.h5ad {src}.{label}.de.xlsx > de_{label}.log".format(jobs = n_cores, label = label, src = bm_full_out_name)):
 			sys.exit(1)
 
 		if os.system("pegasus annotate_cluster --de-key de_res_{label} {src}.h5ad {src}.{label}.anno.txt > anno_{label}.log".format(label = label, src = bm_full_out_name)):
 			sys.exit(1)
 
-if __name__ == '__main__':
-	extract_hvf(bm_full_data_source)
-	extract_hvf(neuron_data_source)
-	preprocess_data(full_data_source)
-	preprocess_data(tiny_data_source)
-	preprocess_data(neuron_data_source)
+		if os.system('pegasus annotate_cluster --annotation "anno_{label}:{label}_labels:{anno}" {src}.h5ad'.format(label = label, anno = anno_str, src = bm_full_out_name)):
+			sys.exit(1)
 
-	run_pegasus_process()
+if __name__ == '__main__':
+	dataset = sys.argv[1]
+	assert dataset in ['MantonBM', '1M_neurons']
+
+	if dataset == 'MantonBM':
+		extract_hvf(bm_full_data_source)
+		preprocess_data(full_data_source)
+		preprocess_data(tiny_data_source)
+		run_pegasus_process()
+	else:
+		extract_hvf(neuron_data_source)
+		preprocess_data(neuron_data_source)

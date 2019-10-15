@@ -1,21 +1,19 @@
 library(Seurat)
 library(parallel)
-library(R.utils)
-library(Matrix)
-library(hash)
-library(stringi)
 library(future)
 
 seed <- 0
 n.cores <- detectCores()
+logfile <- "seurat_cca.log"
 
 options(future.globals.maxSize = 20 * 1024^3)  # 20 GB
 plan("multiprocess", workers = n.cores)
 plan()
+write(paste("Use", n.cores, "cores."), file = logfile)
 
 src.obj <- ReadH5AD("/projects/benchmark/MantonBM/MantonBM_nonmix_tiny_filter_norm.h5ad")
 obj.list <- SplitObject(src.obj, split.by = "Channel")
-print(paste0("After splitting, there are ", length(obj.list), " batches."))
+write(paste0("After splitting, there are ", length(obj.list), " batches."), file = logfile, append = TRUE)
 
 ## Read preset high variable features
 df.hvf <- read.csv(file = "/projects/benchmark/MantonBM/MantonBM_nonmix_hvf.txt")
@@ -31,12 +29,14 @@ obj.list <- lapply(X = obj.list, FUN = function(x) {
 now <- Sys.time()
 ica.anchors <- FindIntegrationAnchors(object.list = obj.list)
 print("Computing Anchors using CCA:")
-print(Sys.time() - now)
+logstr.anchor <- Sys.time() - now
+write(paste("Finding Anchors time:", logstr.anchor, attr(logstr.hvgsif, "units")), file = logfile, append = TRUE)
 
 now <- Sys.time()
 ica.combined <- IntegrateData(anchorset = ica.anchors)
 print("Data Integration:")
-print(Sys.time() - now)
+logstr.integrate <- Sys.time() - now
+write(paste("Integration time:", logstr.integrate, attr(logstr.integrate, "units")), file = logfile, append = TRUE)
 
 DefaultAssay(object = ica.combined) <- "integrated"
 

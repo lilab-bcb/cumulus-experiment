@@ -7,7 +7,7 @@ import time
 from termcolor import cprint
 
 n_cores = os.cpu_count()
-data_src = "MantonBM_nonmix_corrected"
+data_src = "../MantonBM_nonmix_pegasus"
 data_dst = "spectral_result"
 spectral_label = "spectral_labels"
 
@@ -22,10 +22,6 @@ def run_spectral(data, rep_key, n_clusters, K = 100, n_jobs = 1, random_state = 
 
 
 if __name__ == '__main__':
-
-	if (data_src + '.h5ad') not in os.listdir('.'):
-		if os.system("pegasus cluster -p {jobs} --correct-batch-effect --diffmap /projects/benchmark/MantonBM/MantonBM_nonmix.h5sc {name}".format(jobs = n_cores, name = data_src)):
-			sys.exit(1)
 
 	if (data_dst + '.h5ad') not in os.listdir('.'):
 		adata = pg.read_input(data_src + '.h5ad')

@@ -7,6 +7,8 @@ bm_full_data_source = "/projects/benchmark/MantonBM/MantonBM_nonmix.h5sc"
 bm_tiny_data_source = "/projects/benchmark/MantonBM/MantonBM_nonmix_tiny.h5sc"
 neuron_data_source = "/projects/benchmark/1M_Neurons/1M_neurons.h5"
 
+bm_full_out_name = "MantonBM_nonmix_pegasus"
+
 def extract_hvf(input_file):
 
 	fname_prefix = os.path.splitext(input_file)[0]
@@ -72,9 +74,24 @@ def preprocess_data(in_file):
 	scc.pca(adata_hvf)
 	scc.write_output(adata_hvf, output_hvf_name2)
 
+def run_pegasus_process():
+	n_cores = os.cpu_count()
+	if os.system("pegasus cluster -p {jobs} --plot-hvf --correct-batch-effect --diffmap --louvain --leiden --spectral-louvain --spectral-leiden --fitsne --tsne --umap --fle --net-tsne --net-umap --net-fle {src} {dst} > pegasus.log".format(jobs = n_cores, src = bm_full_data_source, dst = bm_full_out_name)):
+		sys.exit(1)
+
+	label_list = ['louvain', 'leiden', 'spectral_louvain', 'spectral_leiden']
+	for label in label_list:
+		if os.system("pegasus de_analysis -p {jobs} --labels {label}_labels --result-key de_res_{label} --t {src}.h5ad {src}.{label}.de.xlsx > de_{label}.log".format(jobs = n_cores, label = label, src = bm_full_out_name)):
+			sys.exit(1)
+
+		if os.system("pegasus annotate_cluster --de-key de_res_{label} {src}.h5ad {src}.{label}.anno.txt > anno_{label}.log".format(label = label, src = bm_full_out_name)):
+			sys.exit(1)
+
 if __name__ == '__main__':
 	extract_hvf(bm_full_data_source)
 	extract_hvf(neuron_data_source)
 	preprocess_data(full_data_source)
 	preprocess_data(tiny_data_source)
 	preprocess_data(neuron_data_source)
+
+	run_pegasus_process()

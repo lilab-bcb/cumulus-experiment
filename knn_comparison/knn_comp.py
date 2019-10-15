@@ -213,8 +213,8 @@ if __name__ == '__main__':
 			df_list = []
 			baseline_indices = get_NN_brute(None)
 
-			# For scCloud
-			knn_indices = get_NN_sccloud(None)
+			# For pegasus
+			knn_indices = get_NN_pegasus(None)
 			df_sccloud = generate_knn_recall_dataframe('Pegasus', knn_indices, baseline_indices)
 			df_list.append(df_sccloud)
 

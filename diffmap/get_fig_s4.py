@@ -2,7 +2,7 @@ import os, sys
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-import sccloud as scc
+import pegasus as pg
 
 from scipy.sparse import issparse
 from scipy.sparse.csgraph import connected_components
@@ -11,11 +11,11 @@ from scipy.stats import entropy
 from sklearn.utils.extmath import randomized_svd
 from termcolor import cprint
 
-from sccloud.tools import update_rep, W_from_rep
-from sccloud.tools.diffusion_map import calculate_normalized_affinity, calc_von_neumann_entropy, find_knee_point
+from pegasus.tools import update_rep, W_from_rep
+from pegasus.tools.diffusion_map import calculate_normalized_affinity, calc_von_neumann_entropy, find_knee_point
 
-src_file = "/projects/benchmark/MantonBM/MantonBM_nonmix.h5sc"
-outname = "MantonBM_sccloud_output"
+src_name = "../MantonBM_nonmix_pegasus"
+outname = "MantonBM_pegasus_output"
 
 def get_entropy(W: "csr_matrix", n_components: int = 100, solver: str = 'eigsh', random_state: int = 0, max_t: int = 5000):
     cprint("Calculate coordinates:", "yellow")
@@ -50,7 +50,7 @@ def get_entropy(W: "csr_matrix", n_components: int = 100, solver: str = 'eigsh',
     y = np.array([calc_von_neumann_entropy(Lambda, t) for t in x])
     t = x[find_knee_point(x, y)]
 
-    return np.array(range(1, max_t + 1), dtype = int), y, t
+    return x.astype('int'), y, t
 
 def plot_curve(t_arr, entropy_arr, knee_pt):
     cprint("Plotting:", "yellow")
@@ -60,15 +60,12 @@ def plot_curve(t_arr, entropy_arr, knee_pt):
     ax.text(knee_pt + 0.01, entropy_arr[int(knee_pt)] - 0.01, "Knee Point", horizontalalignment = 'left', size = 'medium', color = 'black')
     plt.xlabel("Time Stamp")
     plt.ylabel("von Neumann Entropy")
-    ax.get_figure().savefig("von_neumann_entropy.pdf")
+    ax.get_figure().savefig("Figure_S4B.pdf")
     plt.close()
 
 if __name__ == '__main__':
 
-    #if os.system("sccloud cluster -p 20 --correct-batch-effect --diffmap {src} {dst}".format(src = src_file, dst = outname)):
-    #   sys.exit(1)
-
     rep = update_rep("pca")
-    adata = scc.read_input("{}.h5ad".format(outname))
+    adata = pg.read_input("{}.h5ad".format(src_name))
     t_arr, entropy_arr, knee_pt = get_entropy(W_from_rep(adata, rep))
     plot_curve(t_arr, entropy_arr, knee_pt)

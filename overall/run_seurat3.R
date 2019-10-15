@@ -63,6 +63,7 @@ now <- Sys.time()
 adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy", compute.SNN = FALSE)
 logstr.knn <- Sys.time() - now
 write(paste("KNN time:", logstr.knn, attr(logstr.knn, "units")), file = logfile, append = TRUE)
+save(adata, file = "seurat_knn_no_snn.RData")
 #rm(adata)
 
 #print("Finding Clusters using Louvain:")

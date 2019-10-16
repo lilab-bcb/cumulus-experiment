@@ -3,9 +3,9 @@ import sccloud as scc
 import pandas as pd
 from termcolor import cprint
 
-bm_full_data_source = "/projects/benchmark/MantonBM/MantonBM_nonmix.h5sc"
-bm_tiny_data_source = "/projects/benchmark/MantonBM/MantonBM_nonmix_tiny.h5sc"
-neuron_data_source = "/projects/benchmark/1M_Neurons/1M_neurons.h5"
+bm_full_data_source = "/data/MantonBM_nonmix.h5sc"
+bm_tiny_data_source = "/data/MantonBM_nonmix_tiny.h5sc"
+neuron_data_source = "/data/1M_neurons.h5"
 
 bm_full_out_name = "MantonBM_nonmix_pegasus"
 

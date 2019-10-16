@@ -15,7 +15,7 @@ plan("multiprocess", workers = n.cores)
 plan()
 
 ## Benchmark Highly Variable Gene selection. ##
-src.obj <- ReadH5AD("/projects/benchmark/MantonBM/MantonBM_nonmix_filter_norm.h5ad")
+src.obj <- ReadH5AD("/data/MantonBM_nonmix_filter_norm.h5ad")
 obj.list <- SplitObject(src.obj, split.by = "Channel")
 print("Finding Highly Variable Genes:")
 now <- Sys.time()
@@ -24,7 +24,7 @@ logstr.hvgsif <- Sys.time() - now
 write(paste("HVG time:", logstr.hvgsif, attr(logstr.hvgsif, "units")), file = logfile)
 
 ## Benchmark PCA.
-adata <- ReadH5AD("/projects/benchmark/MantonBM/MantonBM_nonmix_corrected_hvf.h5ad")
+adata <- ReadH5AD("/data/MantonBM_nonmix_corrected_hvf.h5ad")
 print("PCA time:")
 now <- Sys.time()
 adata <- ScaleData(adata, scale.max = 10, verbose = debug.mode)

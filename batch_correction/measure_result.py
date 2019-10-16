@@ -166,7 +166,7 @@ def process_data(data, method, output = None, processed = False):
 
 	cprint("Plotting UMAP for cells with cell types...", "green")
 	pg.write_output(data, "{}_compare".format(method))
-	if os.system("pegasus plot scatter --basis umap --attributes Cluster,Individual {name}_compare.h5ad Figure_S2{idx}.pdf".format(name = method, idx = figure_index[method])):
+	if os.system("pegasus plot scatter --basis umap --attributes Cluster,Individual {name}_compare.h5ad /output/Figure_S2{idx}.pdf".format(name = method, idx = figure_index[method])):
 		sys.exit(1)
 
 def plot_scatter(precomputed = False):
@@ -198,7 +198,7 @@ def plot_scatter(precomputed = False):
 	plt.ylabel('kBET accept rate')
 
 
-	plt.savefig("Figure_2A.pdf")
+	plt.savefig("/output/Figure_2A.pdf")
 	plt.close()
 
 

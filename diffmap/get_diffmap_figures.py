@@ -14,7 +14,7 @@ from termcolor import cprint
 from pegasus.tools import update_rep, W_from_rep
 from pegasus.tools.diffusion_map import calculate_normalized_affinity, calc_von_neumann_entropy, find_knee_point
 
-src_file = "/projects/benchmark/MantonBM/MantonBM_nonmix.h5sc"
+src_file = "/data/MantonBM_nonmix.h5sc"
 pegasus_src = "../MantonBM_nonmix_pegasus"
 outname = "MantonBM_pegasus_output"
 n_cores = os.cpu_count()
@@ -65,7 +65,7 @@ def plot_curve(t_arr, entropy_arr, knee_pt):
     ax.text(knee_pt + 0.01, entropy_arr[int(knee_pt)] - 0.01, "Knee Point", horizontalalignment = 'left', size = 'medium', color = 'black')
     plt.xlabel("Time Stamp")
     plt.ylabel("von Neumann Entropy")
-    ax.get_figure().savefig("Figure_S4B.pdf")
+    ax.get_figure().savefig("/output/Figure_S4B.pdf")
     plt.close()
 
 def gen_fig_s4a():
@@ -78,7 +78,7 @@ def gen_fig_s4a():
         if os.system('pegasus annotate_cluster --annotation "{anno}" MantonBM_nonmix_ndc_{num}_t_neg_one'.format(anno = anno_str, num = ndc)):
             sys.exit(1)
 
-        if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" MantonBM_nonmix_ndc_{num}_t_neg_one.h5ad Figure_S4A_{pos}.pdf'.format(palettes = palette_diffmap, pos = position)):
+        if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" MantonBM_nonmix_ndc_{num}_t_neg_one.h5ad /output/Figure_S4A_{pos}.pdf'.format(palettes = palette_diffmap, pos = position)):
             sys.exit(1)
 
 
@@ -89,10 +89,10 @@ def gen_fig_s4b():
     plot_curve(t_arr, entropy_arr, knee_pt)
 
 def gen_fig_2b():
-    if os.system("cp Figure_S4A_right.pdf Figure_2B_left.pdf"):
+    if os.system("cp Figure_S4A_right.pdf /output/Figure_2B_left.pdf"):
         sys.exit(1)
 
-    if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad Figure_2B_right.pdf'.format(palettes = palette_diffmap, src = pegasus_src)):
+    if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad /output/Figure_2B_right.pdf'.format(palettes = palette_diffmap, src = pegasus_src)):
         sys.exit(1)
 
 if __name__ == '__main__':

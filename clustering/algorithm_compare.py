@@ -19,7 +19,7 @@ palettes_dict = {
 def gen_plots(in_file):
 
 	for label in label_list:
-		if os.system('pegasus plot scatter --basis fitsne --attributes anno_{label} --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad Figure_S5.{label}.pdf'.format(label = label, src = in_file, palettes = palettes_dict[label])):
+		if os.system('pegasus plot scatter --basis fitsne --attributes anno_{label} --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad /output/Figure_S5.{label}.pdf'.format(label = label, src = in_file, palettes = palettes_dict[label])):
 			sys.exit(1)
 
 

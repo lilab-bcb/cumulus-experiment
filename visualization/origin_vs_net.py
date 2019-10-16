@@ -19,7 +19,7 @@ fig_index = {
 def calc_and_plot(in_file):
 
 	for basis in basis_list:
-		if os.system("pegasus plot scatter --basis {basis} --attributes anno_louvain {src}.h5ad {dst}.pdf".format(basis = basis, src = in_file, dst = fig_index[basis])):
+		if os.system("pegasus plot scatter --basis {basis} --attributes anno_louvain {src}.h5ad /output/{dst}.pdf".format(basis = basis, src = in_file, dst = fig_index[basis])):
 			sys.exit(1)
 
 
@@ -38,11 +38,11 @@ def net_umap_phase_plots(adata):
 	bdata.obsm['X_net_umap_init'] = bdata.uns['X_net_umap_small']
 	pg.write_output(bdata, "net_umap_init")
 
-	if os.system("pegasus plot scatter --basis net_umap_init --attributes louvain_labels net_umap_init.h5ad Figure_2C_left.pdf"):
+	if os.system("pegasus plot scatter --basis net_umap_init --attributes louvain_labels net_umap_init.h5ad /output/Figure_2C_left.pdf"):
 		sys.exit(1)
 
 	# Predict plot
-	if os.system("pegasus plot scatter --basis net_umap_pred --attributes louvain_labels {src}.h5ad Figure_2C_center.pdf".format(src = data_src)):
+	if os.system("pegasus plot scatter --basis net_umap_pred --attributes louvain_labels {src}.h5ad /output/Figure_2C_center.pdf".format(src = data_src)):
 		sys.exit(1)
 
 

@@ -12,10 +12,10 @@ sc.settings.n_jobs = os.cpu_count()
 sc.settings.verbosity = 4
 rand_seed = 0
 
-filter_norm_data = "/projects/benchmark/1M_Neurons/1M_neurons_filter_norm.h5ad"
-hvf_file = "/projects/benchmark/1M_Neurons/1M_neurons_hvf.txt"
-pca_data = "/projects/benchmark/1M_Neurons/1M_neurons_filter_norm_pca.h5ad"
-corrected_data = "/projects/benchmark/1M_Neurons/1M_neurons_corrected.h5ad"
+filter_norm_data = "/data/1M_neurons_filter_norm.h5ad"
+hvf_file = "/data/1M_neurons_hvf.txt"
+pca_data = "/data/1M_neurons_filter_norm_pca.h5ad"
+corrected_data = "/data/1M_neurons_corrected.h5ad"
 
 
 print("Reading Mouse Neuron dataset")

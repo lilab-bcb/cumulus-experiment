@@ -4,7 +4,7 @@ library(parallel)
 library(future)
 
 src_file <- "/data/MantonBM_nonmix_10x.h5"
-dst_folder <- "/data/"
+dst_folder <- "./"
 seed <- 0
 debug.mode <- TRUE
 logfile <- paste0(dst_folder, "seurat_hvg_batch_correction.log")

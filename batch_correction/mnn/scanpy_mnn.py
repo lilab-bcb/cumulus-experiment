@@ -8,8 +8,8 @@ from datetime import timedelta
 
 rand_seed = 0
 
-src_file = "/projects/benchmark/MantonBM/MantonBM_nonmix_tiny_filter_norm.h5ad"
-hvf_file = "/projects/benchmark/MantonBM/MantonBM_nonmix_hvf.txt"
+src_file = "/data/MantonBM_nonmix_tiny_filter_norm.h5ad"
+hvf_file = "/data/MantonBM_nonmix_hvf.txt"
 
 
 def calc_mnn():

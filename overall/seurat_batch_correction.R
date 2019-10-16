@@ -11,7 +11,7 @@ plan()
 write(paste0("Use ", n.cores, " cores."), file = logfile)
 
 ## Benchmark Batch Correction. ##
-src.obj <- ReadH5AD("/projects/benchmark/MantonBM/MantonBM_nonmix_filter_norm_hvf.h5ad")
+src.obj <- ReadH5AD("/data/MantonBM_nonmix_filter_norm_hvf.h5ad")
 VariableFeatures(src.obj) <- GetAssayData(src.obj)@Dimnames[[1]]
 obj.list <- SplitObject(src.obj, split.by = "Channel")
 now <- Sys.time()

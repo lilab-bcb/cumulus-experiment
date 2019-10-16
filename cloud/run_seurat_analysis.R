@@ -3,7 +3,7 @@ library(R.utils)
 library(parallel)
 library(future)
 
-dst_folder <- "/data/"
+dst_folder <- "./"
 seed <- 0
 debug.mode <- TRUE
 logfile <- paste0(dst_folder, "seurat_analysis.log")

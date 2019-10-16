@@ -11,12 +11,12 @@ plan("multiprocess", workers = n.cores)
 plan()
 write(paste("Use", n.cores, "cores."), file = logfile)
 
-src.obj <- ReadH5AD("/projects/benchmark/MantonBM/MantonBM_nonmix_tiny_filter_norm.h5ad")
+src.obj <- ReadH5AD("/data/MantonBM_nonmix_tiny_filter_norm.h5ad")
 obj.list <- SplitObject(src.obj, split.by = "Channel")
 write(paste0("After splitting, there are ", length(obj.list), " batches."), file = logfile, append = TRUE)
 
 ## Read preset high variable features
-df.hvf <- read.csv(file = "/projects/benchmark/MantonBM/MantonBM_nonmix_hvf.txt")
+df.hvf <- read.csv(file = "/data/MantonBM_nonmix_hvf.txt")
 hvf.features <- as.character(unlist(df.hvf['index']))
 
 ## Create Seurat objects

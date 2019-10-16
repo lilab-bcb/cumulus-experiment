@@ -10,7 +10,7 @@ from joblib import Parallel, delayed
 from utils import str_time
 
 
-data_source = "/projects/benchmark/MantonBM/MantonBM_nonmix_corrected.h5ad"
+data_source = "/data/MantonBM_nonmix_corrected.h5ad"
 
 time_stats_file = "time_stats.txt"
 
@@ -161,7 +161,7 @@ def plot_result(df_list):
 	ax.set(ylabel = 'Recall', xlabel = '')
 	vals = ax.get_yticks()
 	ax.set_yticklabels(['{0:.0%}'.format(x) for x in vals])
-	ax.get_figure().savefig("knn_recall_boxplot.pdf")
+	ax.get_figure().savefig("/output/Figure_S3A.pdf")
 	cprint("Boxplot is generated!", "yellow")
 	plt.close()
 
@@ -178,7 +178,7 @@ def plot_result(df_list):
 
 	ax = sns.barplot(x = 'method', y = 'minutes', data = df_time, order = ['Seurat v3', 'SCANPY', 'Pegasus'])
 	ax.set(ylabel = 'Total Time in minutes', xlabel = '')
-	ax.get_figure().savefig("knn_time.pdf")
+	ax.get_figure().savefig("/output/Figure_S3B.pdf")
 	cprint("Barplot of total time is generated!", "yellow")
 	plt.close()
 

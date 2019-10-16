@@ -8,7 +8,7 @@ from datetime import timedelta
 sc.settings.n_jobs = os.cpu_count()
 print("Using {} cores if possible.".format(sc.settings.n_jobs))
 
-src_file = "/projects/benchmark/MantonBM/MantonBM_nonmix_tiny_filter_norm_pca_hvf.h5ad"
+src_file = "/data/MantonBM_nonmix_tiny_filter_norm_pca_hvf.h5ad"
 
 print("Reading ICA (bone marrow) dataset")
 adata = sc.read_h5ad(src_file)

@@ -7,7 +7,7 @@ from sklearn.metrics import adjusted_mutual_info_score
 
 n_cores = os.cpu_count()
 
-src_file = "/projects/benchmark/MantonBM/MantonBM_nonmix.h5sc"
+src_file = "/data/MantonBM_nonmix.h5sc"
 immune_gene_file = "immune_genes.txt"
 
 seurat_correct_name = "MantonBM_nonmix_seurat_hvf_corrected"
@@ -86,13 +86,13 @@ def get_mutual_info():
 
 def plot_figures():
 
-	if os.system('pegasus plot scatter --basis fitsne --attributes anno --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad Figure_S1C_left.pdf'.format(src = seurat_correct_name, palettes = palettes_seurat)):
+	if os.system('pegasus plot scatter --basis fitsne --attributes anno --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad /output/Figure_S1C_left.pdf'.format(src = seurat_correct_name, palettes = palettes_seurat)):
 		sys.exit(1)
 
-	if os.system('pegasus plot scatter --basis fitsne --attributes anno_louvain --wspace 1.2 --set-paletts "{palettes}" {src}.h5ad Figure_S1C_right.pdf'.format(src = pegasus_correct_name, palettes = palettes_pegasus)):
+	if os.system('pegasus plot scatter --basis fitsne --attributes anno_louvain --wspace 1.2 --set-paletts "{palettes}" {src}.h5ad /output/Figure_S1C_right.pdf'.format(src = pegasus_correct_name, palettes = palettes_pegasus)):
 		sys.exit(1)
 
-	if os.system("cp {src}.hvf.pdf Figure_S1A.pdf".format(src = pegasus_correct_name)):
+	if os.system("cp {src}.hvf.pdf /output/Figure_S1A.pdf".format(src = pegasus_correct_name)):
 		sys.exit(1)
 
 

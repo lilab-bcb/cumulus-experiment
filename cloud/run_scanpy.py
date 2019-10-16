@@ -12,7 +12,7 @@ rand_seed = 0
 print("Use {} cores.".format(sc.settings.n_jobs))
 
 input_file = "/data/MantonBM_nonmix_10x.h5"
-output_file = "/data/scanpy_analysis_result.h5ad"
+output_file = "scanpy_analysis_result.h5ad"
 
 print("Reading ICA (bone marrow) dataset")
 adata = sc.read_10x_h5(input_file, genome = 'GRCh38')

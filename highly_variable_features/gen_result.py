@@ -2,8 +2,6 @@ import pegasus as pg
 import numpy as np
 import pandas as pd
 import os, sys
-import seaborn as sns
-import matplotlib.pyplot as plt
 from termcolor import cprint
 from sklearn.metrics import adjusted_mutual_info_score
 
@@ -14,22 +12,28 @@ immune_gene_file = "immune_genes.txt"
 
 seurat_correct_name = "MantonBM_nonmix_seurat_hvf_corrected"
 pegasus_correct_name = "../MantonBM_nonmix_pegasus"
-pegasus_out_name = "MantonBM_nonmix_pegasus_hvf_corrected"
 
+anno_seurat = "1. CD4+ Naive T cells;2. CD14+ Monocytes;3. T helper cells;4. Cytotoxic T cells;5. Naive B cells;6. CD8+ Naive T cells;7. Cytotoxic T cells;8. NK cells;9. CD14+ Monocytes;10. Erythrocytes;11. Memory B cells;12. HSCs;13. Pre B cells;14. cDCs;15. CD16+ Monocytes;16. Erythrocytes;17. Pro B cells;18. pDCs;19. Plasma cells;20. Pre B cells;21. MSCs;22. Cytotoxic T cells"
+
+palettes_seurat = "#c5b0d5,#ff7f0e,#8c564b,#2ca02c,#ff9896,#dbdb8d,#1f77b4,#e377c2,#ffbb78,#9edae5,#aec7e8,#d62728,#98df8a,#9467bd,#c49c94,#ad494a,#f7b6d2,#bcbd22,#17becf,#8c6d31,#000000,#888888"
+palettes_pegasus = "#c5b0d5,#ff7f0e,#8c564b,#ff9896,#1f77b4,#dbdb8d,#e377c2,#2ca02c,#9edae5,#aec7e8,#ffbb78,#98df8a,#d62728,#9467bd,#c49c94,#f7b6d2,#bcbd22,#17becf,#ad494a,#8c6d31,#000000"
 
 def get_hvf():
 	cprint("Computing highly variable genes using Seurat method...", "green")
-	if os.system("pegasus cluster -p {jobs} --correct-batch-effect --select-hvf-flavor Seurat --louvain --fitsne --fle {src} {outname}".format(jobs = n_cores, src = src_file, outname = seurat_correct_name)):
+	if os.system("pegasus cluster -p {jobs} --correct-batch-effect --select-hvf-flavor Seurat --louvain --fitsne {src} {outname}".format(jobs = n_cores, src = src_file, outname = seurat_correct_name)):
 		sys.exit(1)
 
 
-def annotate_data(file_name):
-	cprint("Annotating Cells for {name}...".format(name = file_name), "green")
+def annotate_data():
+	cprint("Annotating Cells for {name}...".format(name = seurat_correct_name), "green")
 
-	if os.system("pegasus de_analysis -p {jobs} --labels louvain_labels --t {name}.h5ad {name}.de.xlsx".format(jobs = n_cores, name = file_name)):
+	if os.system("pegasus de_analysis -p {jobs} --labels louvain_labels --t {name}.h5ad {name}.de.xlsx".format(jobs = n_cores, name = seurat_correct_name)):
 		sys.exit(1)
 
-	if os.system("pegasus annotate_cluster {name}.h5ad {name}.anno.txt".format(name = file_name)):
+	if os.system("pegasus annotate_cluster {name}.h5ad {name}.anno.txt".format(name = seurat_correct_name)):
+		sys.exit(1)
+
+	if os.system('pegasus annotate_cluster --annotation "anno:louvain_labels:{anno}" {name}.h5ad'.format(anno = anno_seurat, name = seurat_correct_name)):
 		sys.exit(1)
 
 
@@ -80,11 +84,15 @@ def get_mutual_info():
 	ami = adjusted_mutual_info_score(adata.obs['louvain_labels'], bdata.obs['louvain_labels'], average_method = 'arithmetic')
 	cprint("AMI = {:.4f}".format(ami))
 
-def plot_figures(in_file, out_file):
-	if os.system("pegasus plot scatter --basis fitsne --attributes louvain_labels {input}.h5ad {output}.louvain.fitsne.pdf".format(input = in_file, output = out_file)):
+def plot_figures():
+
+	if os.system('pegasus plot scatter --basis fitsne --attributes anno --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad Figure_S1C_left.pdf'.format(src = seurat_correct_name, palettes = palettes_seurat)):
 		sys.exit(1)
 
-	if os.system("pegasus plot scatter --basis fle --attributes louvain_labels {input}.h5ad {output}.louvain.fle.pdf".format(input = in_file, output = out_file)):
+	if os.system('pegasus plot scatter --basis fitsne --attributes anno_louvain --wspace 1.2 --set-paletts "{palettes}" {src}.h5ad Figure_S1C_right.pdf'.format(src = pegasus_correct_name, palettes = palettes_pegasus)):
+		sys.exit(1)
+
+	if os.system("cp {src}.hvf.pdf Figure_S1A.pdf".format(src = pegasus_correct_name)):
 		sys.exit(1)
 
 
@@ -92,11 +100,10 @@ if __name__ == '__main__':
 	f_list = [f for f in os.listdir('.') if f in [seurat_correct_name + '.h5ad']]
 	if len(f_list) != 1:
 		get_hvf()
-		annotate_data(seurat_correct_name)
+		annotate_data()
 
 	compare_markers()
 	get_mutual_info()
 
-	plot_figures(seurat_correct_name, seurat_correct_name)
-	plot_figures(pegasus_correct_name, pegasus_out_name)
+	plot_figures()
 

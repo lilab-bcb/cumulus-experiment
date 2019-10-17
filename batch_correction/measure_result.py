@@ -148,7 +148,8 @@ def process_data(data, method, output = None, processed = False):
 	cprint("Loading ground truth cell types...", "green")
 	df_celltype = pd.read_csv("ground_cell_type.txt")
 	assert np.sum(df_celltype['cell_id'] != data.obs.index.values) == 0
-	data.obs['Cluster'] = pd.Categorical(df_celltype['cell_types'].values)
+	data.obs['cell_types'] = pd.Categorical(df_celltype['cell_types'].values)
+	data.obs['Cluster'] = pd.Categorical(df_celltype['louvain_labels'].values)
 
 	# Set Individual
 	if method == 'mnn':
@@ -157,11 +158,11 @@ def process_data(data, method, output = None, processed = False):
 		data.obs['Individual'] = pd.Categorical(data.obs['Channel'].apply(lambda s: s.split('_')[0][8:]))
 
 	cprint("Calculating Mean Silhouette Score on UMAP coordinates...", "green")
-	sil_score = silhouette_score(data.obsm['X_umap'], data.obs['Cluster'])
+	sil_score = silhouette_score(data.obsm['X_umap'], data.obs['cell_types'])
 	cprint("Mean Silhouette Score on UMAP = {:.4f}.".format(sil_score), "yellow")
 
 	cprint("Calculating kSIM on UMAP coordinates...", "green")
-	ksim_mean, ksim_ac_rate = pg.calc_kSIM(data, attr = 'Cluster', rep = 'umap')
+	ksim_mean, ksim_ac_rate = pg.calc_kSIM(data, attr = 'cell_types', rep = 'umap')
 	cprint("Mean kSIM = {mean:.4f}, with accept rate {rate:.4f}.".format(mean = ksim_mean, rate = ksim_ac_rate), "yellow")
 
 	measure_result.append((method_print_name[method], ksim_ac_rate, kbet_ac_rate))

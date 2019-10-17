@@ -30,6 +30,8 @@ measure_result = []
 
 measure_precomputed_file = "correction_benchmark.txt"
 
+palettes_cluster = "#1d6cab,#ff7410,#279627,#d02324,#875bb2,#814c42,#df6cba,#b4b51f,#17b6c9,#a5c0e5,#ffb36d,#8dda7f,#777777,#bda7cf,#bc9189,#f6adcc,#d6d682,#94d5e1,#a34041"
+
 def process_baseline():
 	cprint("For pegasus with no batch correction:", "red")
 	f_list = [f for f in os.listdir("./baseline") if f in ["baseline_result.h5ad"]]
@@ -166,7 +168,7 @@ def process_data(data, method, output = None, processed = False):
 
 	cprint("Plotting UMAP for cells with cell types...", "green")
 	pg.write_output(data, "{}_compare".format(method))
-	if os.system("pegasus plot scatter --basis umap --attributes Cluster,Individual {name}_compare.h5ad /output/Figure_S2{idx}.pdf".format(name = method, idx = figure_index[method])):
+	if os.system("pegasus plot scatter --basis umap --attributes Cluster,Individual --set-palettes {palettes} {name}_compare.h5ad /output/Figure_S2{idx}.pdf".format(name = method, idx = figure_index[method])):
 		sys.exit(1)
 
 def plot_scatter(precomputed = False):

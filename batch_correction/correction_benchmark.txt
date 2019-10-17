@@ -1,0 +1,7 @@
+method,kSIM,kBET
+baseline,0.8668,0.1126
+pegasus,0.7586,0.3286
+seurat,0.6912,0.6217
+combat,0.7559,0.3286
+bbknn,0.8333,0.2227
+mnn,0.8367,0.2669

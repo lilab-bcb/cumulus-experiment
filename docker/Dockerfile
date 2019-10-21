@@ -153,3 +153,5 @@ ENV PATH=$old_path
 
 # Add experiment scripts
 RUN git clone https://github.com/lilab-bcb/cumulus-experiment.git /experiment
+
+WORKDIR /experiment

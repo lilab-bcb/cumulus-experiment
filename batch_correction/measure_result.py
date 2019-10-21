@@ -54,7 +54,7 @@ def process_pegasus():
 			sys.exit(1)
 
 	cprint("Loading corrected data...", "green")
-	adata = pg.read_input('./pegasus/tiny_pegasus_corrected.h5ad')
+	adata = pg.read_input('./pegasus/pegasus_corrected.h5ad')
 
 	process_data(adata, method = 'pegasus', processed = True)
 

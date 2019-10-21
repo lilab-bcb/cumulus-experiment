@@ -32,7 +32,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD5
 	apt-get -y install r-base
 
 ## Get Seurat 3.1.0 source code ##
-RUN wget https://cran.r-project.org/src/contrib/Seurat_3.1.0.tar.gz && \
+RUN wget https://cran.r-project.org/src/contrib/Archive/Seurat/Seurat_3.1.0.tar.gz && \
 	tar -zxvf Seurat_3.1.0.tar.gz && \ 
 	mv Seurat /opt/software/seurat-3.1.0 && \
 	rm Seurat_3.1.0.tar.gz
@@ -62,8 +62,6 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh &
 
 ENV PATH=/root/miniconda3/bin:$PATH
 ARG old_path=$PATH
-
-RUN conda update -n base -c defaults conda
 
 # Install pegasus environment
 RUN conda create -n pegasus-env python=3.7.3 -y

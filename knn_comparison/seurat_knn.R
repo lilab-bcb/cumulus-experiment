@@ -1,4 +1,3 @@
-library(RANN)
 library(parallel)
 library(future.apply)
 
@@ -11,6 +10,7 @@ plan()
 X <- read.table("x_pca.txt", header = FALSE)
 
 ## For nn2 ##
+#library(RANN)
 #start_ann <- Sys.time()
 #my.knn1 <- nn2(data = X, k = 100, searchtype = "standard", eps = 0)
 #end_ann <- Sys.time()

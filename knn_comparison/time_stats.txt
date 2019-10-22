@@ -1,0 +1,4 @@
+method,time,unit
+Pegasus,14.66,s
+SCANPY,4.76,min
+Seurat v3,49,s

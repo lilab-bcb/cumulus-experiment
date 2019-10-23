@@ -10,6 +10,8 @@ We benchmark Pegasus, SCANPY, and Seurat with the following versions:
 | SCANPY   | 1.4.4.post1 | 07/29/2019   |
 | Seurat   | 3.1.0       | 08/20/2019   |
 
+Both Pegasus and SCANPY are run on Python 3.7.3. Seurat is run on R 3.6.1.
+
 ## Get Raw Data
 
 ## Start Docker Container
@@ -237,10 +239,139 @@ This will generate the corresponding figures in ``/output``.
 
 ## Experiment on Diffusion Maps
 
+In Pegasus environment, run the following commands:
+
+```
+(pegasus-env) root# cd /experiment/diffmap
+(pegasus-env) root# python get_diffmap_figures.py
+```
+
+When finished, you'll find the figures generated in ``/output``.
+
 ## Experiment on Clustering Algorithms
+
+In Pegasus environment, run the following commands:
+
+```
+(pegasus-env) root# cd /experiment/clustering
+(pegasus-env) root# python algorithm_compare.py
+(pegasus-env) root# python spectral_clustering.py
+```
+
+When finished, you'll find the figures generated in ``/output``, and AMI results can be read from the screen output. Besides, you can check ``/experiment/pegasus.log`` for the execution time on each of the 4 clustering algorithms, while the time on spectral clustering can be read from the screen output.
 
 ## Experiment on Visualization Methods
 
+In Pegasus environment, run the following commands:
+
+```
+(pegasus-env) root# cd /experiment/visualization
+(pegasus-env) root# python origin_vs_net.py
+```
+
+When finished, you'll find the figures generated in ``/output``, and for each visualization method, its kSIM regarding Louvain clustering labels can be seen from screen output. Besides, you can check ``/experiment/pegasus.log`` for the execution time on each visualization method.
+
 ## Benchmark on Analysis Tasks
 
+All 3 packages are benchmarked on Bone Marrow dataset, while only Pegasus and SCANPY are benchmarked on Mouse Neuron, because Seurat fails at loading the count matrix step for this big dataset.
+
+### Manton Bone Marrow Dataset
+
+#### Pegasus
+
+To benchmark Pegasus, in Pegasus environment, run the following command:
+
+```
+(pegasus-env) root# cd /experiment/overall
+(pegasus-env) root# python run_pegasus.py
+```
+
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/pegasus.log``.
+
+#### SCANPY
+
+To benchmark SCANPY, in SCANPY environment, run the following command:
+
+```
+(scanpy-env) root# cd /experiment/overall
+(scanpy-env) root# python run_scanpy.py > scanpy.log
+```
+
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/scanpy.log``.
+
+#### Seurat
+
+The benchmark on Seurat is a little bit complicated, as it's written in R. 
+
+First, in Pegasus environment, run the following commands to generate a Seurat-compatible h5ad file on the dataset, and convert it into Seurat object format:
+
+```
+(pegasus-env) root# cd /experiment/overall
+(pegasus-env) root# ./get_seurat_compatible.sh
+(pegasus-env) root# Rscript convert_mantonbm_pegasus.R
+```
+
+When finished, you'll have a Seurat object in ``/experiment/overall/MantonBM_nonmix.RData`` for benchmarking steps starting from kNN. 
+
+Now in SCANPY environment, run the following command:
+
+```
+(scanpy-env) root# Rscript run_seurat3.R
+```
+
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/seurat.log``.
+
+As Seurat fails in the Batch correction and Leiden clustering steps, I make them as two separate R scripts for users to try themselves.
+
+Run the following command to benchmark on Batch correction using Seurat:
+
+```
+root# Rscript seurat_batch_correction.R
+```
+
+When terminated with failure, you'll find the time information in its log file ``/experiment/overall/seurat_batch_correction.log``, and error message from screen output.
+
+In SCANPY environment, run the following command to benchmark on Leiden clustereing using Seurat:
+
+```
+(scanpy-env) root# Rscript seurat_leiden.R
+```
+
+When terminated with failure, you may find information in its log file ``/experiment/overall/seurat_leidenl.log`` and screen output.
+
+
+### Mouse Neuron Dataset
+
+#### Pegasus
+
+In Pegasus environment, run the following commands:
+
+```
+(pegasus-env) root# cd /experiment/overall
+(pegasus-env) root# python run_pegasus_1m.py
+```
+
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/1m_pegasus.log``.
+
+#### SCANPY
+
+In SCANPY environment, run the following command:
+
+```
+(scanpy-env) root# cd /experiment/overall
+(scanpy-env) root# python run_scanpy_1m.py > 1m_scanpy.log
+```
+
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/1m_scanpy.log``.
+
+#### Seurat
+
+Seurat fails at loading data step. Users can try the following commands in R environment, and check out the error message:
+
+```
+> library(Seurat)
+> adata <- Read10X("/data/1M_neurons.h5")
+```
+
 ## Benchmark on Workflows
+

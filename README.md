@@ -375,3 +375,62 @@ Seurat fails at loading data step. Users can try the following commands in R env
 
 ## Benchmark on Workflows
 
+The benchmark was performed on Google Cloud, with 32 CPUs under the default Haswell platform, and 120 GB memory. The dataset used is Manton Bone Marrow dataset. The analysis tasks performed are:
+
+* Count matrix aggregation
+* Highly variable features selection
+* Batch correction
+* PCA
+* Find K nearest neighbors
+* Louvain-like clustering
+* tSNE-like visualization
+* UMAP-like visualization
+* Differential expression analysis, and cell type annotation.
+
+Notice that Cumulus is the only one providing **Count matrix aggregation** feature.
+
+### Cumulus
+
+Benchmark on Cumulus is done by running jobs on Terra via Cumulus WDL workflows. And its overall execution time includes all Terra or Google Cloud specific preprocessing and postprocessing phases.
+
+You need to set up your account and workspace on Terra first. 
+
+Then change parameters ``"cumulus.input_file"`` and ``"cumulus.output_name"`` in ``/experiment/cloud/inputs_32.cpu.json`` to your own. Also, you need to specify your own workspace name in ``/experiment/cloud/run_cumulus.sh`` after ``-w`` flag.
+
+After that, in Pegasus environment, run the following command to start the execution:
+
+```
+(pegasus-env) root# cd /experiment/cloud
+(pegasus-env) root# ./run_cumulus.sh
+```
+
+Then check its progress and result using the URL shown on your screen.
+
+### SCANPY
+
+As SCANPY doesn't have a cloud-based interface, its benchmark is performed on a Google Cloud VM. Besides, since we used BBKNN for batch correction, SCANPY doesn't need to find kNN.
+
+Similarly as benchmarks before, in SCANPY environment, run the following commands
+
+```
+(scanpy-env) root# cd /experiment/cloud
+(scanpy-env) root# python run_scanpy.py > scanpy.log
+```
+
+When finished, you'll find execution time for each step in its log file ``/experiment/cloud/scanpy.log``.
+
+### Seurat
+
+Similarly as SCANPY, benchmark on Seurat is performed on a Google Cloud VM, and used as a single-server solution.
+
+Besides, as Seurat would fail for batch correction when using 63 channels as the batches, we instead use batch correction with 8 donors being the batches. Moreover, the batch correction failed when using 10, 15, 20, and 32 threads via R _future_ package. So we simply used 2 threads just to make sure the batch correction step terminates successfully. Then for all the other steps, 32 threads are used whenever possible.
+
+In SCANPY environment, run the following commands
+
+```
+(scanpy-env) root# cd /experiment/cloud
+(scanpy-env) root# Rscript run_seurat_hvg_batch_correction.R
+(scanpy-env) root# Rscript run_seurat_analysis.R
+```
+
+When finished, you'll find execution time for each step in log files ``/experiment/cloud/seurat_batch_correction.log`` and ``/experiment/cloud/seurat_analysis.log``.

@@ -169,7 +169,7 @@ For all the other output files, you can open them in ``/path-to-out`` outside th
 
 ### Expected Runtime
 
-We tested this demo on a MacBook laptop with 2.9 GHz 6-Core Intel i9 CPU (i.e. 12 CPUs to use), 32GB memory, MacOS 10.15.1, and Docker Desktop 2.1.0.4. The overall runtime was 18 minutes.
+We tested this demo on a MacBook laptop with 2.9 GHz 6-Core Intel i9 CPU (i.e. 12 CPUs to use), 32GB memory, MacOS 10.15.1, and Docker Desktop 2.1.0.4 (with Docker engine 19.03.4). The overall runtime was 18 minutes.
 
 ## Reproducing Paper Results
 

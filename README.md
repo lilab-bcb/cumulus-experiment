@@ -6,6 +6,22 @@ To try it out with our software, please pull our [cumulusprod/cumulus-experiment
 
 Sections below give instructions on each benchmark, as well as other useful instructions and information.
 
+## Software Versions for Benchmark
+
+The benchmark platform was a single server with 28 CPUs and Ubuntu Linux 18.04 OS. There is also a benchmark on cloud, which used Google Cloud platform, with detailed settings in Section [Benchmark on Workflows](#benchmark-on-workflows).
+
+We benchmark Pegasus, SCANPY, and Seurat with the following versions:
+
+| Software | Version     | Release Date | Language Platform |
+|:---------|:-----------:|:------------:|:------------------|
+| Pegasus  | 0.15.0      | 10/02/2019   | Python 3.7.3 |
+| SCANPY   | 1.4.4.post1 | 07/29/2019   | Python 3.7.3 |
+| Seurat   | 3.1.0       | 08/20/2019   | R 3.6.1 |
+
+For versions of software dependencies, please refer to information in our [Dockerfile](https://raw.githubusercontent.com/lilab-bcb/cumulus-experiment/master/docker/Dockerfile).
+
+Non-standard hardware is not required.
+
 ## Software Installation
 
 **Cumulus** is a cloud-based framework for single-cell/single-nucleus RNA-Seq data analysis. It accounts for processing from sequencing output extraction down to mining biological knowledge from gene-count matrix. It's used as [Terra](https://app.terra.bio/) workflows. Its open-source GitHub repository is [here](https://github.com/klarman-cell-observatory/cumulus), and its documentation can be found [here](https://cumulus-doc.readthedocs.io).
@@ -37,20 +53,6 @@ Then see Section [Run as a Docker Container](#run-as-a-docker-container) for how
 ### Local Installation
 
 Otherwise, if you want to try Pegasus on your machine, please following its installation [here](https://pegasus.readthedocs.io/en/0.15.0/installation.html).
-
-## Software Versions for Benchmark
-
-The benchmark platform was a single server with 28 CPUs and Ubuntu Linux 18.04 OS. There is also a benchmark on cloud, which used Google Cloud platform, with detailed settings in Section [Benchmark on Workflows](#benchmark-on-workflows).
-
-We benchmark Pegasus, SCANPY, and Seurat with the following versions:
-
-| Software | Version     | Release Date | Language Platform |
-|:---------|:-----------:|:------------:|:------------------|
-| Pegasus  | 0.15.0      | 10/02/2019   | Python 3.7.3 |
-| SCANPY   | 1.4.4.post1 | 07/29/2019   | Python 3.7.3 |
-| Seurat   | 3.1.0       | 08/20/2019   | R 3.6.1 |
-
-For versions of software dependencies, please refer to information in our [Dockerfile](https://raw.githubusercontent.com/lilab-bcb/cumulus-experiment/master/docker/Dockerfile).
 
 ## Run as a Docker Container
 
@@ -84,21 +86,21 @@ To terminate the container, if inside it, type ``exit``; if outside, type ``dock
 
 ### Human Bone Marrow Dataset
 
-This dataset has 378,000 cells and 33,694 genes. It consists of 63 channels collected from 8 donors. Donor 6 has 7 channles in use, while each of the other donors provides 8 channels.
+This dataset has 378,000 cells and 33,694 genes before quality control. It consists of 63 channels collected from 8 donors. Donor 6 has 7 channles in use, while each of the other donors provides 8 channels.
 
-This dataset is available at https://data.humancellatlas.org/explore/projects/cc95ff89-2e68-4a08-a234-480eca21ce79 in **loom** and **mtx** formats.
+This dataset is available at https://data.humancellatlas.org/explore/projects/cc95ff89-2e68-4a08-a234-480eca21ce79 in **csv**, **loom** and **mtx** formats.
 
 For the experiments, we've provided its **10X h5** and **h5sc** (Cumulus h5) formats in ``/data`` folder in the docker image. Below is their summary:
 
 | File | Description |
 |:-----|:------------|
-| ``/data/MantonBM_nonmix_10x.h5`` | Bone Marrow dataset in **10X h5** format. Used for benchmark on workflow and analysis tasks. |
-| ``/data/MantonBM_nonmix.h5sc`` | Bone Marrow dataset in **h5sc** format. Used for benchmarks. |
+| ``/data/MantonBM_nonmix_10x.h5`` | Bone Marrow dataset in **10X h5** format. Used for SCANPY and Seurat. |
+| ``/data/MantonBM_nonmix.h5sc`` | Bone Marrow dataset in **h5sc** format. Used for Pegasus. |
 | ``/data/MantonBM_nonmix_tiny.h5sc`` | A subset of ``MantonBM_nonmix.h5sc`` of 8 samples, each from one donor. Used for batch correction benchmark. |
 
 ### Mouse Brain Dataset
 
-This dataset has 1,306,127 cells and 27,998 genes, with 133 channels. It can be downloaded in command line after running this docker as container:
+This dataset has 1,306,127 cells and 27,998 genes before quality control, with 133 channels. It can be downloaded in command line after running this docker as container:
 
 ```
 wget -O http://cf.10xgenomics.com/samples/cell-exp/1.3.0/1M_neurons/1M_neurons_filtered_gene_bc_matrices_h5.h5 /data/1M_neurons.h5

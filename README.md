@@ -1,36 +1,175 @@
 # Experiment and Benchmark on Cumulus and Pegasus
 
+This repository stores the code for experiment and benchmark in our BioRxiv paper "[Cumulus: a cloud-based data analysis framework for large-scale single-cell and single-nucleus RNA-seq](https://www.biorxiv.org/content/10.1101/823682v1.abstract)".
+
+To try it out with our software, please pull our [cumulusprod/cumulus-experiment](https://hub.docker.com/repository/docker/cumulusprod/cumulus-experiment) docker image, and run it as a docker container. 
+
+Sections below give instructions on each benchmark, as well as other useful instructions and information.
+
+## Software Installation
+
+**Cumulus** is a cloud-based framework for single-cell/single-nucleus RNA-Seq data analysis. It accounts for processing from sequencing output extraction down to mining biological knowledge from gene-count matrix. It's used as [Terra](https://app.terra.bio/) workflows. Its open-source GitHub repository is [here](https://github.com/klarman-cell-observatory/cumulus), and its documentation can be found [here](https://cumulus-doc.readthedocs.io).
+
+**Pegasus** is the analysis module of Cumulus, which is written in Python. Its GitHub repository is [here](https://github.com/klarman-cell-observatory/pegasus), with documentation [here](https://pegasus.readthedocs.io). Pegasus is avalabile on PyPI with package name [pegasuspy](https://pypi.org/project/pegasuspy/).
+
+### Run with Docker
+
+We recommending using Docker to run our docker image for reproducing our benchmark results, as this is a way with **no installation** but just Docker itself (if you don't have it on your computer):
+
+1. Install Docker on your computer following instructions [here](https://docs.docker.com/v17.09/engine/installation/#supported-platforms), if you don't have Docker yet.
+
+2. Sign up with an account for [Docker Hub](https://hub.docker.com/).
+
+3. Sign in for docker on your computer with your Docker Hub account:
+
+```
+docker login
+```
+
+4. Pull our docker image public on Docker Hub to your computer:
+
+```
+docker pull cumulusprod/cumulus-experiment
+```
+
+Then see Section [Run as a Docker Container](#run-as-a-docker-container) for how to run it as a docker container on your computer.
+
+### Local Installation
+
+Otherwise, if you want to try Pegasus on your machine, please following its installation [here](https://pegasus.readthedocs.io/en/0.15.0/installation.html).
+
 ## Software Versions for Benchmark
+
+The benchmark platform was a single server with 28 CPUs and Ubuntu Linux 18.04 OS. There is also a benchmark on cloud, which used Google Cloud platform, with detailed settings in Section [Benchmark on Workflows](#benchmark-on-workflows).
 
 We benchmark Pegasus, SCANPY, and Seurat with the following versions:
 
-| Software | Version     | Release Date |
-|:---------|:-----------:|:------------:|
-| Pegasus  | 0.15.0      | 10/02/2019   |
-| SCANPY   | 1.4.4.post1 | 07/29/2019   |
-| Seurat   | 3.1.0       | 08/20/2019   |
+| Software | Version     | Release Date | Language Platform |
+|:---------|:-----------:|:------------:|:------------------|
+| Pegasus  | 0.15.0      | 10/02/2019   | Python 3.7.3 |
+| SCANPY   | 1.4.4.post1 | 07/29/2019   | Python 3.7.3 |
+| Seurat   | 3.1.0       | 08/20/2019   | R 3.6.1 |
 
-Both Pegasus and SCANPY are run on Python 3.7.3. Seurat is run on R 3.6.1.
+For versions of software dependencies, please refer to information in our [Dockerfile](https://raw.githubusercontent.com/lilab-bcb/cumulus-experiment/master/docker/Dockerfile).
 
-## Get Raw Data
+## Run as a Docker Container
 
-## Start Docker Container
+In terminal of your computer, type the following command to run our docker image as a docker container:
 
 ```
-$ docker run -it --rm -v /path-to-data:/data -v /path-to-output:/output cumulusprod:cumulus-experiment
+docker run -it --rm --name my-experiment -v /path-to-output:/output cumulusprod:cumulus-experiment
 ```
 
-where ``/path-to-data`` is the local directory in which the experiment data are stored, and ``/path-to-output`` is the local directory to which you want to set the experiment output.
+where 
+* ``/path-to-output`` is the local directory to which you want to set the experiment output;
+* ``my-experiment`` is the container name, which can be changed to your preferred name.
 
 Notice that there are 2 conda environments already installed: ``pegasus-env`` and ``scanpy-env``. You can activate/deactivate either of them with the following commands (taking ``pegasus-env`` as the example):
 
 ```
 root# source activate pegasus-env
 (pegasus-env) root# conda deactivate
-$
+root#
 ```
 
-## Generate Data for Experiment and Benchmark
+where ``root#`` and ``(pegasus-env) root#`` are environment information automatically appearing in terminal. Similarly below.
+
+To detach from this container, press ``Ctrl`` + ``p``, then ``Ctrl`` + ``q``. 
+
+To attach back, type ``docker attach my-experiment``, where ``my-experiment`` is the container name you set in ``docker run`` with ``--name`` option.
+
+To terminate the container, if inside it, type ``exit``; if outside, type ``docker container stop my-experiment``.
+
+## Raw Data
+
+### Human Bone Marrow Dataset
+
+This dataset has 378,000 cells and 33,694 genes. It consists of 63 channels collected from 8 donors. Donor 6 has 7 channles in use, while each of the other donors provides 8 channels.
+
+This dataset is available at https://data.humancellatlas.org/explore/projects/cc95ff89-2e68-4a08-a234-480eca21ce79 in **loom** and **mtx** formats.
+
+For the experiments, we've provided its **10X h5** and **h5sc** (Cumulus h5) formats in ``/data`` folder in the docker image. Below is their summary:
+
+| File | Description |
+|:-----|:------------|
+| ``/data/MantonBM_nonmix_10x.h5`` | Bone Marrow dataset in **10X h5** format. Used for benchmark on workflow and analysis tasks. |
+| ``/data/MantonBM_nonmix.h5sc`` | Bone Marrow dataset in **h5sc** format. Used for benchmarks. |
+| ``/data/MantonBM_nonmix_tiny.h5sc`` | A subset of ``MantonBM_nonmix.h5sc`` of 8 samples, each from one donor. Used for batch correction benchmark. |
+
+### Mouse Brain Dataset
+
+This dataset has 1,306,127 cells and 27,998 genes, with 133 channels. It can be downloaded in command line after running this docker as container:
+
+```
+wget -O http://cf.10xgenomics.com/samples/cell-exp/1.3.0/1M_neurons/1M_neurons_filtered_gene_bc_matrices_h5.h5 /data/1M_neurons.h5
+```
+
+When finished, the data file is ``/data/1M_neurons.h5``. It will be used for benchmark on analysis tasks.
+
+## Demo
+
+Before reproducing our benchmark and experiment in paper, you can try Pegasus with data provided in our docker as a demo.
+
+### Execution
+
+In the docker container, run the following commands:
+
+```
+root# source activate pegasus-env
+(pegasus-env) root# pegasus cluster -p 8 --output-filtration-results --plot-filtration-results --correct-batch-effect --diffmap --spectral-leiden --fitsne /data/MantonBM_nonmix.h5sc /output/demo_out
+```
+
+This runs clustering with 8 threads: generate Quality-Control (QC) summary as spreadsheet and plots, apply batch correction, compute Diffusion Maps, cluster using Spectral Leiden algorithm, calculate FIt-SNE embedding. Steps like PCA and kNN are done by default. 
+
+Notice that you can add ``--knn-full-speed`` to run kNN with multiple threads. But because this can reduce the reproducibility on kNN result, we choose to do it with single core here. 
+
+For details on options of ``pegasus cluster`` command, please see [here](https://pegasus.readthedocs.io/en/latest/usage.html#pegasus-cluster).
+
+After that, apply Differential Expression (DE) analysis and cell type annotation on clusters:
+
+```
+(pegasus-env) root# pegasus de_analysis -p 8 --labels spectral_leiden_labels --t /output/demo_out.h5ad /output/demo_out.de.xlsx
+(pegasus-env) root# pegasus annotate_cluster /output/demo_out.h5ad /output/demo_out.anno.txt
+```
+
+The DE analysis also uses 8 threads. It applies only Welch's t-test on clusters, and the putative cell type annotation simply uses this test result.
+
+Finally, generete FIt-SNE plots of data regarding cluster labels and channels side-by-side: 
+
+```
+(pegasus-env) root# pegasus plot scatter --basis fitsne --attributes spectral_leiden_labels,Channel /output/demo_out.h5ad /output/demo_out.fitsne.pdf
+```
+
+### Expected Output
+
+When finished, in folder ``/output``, you can find the following results using the following commands in command-line:
+
+| File | Description |
+|:-----|:------------|
+| ``demo_out.h5ad`` | Analysis result in **h5ad** format. |
+| ``demo_out.filt.xlsx`` | Quality-Control (QC) summary as an Excel sheet. |
+| ``demo_out.filt.{UMI, gene, mito}.pdf`` | QC plots regarding UMIs, barcodes, and mitochondrial genes. |
+| ``demo_out.de.xlsx`` | Differential Expression (DE) analysis result in Excel format. |
+| ``demo_out.anno.txt`` | Cell type annotation on each cluster. |
+| ``demo_out.fitsne.pdf`` | FIt-SNE plot on dataset regarding clusters and channels side-by-side. |
+
+For ``demo_out.h5ad``, to load it, in docker container, run
+
+```
+(pegasus-env) root# python
+>>> import pegasus as pg
+>>> adata = pg.read_input("/output/demo_out.h5ad")
+```
+
+to load it as an [anndata](https://icb-anndata.readthedocs-hosted.com/en/stable/anndata.AnnData.html) object.
+
+For all the other output files, you can open them in ``/path-to-out`` outside the docker container.
+
+### Expected Runtime
+
+We tested this demo on a MacBook laptop with 2.9 GHz 6-Core Intel i9 CPU (i.e. 12 CPUs to use), 32GB memory, MacOS 10.15.1, and Docker Desktop 2.1.0.4. The overall runtime was 18 minutes.
+
+## Reproducing Paper Results
 
 First, enter the Conda environment of pegasus by:
 
@@ -71,6 +210,18 @@ Then execute the experiment:
 When finished, you'll find the figures generated in ``/output``, and CSV files containing markers in the current folder.
 
 ## Experiment on Batch Correction
+
+### Package Summary
+
+The following batch correction methods are compared. The benchmark dataset is the 8-channel subset of bone marrow data: ``/data/MantonBM_nonmix_tiny.h5sc``.
+
+| Method | Package | Version | Release Date |
+|--------|---------|---------|--------------|
+| L/S adjustment | Pegasus | 0.15.0 | 10/02/2019 |
+| ComBat | SCANPY | 1.4.4.post1 | 07/29/2019 |
+| MNN | mnnpy | 0.1.9.5 | 02/24/2019 |
+| BBKNN | bbknn | 1.3.6 | 08/22/2019 |
+| CCA | Seurat | 3.1.0 | 08/20/2019 |
 
 ### Ground Truth Cell Types
 
@@ -178,6 +329,17 @@ After executing all these commands, run
 to generate the measurement plot on batch correction methods in ``/output``.
 
 ## Experiment on k-Nearest-Neighbor
+
+### Package Summary
+
+kNN methods of Pegasus, SCANPY, and Seurat are compared. The ground truth of accurate kNN is achieved by bruth force method in ``scikit-learn``. We list the kNN packages that these softwares uses as follow:
+
+| Package | Used By | Version | Release Date |
+|---------|---------|---------|--------------|
+| scikit-learn | Ground Truth | 0.21.3 | 07/29/2019 |
+| hnswlib | Pegasus | 0.3.2.0 | 08/23/2019 |
+| umap-learn | SCANPY | 0.3.10 | 08/14/2019 |
+| RcppAnnoy | Seurat | 0.0.13 | 09/23/2019 | 
 
 ### Generate Ground Truth kNN
 
@@ -393,18 +555,9 @@ Notice that Cumulus is the only one providing **Count matrix aggregation** featu
 
 Benchmark on Cumulus is done by running jobs on Terra via Cumulus WDL workflows. And its overall execution time includes all Terra or Google Cloud specific preprocessing and postprocessing phases.
 
-You need to set up your account and workspace on Terra first. 
+To run it on Terra, please following [cumulus documentation](https://cumulus-doc.readthedocs.io/en/latest/cumulus.html) and [our tutorial video](https://www.youtube.com/watch?v=zKgo3mf4uRk&t=2s) for this benchmark.
 
-Then change parameters ``"cumulus.input_file"`` and ``"cumulus.output_name"`` in ``/experiment/cloud/inputs_32.cpu.json`` to your own. Also, you need to specify your own workspace name in ``/experiment/cloud/run_cumulus.sh`` after ``-w`` flag.
-
-After that, in Pegasus environment, run the following command to start the execution:
-
-```
-(pegasus-env) root# cd /experiment/cloud
-(pegasus-env) root# ./run_cumulus.sh
-```
-
-Then check its progress and result using the URL shown on your screen.
+Notice that you need to upload ``/data/MantonBM_nonmix.h5sc`` to the Google bucket of your workspace via [gsutil](https://cloud.google.com/storage/docs/gsutil), change parameters ``"cumulus.input_file"`` and ``"cumulus.output_name"`` in ``/experiment/cloud/inputs_32.cpu.json`` to your own, and upload this JSON file in **cumulus** workflow page in your workspace.
 
 ### SCANPY
 

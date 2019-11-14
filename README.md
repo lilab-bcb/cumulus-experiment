@@ -103,7 +103,7 @@ For the experiments, we've provided its **10X h5** and **h5sc** (Cumulus h5) for
 This dataset has 1,306,127 cells and 27,998 genes before quality control, with 133 channels. It can be downloaded in command line after running this docker as container:
 
 ```
-wget -O http://cf.10xgenomics.com/samples/cell-exp/1.3.0/1M_neurons/1M_neurons_filtered_gene_bc_matrices_h5.h5 /data/1M_neurons.h5
+wget http://cf.10xgenomics.com/samples/cell-exp/1.3.0/1M_neurons/1M_neurons_filtered_gene_bc_matrices_h5.h5 -O /data/1M_neurons.h5
 ```
 
 When finished, the data file is ``/data/1M_neurons.h5``. It will be used for benchmark on analysis tasks.

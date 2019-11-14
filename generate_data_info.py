@@ -79,6 +79,7 @@ def preprocess_data(in_file):
 	pg.write_output(adata_hvf, output_hvf_name2)
 
 def run_pegasus_process():
+	cprint("Run pegasus on Bone Marrow dataset...", "green")
 	n_cores = os.cpu_count()
 	if os.system("pegasus cluster -p {jobs} --plot-hvf --correct-batch-effect --diffmap --louvain --leiden --spectral-louvain --spectral-leiden --fitsne --tsne --umap --fle --net-tsne --net-umap --net-fle {src} {dst} > pegasus.log".format(jobs = n_cores, src = bm_full_data_source, dst = bm_full_out_name)):
 		sys.exit(1)

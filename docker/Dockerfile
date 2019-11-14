@@ -103,10 +103,7 @@ RUN	pip install Cython==0.29.13 && \
 	pip install anndata==0.6.22.post1 && \
 	pip install termcolor==1.1.0 && \
 	pip install hnswlib==0.3.2.0 && \
-	pip install pegasuspy==0.15.0 && \
-	git clone https://github.com/klarman-cell-observatory/altocumulus.git /opt/software/altocumulus && \
-	cd /opt/software/altocumulus && \
-	pip install -e .
+	pip install pegasuspy==0.15.0
 
 # Install scanpy environment
 RUN conda create -n scanpy-env python=3.7.3 -y

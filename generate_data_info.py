@@ -103,8 +103,8 @@ if __name__ == '__main__':
 
 	if dataset == 'MantonBM':
 		extract_hvf(bm_full_data_source)
-		preprocess_data(full_data_source)
-		preprocess_data(tiny_data_source)
+		preprocess_data(bm_full_data_source)
+		preprocess_data(bm_tiny_data_source)
 		run_pegasus_process()
 	else:
 		extract_hvf(neuron_data_source)

@@ -45,7 +45,7 @@ docker login
 4. Pull our docker image public on Docker Hub to your computer:
 
 ```
-docker pull cumulusprod/cumulus-experiment
+docker pull cumulusprod/cumulus-experiment:19.11
 ```
 
 Then see Section [Run as a Docker Container](#run-as-a-docker-container) for how to run it as a docker container on your computer.
@@ -59,7 +59,7 @@ Otherwise, if you want to try Pegasus on your machine, please following its inst
 In terminal of your computer, type the following command to run our docker image as a docker container:
 
 ```
-docker run -it --rm --name my-experiment -v /path-to-output:/output cumulusprod:cumulus-experiment
+docker run -it --rm --name my-experiment -v /path-to-output:/output cumulusprod:cumulus-experiment:19.11
 ```
 
 where 

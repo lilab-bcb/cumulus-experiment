@@ -50,7 +50,11 @@ def preprocess_data(in_file):
 	pg.log_norm(adata)
 
 	print("Getting Highly Variable Feature Set...")
-	df_hvf = pd.read_csv(os.path.splitext(in_file)[0] + "_hvf.txt")
+	in_name = os.path.splitext(in_file)[0]
+	if in_name.split('_')[-1] == "tiny":
+		df_hvf = pd.read_csv(in_name[0:-5] + "_hvf.txt")
+	else:
+		df_hvf = pd.read_csv(os.path.splitext(in_file)[0] + "_hvf.txt")
 	df_hvf['highly_variable_features'] = [True] * df_hvf.shape[0]
 	df_hvf.set_index('index', inplace = True)
 	df_hvf.drop(columns = ['gene_ids'], inplace = True)

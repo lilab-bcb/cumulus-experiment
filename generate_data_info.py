@@ -2,6 +2,7 @@ import os, sys
 import pegasus as pg
 import pandas as pd
 import numpy as np
+
 from termcolor import cprint
 
 bm_full_data_source = "/data/MantonBM_nonmix.h5sc"
@@ -111,6 +112,7 @@ def run_pegasus_precalculated():
 	pg.correct_batch(adata, features = "highly_variable_features")
 
 	# Load precalculated PCA
+	cprint("Set precalculated PCA info...", "green")
 	adata.obsm['X_pca'] = np.load("/data/precalculated/pca.npy")
 	adata.uns['PCs'] = np.load("/data/precalculated/PCs.npy")
 	adata.uns['pca'] = {}
@@ -123,6 +125,7 @@ def run_pegasus_precalculated():
 
 	del adata
 
+	cprint("Clustering...", "green")
 	n_cores = os.cpu_count()
 	if os.system("pegasus cluster -p {jobs} --processed --louvain --leiden --spectral-louvain --spectral-leiden --fitsne --tsne --umap --fle --net-tsne --net-umap --net-fle {src}.h5ad null > pegasus.log".format(jobs = n_cores, src = bm_full_out_name)):
 		sys.exit(1)
@@ -135,6 +138,7 @@ def run_pegasus_precalculated():
 	
 	label_list = [('louvain', anno_str_louvain), ('leiden', anno_str_leiden), ('spectral_louvain', anno_str_spectral_louvain), ('spectral_leiden', anno_str_spectral_leiden)]
 
+	cprint("DE Analysis...", "green")
 	for label, anno_str in label_list:
 		if os.system("pegasus de_analysis -p {jobs} --labels {label}_labels --result-key de_res_{label} --t {src}.h5ad {src}.{label}.de.xlsx > de_{label}.log".format(jobs = n_cores, label = label, src = bm_full_out_name)):
 			sys.exit(1)
@@ -142,16 +146,20 @@ def run_pegasus_precalculated():
 		if os.system("pegasus annotate_cluster --de-key de_res_{label} {src}.h5ad {src}.{label}.anno.txt > anno_{label}.log".format(label = label, src = bm_full_out_name)):
 			sys.exit(1)
 
+	cprint("Annotating...", "green")
 	annotate_cell_types(label_list)
 
 def run_pegasus_process_raw():
 	cprint("Run pegasus on Bone Marrow dataset without precalculated information...", "green")
 
+	cprint("Clustering...", "green")
 	n_cores = os.cpu_count()
 	if os.system("pegasus cluster -p {jobs} --plot-hvf --correct-batch-effect --diffmap --louvain --leiden --spectral-louvain --spectral-leiden --fitsne --tsne --umap --fle --net-tsne --net-umap --net-fle {src} {dst} > pegasus.log".format(jobs = n_cores, src = bm_full_data_source, dst = bm_full_out_name)):
 		sys.exit(1)
 
 	label_list = ['louvain', 'leiden', 'spectral_louvain', 'spectral_leiden']
+
+	cprint("DE Analysis...", "green")
 	for label in label_list:
 		if os.system("pegasus de_analysis -p {jobs} --labels {label}_labels --result-key de_res_{label} --t {src}.h5ad {src}.{label}.de.xlsx > de_{label}.log".format(jobs = n_cores, label = label, src = bm_full_out_name)):
 			sys.exit(1)

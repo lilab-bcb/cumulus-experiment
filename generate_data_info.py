@@ -79,6 +79,16 @@ def preprocess_data(in_file):
 	pg.pca(adata_hvf)
 	pg.write_output(adata_hvf, output_hvf_name2)
 
+def annotate_cell_types(label_list):
+
+	adata = pg.read_input(bm_full_out_name + ".h5ad")
+
+	for label, anno_str in label_list:
+		anno_dict = {str(i + 1): x for i, x in enumerate(anno_str.split(";"))}
+		pg.annotate(adata, 'anno_{}'.format(label), '{}_labels'.format(label), anno_dict)
+
+	pg.write_output(adata, bm_full_out_name + "_anno.h5ad")
+
 def run_pegasus_precalculated():
 	cprint("Run Pegasus on Bone Marrow dataset with precalculated PCA...", "green")
 
@@ -114,7 +124,7 @@ def run_pegasus_precalculated():
 	del adata
 
 	n_cores = os.cpu_count()
-	if os.system("pegasus cluster -p {jobs} --louvain --leiden --spectral-louvain --spectral-leiden --fitsne --tsne --umap --fle --net-tsne --net-umap --net-fle {src}.h5ad null > pegasus.log".format(jobs = n_cores, src = bm_full_out_name)):
+	if os.system("pegasus cluster -p {jobs} --processed --louvain --leiden --spectral-louvain --spectral-leiden --fitsne --tsne --umap --fle --net-tsne --net-umap --net-fle {src}.h5ad null > pegasus.log".format(jobs = n_cores, src = bm_full_out_name)):
 		sys.exit(1)
 
 	label_list = ['louvain', 'leiden', 'spectral_louvain', 'spectral_leiden']
@@ -132,8 +142,7 @@ def run_pegasus_precalculated():
 		if os.system("pegasus annotate_cluster --de-key de_res_{label} {src}.h5ad {src}.{label}.anno.txt > anno_{label}.log".format(label = label, src = bm_full_out_name)):
 			sys.exit(1)
 
-		if os.system('pegasus annotate_cluster --annotation "anno_{label}:{label}_labels:{anno}" {src}.h5ad'.format(label = label, anno = anno_str, src = bm_full_out_name)):
-			sys.exit(1)
+	annotate_cell_types(label_list)
 
 def run_pegasus_process_raw():
 	cprint("Run pegasus on Bone Marrow dataset without precalculated information...", "green")

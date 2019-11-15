@@ -1,6 +1,7 @@
 import os, sys
 import pegasus as pg
 import pandas as pd
+import numpy as np
 from termcolor import cprint
 
 bm_full_data_source = "/data/MantonBM_nonmix.h5sc"
@@ -78,10 +79,40 @@ def preprocess_data(in_file):
 	pg.pca(adata_hvf)
 	pg.write_output(adata_hvf, output_hvf_name2)
 
-def run_pegasus_process():
-	cprint("Run pegasus on Bone Marrow dataset...", "green")
+def run_pegasus_precalculated():
+	cprint("Run Pegasus on Bone Marrow dataset with precalculated PCA...", "green")
+
+	adata = pg.read_input(bm_full_data_source)
+	pg.qc_metrics(adata)
+	pg.filter_data(adata)
+	pg.log_norm(adata)
+	pg.highly_variable_features(adata, consider_batch = True)
+
+	from pegasus.plotting import plot_hvf
+
+	robust_idx = adata.var["robust"].values
+	plot_hvf(
+		adata.var.loc[robust_idx, "mean"],
+ 		adata.var.loc[robust_idx, "var"],
+		adata.var.loc[robust_idx, "hvf_loess"],
+		adata.var.loc[robust_idx, "highly_variable_features"],
+		bm_full_out_name + ".hvf.pdf",
+	)
+	pg.correct_batch(adata, features = "highly_variable_features")
+
+	# Load precalculated PCA
+	adata.obsm['X_pca'] = np.load("/data/precalculated/pca.npy")
+	adata.uns['PCs'] = np.load("/data/precalculated/PCs.npy")
+	adata.uns['pca'] = {}
+	adata.uns['pca']['variance'] = np.load("/data/precalculated/pca_variance.npy")
+	adata.uns['pca']['variance_ratio'] = np.load("/data/precalculated/pca_variance_ratio.npy")
+
+	pg.neighbors(adata)
+	pg.diffmap(adata)
+	pg.write_output(adata, bm_full_out_name)
+
 	n_cores = os.cpu_count()
-	if os.system("pegasus cluster -p {jobs} --plot-hvf --correct-batch-effect --diffmap --louvain --leiden --spectral-louvain --spectral-leiden --fitsne --tsne --umap --fle --net-tsne --net-umap --net-fle {src} {dst} > pegasus.log".format(jobs = n_cores, src = bm_full_data_source, dst = bm_full_out_name)):
+	if os.system("pegasus cluster -p {jobs} --louvain --leiden --spectral-louvain --spectral-leiden --fitsne --tsne --umap --fle --net-tsne --net-umap --net-fle {src}.h5ad null > pegasus.log".format(jobs = n_cores, src = bm_full_out_name)):
 		sys.exit(1)
 
 	label_list = ['louvain', 'leiden', 'spectral_louvain', 'spectral_leiden']
@@ -102,15 +133,38 @@ def run_pegasus_process():
 		if os.system('pegasus annotate_cluster --annotation "anno_{label}:{label}_labels:{anno}" {src}.h5ad'.format(label = label, anno = anno_str, src = bm_full_out_name)):
 			sys.exit(1)
 
+def run_pegasus_process_raw():
+	cprint("Run pegasus on Bone Marrow dataset without precalculated information...", "green")
+
+	n_cores = os.cpu_count()
+	if os.system("pegasus cluster -p {jobs} --plot-hvf --correct-batch-effect --diffmap --louvain --leiden --spectral-louvain --spectral-leiden --fitsne --tsne --umap --fle --net-tsne --net-umap --net-fle {src} {dst} > pegasus.log".format(jobs = n_cores, src = bm_full_data_source, dst = bm_full_out_name)):
+		sys.exit(1)
+
+	label_list = ['louvain', 'leiden', 'spectral_louvain', 'spectral_leiden']
+	for label in label_list:
+		if os.system("pegasus de_analysis -p {jobs} --labels {label}_labels --result-key de_res_{label} --t {src}.h5ad {src}.{label}.de.xlsx > de_{label}.log".format(jobs = n_cores, label = label, src = bm_full_out_name)):
+			sys.exit(1)
+
+		if os.system("pegasus annotate_cluster --de-key de_res_{label} {src}.h5ad {src}.{label}.anno.txt > anno_{label}.log".format(label = label, src = bm_full_out_name)):
+			sys.exit(1)
+
+def run_pegasus_process(processed):
+	if processed == 'processed':
+		run_pegasus_precalculated()
+	else:
+		run_pegasus_process_raw()	
+
 if __name__ == '__main__':
 	dataset = sys.argv[1]
 	assert dataset in ['MantonBM', '1M_neurons']
 
 	if dataset == 'MantonBM':
+		processed = sys.argv[2]
+		assert processed in ['processed', 'raw']
 		extract_hvf(bm_full_data_source)
 		preprocess_data(bm_full_data_source)
 		preprocess_data(bm_tiny_data_source)
-		run_pegasus_process()
+		run_pegasus_process(processed = processed)
 	else:
 		extract_hvf(neuron_data_source)
 		preprocess_data(neuron_data_source)

@@ -91,7 +91,7 @@ def annotate_cell_types(label_list):
 	pg.write_output(adata, bm_full_out_name + "_anno.h5ad")
 
 def run_pegasus_precalculated():
-	cprint("Run Pegasus on Bone Marrow dataset with precalculated PCA...", "green")
+	cprint("Run Pegasus on Bone Marrow dataset with precalculated PCA and Diffusion Map...", "green")
 
 	adata = pg.read_input(bm_full_data_source)
 	pg.qc_metrics(adata)
@@ -120,7 +120,13 @@ def run_pegasus_precalculated():
 	adata.uns['pca']['variance_ratio'] = np.load("/data/precalculated/pca_variance_ratio.npy")
 
 	pg.neighbors(adata)
-	pg.diffmap(adata)
+
+	# Load precalculated Diffusion Map
+	cprint("Set precalculated Diffusion Map info...", "green")
+	adata.obsm['X_diffmap'] = np.load("/data/precalculated/diffmap.npy")
+	adata.uns['diffmap_evals'] = np.load("/data/precalculated/diffmap_evals.npy")
+	adata.obsm['X_phi'] = np.load("/data/precalculated/diffmap_phi.npy")
+
 	pg.write_output(adata, bm_full_out_name)
 
 	del adata

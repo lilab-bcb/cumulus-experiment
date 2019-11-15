@@ -193,7 +193,9 @@ Execute
 (pegasus-env) root# python generate_data_info.py 1M_neurons
 ```
 
-to get all the necessary data for experiment on Mouse Neuron dataset.
+to get all the necessary data for experiment on Mouse Neuron dataset. 
+
+Notice that Mouse Neuron dataset was only used for runtime benchmark. And since it's a huge dataset, and its processing is memory-consuming, if your computer doesn't have a memory large enough (e.g. 16GB is not enough to hold it due to our test), please consider to only try Bone Marrow dataset. All the figures are based on Bone Marrow dataset.
 
 ## Experiment on Highly Variable Feature Selection
 

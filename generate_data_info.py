@@ -111,6 +111,8 @@ def run_pegasus_precalculated():
 	pg.diffmap(adata)
 	pg.write_output(adata, bm_full_out_name)
 
+	del adata
+
 	n_cores = os.cpu_count()
 	if os.system("pegasus cluster -p {jobs} --louvain --leiden --spectral-louvain --spectral-leiden --fitsne --tsne --umap --fle --net-tsne --net-umap --net-fle {src}.h5ad null > pegasus.log".format(jobs = n_cores, src = bm_full_out_name)):
 		sys.exit(1)

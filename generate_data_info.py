@@ -113,19 +113,19 @@ def run_pegasus_precalculated():
 
 	# Load precalculated PCA
 	cprint("Set precalculated PCA info...", "green")
-	adata.obsm['X_pca'] = np.load("/data/precalculated/pca.npy")
-	adata.uns['PCs'] = np.load("/data/precalculated/PCs.npy")
+	adata.obsm['X_pca'] = np.load("/data/precalculated/pegasus/pca.npy")
+	adata.uns['PCs'] = np.load("/data/precalculated/pegasus/PCs.npy")
 	adata.uns['pca'] = {}
-	adata.uns['pca']['variance'] = np.load("/data/precalculated/pca_variance.npy")
-	adata.uns['pca']['variance_ratio'] = np.load("/data/precalculated/pca_variance_ratio.npy")
+	adata.uns['pca']['variance'] = np.load("/data/precalculated/pegasus/pca_variance.npy")
+	adata.uns['pca']['variance_ratio'] = np.load("/data/precalculated/pegasus/pca_variance_ratio.npy")
 
 	pg.neighbors(adata)
 
 	# Load precalculated Diffusion Map
 	cprint("Set precalculated Diffusion Map info...", "green")
-	adata.obsm['X_diffmap'] = np.load("/data/precalculated/diffmap.npy")
-	adata.uns['diffmap_evals'] = np.load("/data/precalculated/diffmap_evals.npy")
-	adata.obsm['X_phi'] = np.load("/data/precalculated/diffmap_phi.npy")
+	adata.obsm['X_diffmap'] = np.load("/data/precalculated/pegasus/diffmap.npy")
+	adata.uns['diffmap_evals'] = np.load("/data/precalculated/pegasus/diffmap_evals.npy")
+	adata.obsm['X_phi'] = np.load("/data/precalculated/pegasus/diffmap_phi.npy")
 
 	pg.write_output(adata, bm_full_out_name)
 

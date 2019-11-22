@@ -173,6 +173,10 @@ We tested this demo on a MacBook laptop with 2.9 GHz 6-Core Intel i9 CPU (i.e. 1
 
 ## Reproducing Paper Results
 
+### Precalculation for Reproducibility
+
+As PCA and Diffusion Map results are different among different machines, we use precalculated ones done by our experiment server for reproducint paper results. You can find them in ``/data/precalculated`` folder inside docker image.
+
 First, enter the Conda environment of pegasus by:
 
 ```
@@ -182,7 +186,7 @@ root# source activate pegasus-env
 Then execute
 
 ```
-(pegasus-env) root# python generate_data_info.py MantonBM
+(pegasus-env) root# python generate_data_info.py MantonBM processed
 ```
 
 to get all the necessary data for experiment on Manton Bone Marrow dataset.
@@ -197,7 +201,7 @@ to get all the necessary data for experiment on Mouse Neuron dataset.
 
 Notice that Mouse Neuron dataset was only used for runtime benchmark. And since it's a huge dataset, and its processing is memory-consuming, if your computer doesn't have a memory large enough (e.g. 16GB is not enough to hold it due to our test), please consider to only try Bone Marrow dataset. All the figures are based on Bone Marrow dataset.
 
-## Experiment on Highly Variable Feature Selection
+### Experiment on Highly Variable Feature Selection
 
 First, enter the experiment subfolder:
 
@@ -208,14 +212,14 @@ First, enter the experiment subfolder:
 Then execute the experiment:
 
 ```
-(pegasus-env) root# python gen_result.py
+(pegasus-env) root# python gen_result.py processed
 ```
 
 When finished, you'll find the figures generated in ``/output``, and CSV files containing markers in the current folder.
 
-## Experiment on Batch Correction
+### Experiment on Batch Correction
 
-### Package Summary
+#### Package Summary
 
 The following batch correction methods are compared. The benchmark dataset is the 8-channel subset of bone marrow data: ``/data/MantonBM_nonmix_tiny.h5sc``.
 
@@ -227,7 +231,7 @@ The following batch correction methods are compared. The benchmark dataset is th
 | BBKNN | bbknn | 1.3.6 | 08/22/2019 |
 | CCA | Seurat | 3.1.0 | 08/20/2019 |
 
-### Ground Truth Cell Types
+#### Ground Truth Cell Types
 
 As MNN and Seurat CCA both fail for the whole Bone Marrow dataset, we use a subset of it, by selecting one channel per donor, for the batch correction benchmark.
 
@@ -243,7 +247,7 @@ Enter the folder for generating ground truth information, and execute the script
 
 This will generate a file containing ground truth of cell types (``ground_cell_types.txt``) in folder ``/experiment/batch_correction``.
 
-### Benchmark on Baseline Method
+#### Benchmark on Baseline Method
 
 The baseline is running Pegasus clustering without batch correction. In Pegasus environment, run the following commands:
 
@@ -254,7 +258,7 @@ The baseline is running Pegasus clustering without batch correction. In Pegasus 
 
 When finished, you'll have a result file ``baseline_result.h5ad`` in the current folder.
 
-### Benchmark on Pegasus Batch Correction Method
+#### Benchmark on Pegasus Batch Correction Method
 
 In Pegasus environment, run the following commands:
 
@@ -265,7 +269,7 @@ In Pegasus environment, run the following commands:
 
 When finished, you'll have a result file ``pegasus_corrected.h5ad``, along with its log file ``pegasus_correct.log`` in the current folder. To calculate its batch correction time, in ``pegasus_correct.log``, add up the time spent on **Estimation on feature statistics per channel** and **Batch correction** steps.
 
-### Benchmark on ComBat
+#### Benchmark on ComBat
 
 In SCANPY environment, run the following commands:
 
@@ -276,7 +280,7 @@ In SCANPY environment, run the following commands:
 
 When finished, you'll have a result file ``scanpy_combat_corrected.h5ad`` in the corrent folder, and you can read the time spent on ComBat from the screen output.
 
-### Benchmark on MNN
+#### Benchmark on MNN
 
 In SCANPY environment, run the following commands:
 
@@ -287,7 +291,7 @@ In SCANPY environment, run the following commands:
 
 When finished, you'll have a result file ``scanpy_mnn_corrected.h5ad`` in the current folder, and you can read the time spent on MNN from the screen output.
 
-### Benchmark on BBKNN
+#### Benchmark on BBKNN
 
 In SCANPY environment, run the following commands:
 
@@ -298,7 +302,7 @@ In SCANPY environment, run the following commands:
 
 When finished, you'll have a result file ``scanpy_bbknn_corrected.h5ad`` in the current folder, and you can read the time spent on BBKNN from the screen output.
 
-### Benchmark on Seurat CCA
+#### Benchmark on Seurat CCA
 
 Running Seurat batch correction doesn't depend on Python environment. Run the following commands:
 
@@ -309,7 +313,7 @@ root# Rscript seurat_cca.R
 
 When finished, you'll have 3 result files: ``matrix.mtx`` for count matrix, ``barcodes.txt`` for cell barcode names, ``genes.txt`` for gene names in the current folder. Besides, there is also a log file ``seurat_cca.log`` in the folder. To get its batch correction time, add up the time spent on **Finding Anchors** and **Integration** together.
 
-### Measure Performance of All Batch Correction Methods
+#### Measure Performance of All Batch Correction Methods
 
 We calculate two measures for each batch correction method result: **kSIM** and **kBET** accept rates. In Pegasus environment, type the following commands:
 
@@ -332,9 +336,9 @@ After executing all these commands, run
 
 to generate the measurement plot on batch correction methods in ``/output``.
 
-## Experiment on k-Nearest-Neighbor
+### Experiment on k-Nearest-Neighbor
 
-### Package Summary
+#### Package Summary
 
 kNN methods of Pegasus, SCANPY, and Seurat are compared. The ground truth of accurate kNN is achieved by bruth force method in ``scikit-learn``. We list the kNN packages that these softwares uses as follow:
 
@@ -345,7 +349,7 @@ kNN methods of Pegasus, SCANPY, and Seurat are compared. The ground truth of acc
 | umap-learn | SCANPY | 0.3.10 | 08/14/2019 |
 | RcppAnnoy | Seurat | 0.0.13 | 09/23/2019 | 
 
-### Generate Ground Truth kNN
+#### Generate Ground Truth kNN
 
 We use the kNN result by brute force algorithm in _scikit-learn_ as the ground truth. In Pegasus environment, run the following commands:
 
@@ -356,7 +360,7 @@ We use the kNN result by brute force algorithm in _scikit-learn_ as the ground t
 
 When finished, you'll have a result file ``baseline_indices.npy`` in the current folder.
 
-### Benchmark on Pegasus kNN Method
+#### Benchmark on Pegasus kNN Method
 
 In Pegasus environment, run the following commands:
 
@@ -367,7 +371,7 @@ In Pegasus environment, run the following commands:
 
 When finished, you'll have a result file ``pegasus_indices.npy`` in the current folder, and you can read the time spent on kNN from screen output.
 
-### Benchmark on SCANPY kNN Method
+#### Benchmark on SCANPY kNN Method
 
 SCANPY uses kNN from _umap-learn_ package. So we directly benchmark this function. In Pegasus environment, run the following commands:
 
@@ -378,7 +382,7 @@ SCANPY uses kNN from _umap-learn_ package. So we directly benchmark this functio
 
 When finished, you'll have a result file ``scanpy_indices.npy`` in the current folder, and you can read the time spent on kNN from screen output.
 
-### Benchmark on Seurat kNN Method
+#### Benchmark on Seurat kNN Method
 
 Seurat's kNN has two methods: ``nn2`` from _RANN_ package, default method but time-consuming; ``AnnoyNN`` from _RcppAnnoy_ package, not default but more efficient. We decide to choose ``AnnoyNN`` for this benchmark. In Pegasus environment, run the following commands:
 
@@ -390,7 +394,7 @@ Seurat's kNN has two methods: ``nn2`` from _RANN_ package, default method but ti
 
 When finished, you'll have a result file ``seurat_indices_annoy.txt`` in the current folder, and you can read the time spent on kNN from screen output.
 
-## Measure kNN Methods
+#### Measure kNN Methods
 
 Given that all the kNN resuls of the 3 methods are calculated, we are ready to measure the recall of them, and generate their time and recall plots. 
 
@@ -403,7 +407,7 @@ First, update ``time_stats.txt`` in ``/experiment/knn_comparison`` by the time i
 
 This will generate the corresponding figures in ``/output``.
 
-## Experiment on Diffusion Maps
+### Experiment on Diffusion Maps
 
 In Pegasus environment, run the following commands:
 
@@ -414,7 +418,7 @@ In Pegasus environment, run the following commands:
 
 When finished, you'll find the figures generated in ``/output``.
 
-## Experiment on Clustering Algorithms
+### Experiment on Clustering Algorithms
 
 In Pegasus environment, run the following commands:
 
@@ -426,7 +430,7 @@ In Pegasus environment, run the following commands:
 
 When finished, you'll find the figures generated in ``/output``, and AMI results can be read from the screen output. Besides, you can check ``/experiment/pegasus.log`` for the execution time on each of the 4 clustering algorithms, while the time on spectral clustering can be read from the screen output.
 
-## Experiment on Visualization Methods
+### Experiment on Visualization Methods
 
 In Pegasus environment, run the following commands:
 
@@ -437,13 +441,13 @@ In Pegasus environment, run the following commands:
 
 When finished, you'll find the figures generated in ``/output``, and for each visualization method, its kSIM regarding Louvain clustering labels can be seen from screen output. Besides, you can check ``/experiment/pegasus.log`` for the execution time on each visualization method.
 
-## Benchmark on Analysis Tasks
+### Benchmark on Analysis Tasks
 
 All 3 packages are benchmarked on Bone Marrow dataset, while only Pegasus and SCANPY are benchmarked on Mouse Neuron, because Seurat fails at loading the count matrix step for this big dataset.
 
-### Manton Bone Marrow Dataset
+#### Manton Bone Marrow Dataset
 
-#### Pegasus
+##### Pegasus
 
 To benchmark Pegasus, in Pegasus environment, run the following command:
 
@@ -454,7 +458,7 @@ To benchmark Pegasus, in Pegasus environment, run the following command:
 
 When finished, you'll find execution time for each step in its log file ``/experiment/overall/pegasus.log``.
 
-#### SCANPY
+##### SCANPY
 
 To benchmark SCANPY, in SCANPY environment, run the following command:
 
@@ -465,7 +469,7 @@ To benchmark SCANPY, in SCANPY environment, run the following command:
 
 When finished, you'll find execution time for each step in its log file ``/experiment/overall/scanpy.log``.
 
-#### Seurat
+##### Seurat
 
 The benchmark on Seurat is a little bit complicated, as it's written in R. 
 
@@ -506,9 +510,9 @@ In SCANPY environment, run the following command to benchmark on Leiden clustere
 When terminated with failure, you may find information in its log file ``/experiment/overall/seurat_leidenl.log`` and screen output.
 
 
-### Mouse Neuron Dataset
+#### Mouse Neuron Dataset
 
-#### Pegasus
+##### Pegasus
 
 In Pegasus environment, run the following commands:
 
@@ -519,7 +523,7 @@ In Pegasus environment, run the following commands:
 
 When finished, you'll find execution time for each step in its log file ``/experiment/overall/1m_pegasus.log``.
 
-#### SCANPY
+##### SCANPY
 
 In SCANPY environment, run the following command:
 
@@ -530,7 +534,7 @@ In SCANPY environment, run the following command:
 
 When finished, you'll find execution time for each step in its log file ``/experiment/overall/1m_scanpy.log``.
 
-#### Seurat
+##### Seurat
 
 Seurat fails at loading data step. Users can try the following commands in R environment, and check out the error message:
 
@@ -539,7 +543,7 @@ Seurat fails at loading data step. Users can try the following commands in R env
 > adata <- Read10X("/data/1M_neurons.h5")
 ```
 
-## Benchmark on Workflows
+### Benchmark on Workflows
 
 The benchmark was performed on Google Cloud, with 32 CPUs under the default Haswell platform, and 120 GB memory. The dataset used is Manton Bone Marrow dataset. The analysis tasks performed are:
 
@@ -555,7 +559,7 @@ The benchmark was performed on Google Cloud, with 32 CPUs under the default Hasw
 
 Notice that Cumulus is the only one providing **Count matrix aggregation** feature.
 
-### Cumulus
+#### Cumulus
 
 Benchmark on Cumulus is done by running jobs on Terra via Cumulus WDL workflows. And its overall execution time includes all Terra or Google Cloud specific preprocessing and postprocessing phases.
 
@@ -563,7 +567,7 @@ To run it on Terra, please following [cumulus documentation](https://cumulus-doc
 
 Notice that you need to upload ``/data/MantonBM_nonmix.h5sc`` to the Google bucket of your workspace via [gsutil](https://cloud.google.com/storage/docs/gsutil), change parameters ``"cumulus.input_file"`` and ``"cumulus.output_name"`` in ``/experiment/cloud/inputs_32.cpu.json`` to your own, and upload this JSON file in **cumulus** workflow page in your workspace.
 
-### SCANPY
+#### SCANPY
 
 As SCANPY doesn't have a cloud-based interface, its benchmark is performed on a Google Cloud VM. Besides, since we used BBKNN for batch correction, SCANPY doesn't need to find kNN.
 
@@ -576,7 +580,7 @@ Similarly as benchmarks before, in SCANPY environment, run the following command
 
 When finished, you'll find execution time for each step in its log file ``/experiment/cloud/scanpy.log``.
 
-### Seurat
+#### Seurat
 
 Similarly as SCANPY, benchmark on Seurat is performed on a Google Cloud VM, and used as a single-server solution.
 

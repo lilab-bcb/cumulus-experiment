@@ -59,7 +59,7 @@ Otherwise, if you want to try Pegasus on your machine, please following its inst
 In terminal of your computer, type the following command to run our docker image as a docker container:
 
 ```
-docker run -it --rm --name my-experiment -v /path-to-output:/output cumulusprod:cumulus-experiment:19.11
+docker run -it --rm --name my-experiment -v /path-to-output:/output cumulusprod/cumulus-experiment:19.11
 ```
 
 where 

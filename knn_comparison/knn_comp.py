@@ -10,7 +10,7 @@ from joblib import Parallel, delayed
 from utils import str_time
 
 
-data_source = "/data/MantonBM_nonmix_corrected.h5ad"
+data_source = "/data/MantonBM_nonmix_pegasus.h5ad"
 
 time_stats_file = "time_stats.txt"
 

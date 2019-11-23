@@ -5,7 +5,6 @@ from sklearn.metrics.cluster import adjusted_mutual_info_score
 
 n_cores = os.cpu_count()
 data_src = "../MantonBM_nonmix_pegasus"
-out_name = "MantonBM_nonmix_pegasus"
 
 label_list = ['louvain', 'spectral_louvain', 'leiden', 'spectral_leiden']
 

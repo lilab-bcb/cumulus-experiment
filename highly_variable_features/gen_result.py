@@ -105,7 +105,7 @@ def compare_markers():
 
 def get_mutual_info():
 
-	cprint("Calculating AMI Score on Approximated Leiden Clustering Results between two methods...", "green")
+	cprint("Calculating AMI Score on Louvain Clustering Results between two methods...", "green")
 
 	adata = pg.read_input(seurat_correct_name + ".h5ad")
 	bdata = pg.read_input(pegasus_correct_name + ".h5ad")

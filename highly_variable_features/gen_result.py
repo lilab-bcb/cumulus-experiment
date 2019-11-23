@@ -111,7 +111,7 @@ def get_mutual_info():
 	bdata = pg.read_input(pegasus_correct_name + ".h5ad")
 
 	ami = adjusted_mutual_info_score(adata.obs['louvain_labels'], bdata.obs['louvain_labels'], average_method = 'arithmetic')
-	cprint("AMI = {:.4f}".format(ami))
+	cprint("AMI = {:.4f}".format(ami), "yellow")
 
 def plot_figures(processed):
 
@@ -122,7 +122,7 @@ def plot_figures(processed):
 		if os.system('pegasus plot scatter --basis fitsne --attributes louvain_labels {src}.h5ad /output/Figure_S1C_left.pdf'.format(src = seurat_correct_name)):
 			sys.exit(1)
 
-	if os.system('pegasus plot scatter --basis fitsne --attributes anno_louvain --wspace 1.2 --set-paletts "{palettes}" {src}.h5ad /output/Figure_S1C_right.pdf'.format(src = pegasus_correct_name, palettes = palettes_pegasus)):
+	if os.system('pegasus plot scatter --basis fitsne --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad /output/Figure_S1C_right.pdf'.format(src = pegasus_correct_name, palettes = palettes_pegasus)):
 		sys.exit(1)
 
 	if os.system("cp {src}.hvf.pdf /output/Figure_S1A.pdf".format(src = pegasus_correct_name)):

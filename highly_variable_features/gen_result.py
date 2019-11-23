@@ -18,39 +18,33 @@ anno_seurat = "1. CD4+ Naive T cells;2. CD14+ Monocytes;3. T helper cells;4. Cyt
 palettes_seurat = "#c5b0d5,#ff7f0e,#8c564b,#2ca02c,#ff9896,#dbdb8d,#1f77b4,#e377c2,#ffbb78,#9edae5,#aec7e8,#d62728,#98df8a,#9467bd,#c49c94,#ad494a,#f7b6d2,#bcbd22,#17becf,#8c6d31,#000000,#888888"
 palettes_pegasus = "#c5b0d5,#ff7f0e,#8c564b,#ff9896,#1f77b4,#dbdb8d,#e377c2,#2ca02c,#9edae5,#aec7e8,#ffbb78,#98df8a,#d62728,#9467bd,#c49c94,#f7b6d2,#bcbd22,#17becf,#ad494a,#8c6d31,#000000"
 
-def get_hvf(processed):
+def get_hvf():
+	cprint("Computing highly variable genes using Seurat method with precalculated PCA...", "green")
+	adata =pg.read_input(src_file)
+	pg.qc_metrics(adata)
+	pg.filter_data(adata)
+	pg.log_norm(adata)
+	pg.highly_variable_features(adata, consider_batch = True, flavor = 'Seurat')
+	pg.correct_batch(adata, features = "highly_variable_features")
 
-	if processed == 'raw':
-		cprint("Computing highly variable genes using Seurat method...", "green")
-		if os.system("pegasus cluster -p {jobs} --correct-batch-effect --select-hvf-flavor Seurat --louvain --fitsne {src} {outname}".format(jobs = n_cores, src = src_file, outname = seurat_correct_name)):
-			sys.exit(1)
-	else:
-		cprint("Computing highly variable genes using Seurat method with precalculated PCA...", "green")
-		adata =pg.read_input(src_file)
-		pg.qc_metrics(adata)
-		pg.filter_data(adata)
-		pg.log_norm(adata)
-		pg.highly_variable_features(adata, consider_batch = True, flavor = 'Seurat')
-		pg.correct_batch(adata, features = "highly_variable_features")
+	cprint("Set precalculated PCA info...", "green")
+	adata.obsm['X_pca'] = np.load("/data/precalculated/seurat_hvf/pca.npy")
+	adata.uns['PCs'] = np.load("/data/precalculated/seurat_hvf/PCs.npy")
+	adata.uns['pca'] = {}
+	adata.uns['pca']['variance'] = np.load("/data/precalculated/seurat_hvf/pca_variance.npy")
+	adata.uns['pca']['variance_ratio'] = np.load("/data/precalculated/seurat_hvf/pca_variance_ratio.npy")
 
-		cprint("Set precalculated PCA info...", "green")
-		adata.obsm['X_pca'] = np.load("/data/precalculated/seurat_hvf/pca.npy")
-		adata.uns['PCs'] = np.load("/data/precalculated/seurat_hvf/PCs.npy")
-		adata.uns['pca'] = {}
-		adata.uns['pca']['variance'] = np.load("/data/precalculated/seurat_hvf/pca_variance.npy")
-		adata.uns['pca']['variance_ratio'] = np.load("/data/precalculated/seurat_hvf/pca_variance_ratio.npy")
+	pg.neighbors(adata)
 
-		pg.neighbors(adata)
+	pg.write_output(adata, seurat_correct_name)
+	del adata
 
-		pg.write_output(adata, seurat_correct_name)
-		del adata
-
-		cprint("Clustering...", "green")
-		if os.system("pegasus cluster -p {jobs} --processed --louvain --fitsne {src} {outname}".format(jobs = n_cores, src = seurat_correct_name + '.h5ad', outname = seurat_correct_name)):
-			sys.exit(1)
+	cprint("Clustering...", "green")
+	if os.system("pegasus cluster -p {jobs} --processed --louvain --fitsne {src} {outname}".format(jobs = n_cores, src = seurat_correct_name + '.h5ad', outname = seurat_correct_name)):
+		sys.exit(1)
 
 
-def annotate_data(processed):
+def annotate_data():
 	cprint("Annotating Cells for {name}...".format(name = seurat_correct_name), "green")
 
 	if os.system("pegasus de_analysis -p {jobs} --labels louvain_labels --t {name}.h5ad {name}.de.xlsx".format(jobs = n_cores, name = seurat_correct_name)):
@@ -59,11 +53,10 @@ def annotate_data(processed):
 	if os.system("pegasus annotate_cluster {name}.h5ad {name}.anno.txt".format(name = seurat_correct_name)):
 		sys.exit(1)
 
-	if processed == 'processed':
-		adata = pg.read_input(seurat_correct_name + '.h5ad')
-		anno_dict = {str(i + 1): x for i, x in enumerate(anno_seurat.split(";"))}
-		pg.annotate(adata, 'anno', 'louvain_labels', anno_dict)
-		pg.write_output(adata, seurat_correct_name)
+	adata = pg.read_input(seurat_correct_name + '.h5ad')
+	anno_dict = {str(i + 1): x for i, x in enumerate(anno_seurat.split(";"))}
+	pg.annotate(adata, 'anno', 'louvain_labels', anno_dict)
+	pg.write_output(adata, seurat_correct_name)
 
 
 def compare_markers():
@@ -114,14 +107,10 @@ def get_mutual_info():
 	ami = adjusted_mutual_info_score(adata.obs['louvain_labels'], bdata.obs['louvain_labels'], average_method = 'arithmetic')
 	cprint("AMI = {:.4f}".format(ami), "yellow")
 
-def plot_figures(processed):
+def plot_figures():
 
-	if processed == 'processed':
-		if os.system('pegasus plot scatter --basis fitsne --attributes anno --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad /output/Figure_S1C_left.pdf'.format(src = seurat_correct_name, palettes = palettes_seurat)):
-			sys.exit(1)
-	else:
-		if os.system('pegasus plot scatter --basis fitsne --attributes louvain_labels {src}.h5ad /output/Figure_S1C_left.pdf'.format(src = seurat_correct_name)):
-			sys.exit(1)
+	if os.system('pegasus plot scatter --basis fitsne --attributes anno --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad /output/Figure_S1C_left.pdf'.format(src = seurat_correct_name, palettes = palettes_seurat)):
+		sys.exit(1)
 
 	if os.system('pegasus plot scatter --basis fitsne --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad /output/Figure_S1C_right.pdf'.format(src = pegasus_correct_name, palettes = palettes_pegasus)):
 		sys.exit(1)
@@ -131,15 +120,13 @@ def plot_figures(processed):
 
 
 if __name__ == '__main__':
-	processed = sys.argv[1]
-	assert processed in ['processed', 'raw']
 	f_list = [f for f in os.listdir('.') if f in [seurat_correct_name + '.h5ad']]
 	if len(f_list) != 1:
-		get_hvf(processed)
-		annotate_data(processed)
+		get_hvf()
+		annotate_data()
 
 	compare_markers()
 	get_mutual_info()
 
-	plot_figures(processed)
+	plot_figures()
 

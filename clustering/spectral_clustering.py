@@ -42,8 +42,10 @@ if __name__ == '__main__':
 	if os.system("pegasus annotate_cluster {name}.h5ad {name}.anno.txt".format(name = data_dst)):
 		sys.exit(1)
 
-	if os.system('pegasus annotate_cluster --annotation "anno:{label}:{anno}" {src}.h5ad'.format(label = spectral_label, anno = anno_str, src = data_dst)):
-		sys.exit(1)
+	adata = pg.read_input(data_src + '.h5ad')
+	anno_dict = {str(i + 1): x for i, x in enumerate(anno_str.split(";"))}
+	pg.annotate(adata, 'anno', spectral_label, anno_dict)
+	pg.write_output(adata, data_dst)
 
 	if os.system('pegasus plot scatter --basis fitsne --attributes anno --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad /output/Figure_S5A_left.pdf'.format(palettes = palettes_spectral, src = data_dst)):
 		sys.exit(1)

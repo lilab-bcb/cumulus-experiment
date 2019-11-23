@@ -26,7 +26,7 @@ def get_hvf(processed):
 			sys.exit(1)
 	else:
 		cprint("Computing highly variable genes using Seurat method with precalculated PCA...", "green")
-		adata =pg.read(src_file)
+		adata =pg.read_input(src_file)
 		pg.qc_metrics(adata)
 		pg.filter_data(adata)
 		pg.log_norm(adata)

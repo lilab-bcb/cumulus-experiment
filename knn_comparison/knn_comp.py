@@ -73,7 +73,7 @@ def get_NN_scanpy(data, K = 100):
 	f_list = [f for f in os.listdir('.') if f == 'scanpy_indices.npy']
 
 	if len(f_list) == 0:
-		cprint("Calculating KNN with scanpy algorithm...", "yellow")
+		cprint("Calculating KNN with SCANPY algorithm...", "yellow")
 		from umap.umap_ import nearest_neighbors
 		from numpy.random import RandomState
 		rs = RandomState(0)
@@ -81,11 +81,11 @@ def get_NN_scanpy(data, K = 100):
 		knn_indices, knn_distances, _ = nearest_neighbors(data.obsm['X_pca'], K, random_state = rs, metric = 'euclidean', metric_kwds = {}, angular = False, verbose = False)
 		end_scanpy = time.time()
 		cprint("Finished!", "yellow")
-		cprint("Time used for scanpy: " + str_time(end_scanpy - start_scanpy) + ".")
+		cprint("Time used for SCANPY: " + str_time(end_scanpy - start_scanpy) + ".", "yellow")
 		np.save('scanpy_indices.npy', knn_indices)
 		cprint("Results are saved!", "yellow")
 	else:
-		cprint("Loading pre-calculated scanpy results...", "yellow")
+		cprint("Loading pre-calculated SCANPY results...", "yellow")
 		knn_indices = np.load('scanpy_indices.npy')
 
 	return knn_indices
@@ -123,7 +123,7 @@ def calc_recall_for_one_datapoint(idx, knn_indices, baseline_indices, debug = Fa
 
 	return num_correct / num_total
 
-def generate_knn_recall_dataframe(method, knn_indices, baseline_indices, K = 100, n_jobs = 8, temp_folder = None):
+def generate_knn_recall_dataframe(method, knn_indices, baseline_indices, K = 100, n_jobs = 1, temp_folder = None):
 
 	f_list = [f for f in os.listdir('.') if f == "{}_recall.npy".format(method)]
 

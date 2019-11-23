@@ -71,6 +71,7 @@ def compare_markers():
 	cprint("Loading list of immune genes...", "green")
 	df_ground = pd.read_csv(immune_gene_file)
 	markers = df_ground['gene'].values
+	cprint("In total, {} genes are used for this comparison.".format(markers.shape[0]), "yellow")
 
 	cprint("Processing Seurat HVF selection...", "green")
 	adata = pg.read_input(seurat_correct_name + ".h5ad")

@@ -42,7 +42,7 @@ if __name__ == '__main__':
 	if os.system("pegasus annotate_cluster {name}.h5ad {name}.anno.txt".format(name = data_dst)):
 		sys.exit(1)
 
-	adata = pg.read_input(data_src + '.h5ad')
+	adata = pg.read_input(data_dst + '.h5ad')
 	anno_dict = {str(i + 1): x for i, x in enumerate(anno_str.split(";"))}
 	pg.annotate(adata, 'anno', spectral_label, anno_dict)
 	pg.write_output(adata, data_dst)

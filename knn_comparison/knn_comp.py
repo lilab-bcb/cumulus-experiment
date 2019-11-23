@@ -14,6 +14,8 @@ data_source = "../MantonBM_nonmix_pegasus.h5ad"
 
 time_stats_file = "time_stats.txt"
 
+n_cores = os.cpu_count()
+
 
 def get_NN_brute(data, num_threads = 8, K = 100):
 	f_list = [f for f in os.listdir('.') if f == 'baseline_indices.npy']
@@ -215,17 +217,17 @@ if __name__ == '__main__':
 
 			# For pegasus
 			knn_indices = get_NN_pegasus(None)
-			df_pegasus = generate_knn_recall_dataframe('Pegasus', knn_indices, baseline_indices)
+			df_pegasus = generate_knn_recall_dataframe('Pegasus', knn_indices, baseline_indices, n_jobs = n_cores)
 			df_list.append(df_pegasus)
 
 			# For scanpy
 			knn_indices = get_NN_scanpy(None)
-			df_scanpy = generate_knn_recall_dataframe('SCANPY', knn_indices, baseline_indices)
+			df_scanpy = generate_knn_recall_dataframe('SCANPY', knn_indices, baseline_indices, n_jobs = n_cores)
 			df_list.append(df_scanpy)
 
 			# For seurat
 			knn_indices = get_NN_Seurat(None)
-			df_seurat = generate_knn_recall_dataframe('Seurat v3', knn_indices, baseline_indices)
+			df_seurat = generate_knn_recall_dataframe('Seurat v3', knn_indices, baseline_indices, n_jobs = n_cores)
 			df_list.append(df_seurat)
 	
 			plot_result(df_list)

@@ -22,7 +22,7 @@ def run_spectral(data, rep_key, n_clusters, K = 100, n_jobs = 1, random_state = 
 	km = KMeans(n_clusters = n_clusters, n_jobs = n_jobs, random_state = random_state)
 	km.fit(X)
 
-	data.obs[spectral_label] = (km.labels_.astype('int') + 1).astype('str').astype('category')
+	data.obs[spectral_label] = pd.Categorical((km.labels_.astype('int') + 1).astype('str'))
 
 
 if __name__ == '__main__':

@@ -60,7 +60,7 @@ def annotate_data(processed):
 		sys.exit(1)
 
 	if processed == 'processed':
-		adata = pg.read(seurat_correct_name + '.h5ad')
+		adata = pg.read_input(seurat_correct_name + '.h5ad')
 		anno_dict = {str(i + 1): x for i, x in enumerate(anno_seurat.split(";"))}
 		pg.annotate(adata, 'anno', 'louvain_labels', anno_dict)
 		pg.write_output(adata, seurat_correct_name)

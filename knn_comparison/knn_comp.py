@@ -119,7 +119,7 @@ def calc_recall_for_one_datapoint(idx, knn_indices, baseline_indices, debug = Fa
 			num_correct += 1
 
 	if debug:
-		print("Among {total} NN's, {consistent} are consistent with baseline result.".format(total = num_total, consistent = num_correct))
+		print("For point {index}: Among {total} NN's, {consistent} are consistent with baseline result.".format(index = idx, total = num_total, consistent = num_correct))
 
 	return num_correct / num_total
 

@@ -186,7 +186,7 @@ root# source activate pegasus-env
 Then execute
 
 ```
-(pegasus-env) root# python generate_data_info.py MantonBM processed
+(pegasus-env) root# python generate_data_info.py MantonBM
 ```
 
 to get all the necessary data for experiment on Manton Bone Marrow dataset.
@@ -212,10 +212,19 @@ First, enter the experiment subfolder:
 Then execute the experiment:
 
 ```
-(pegasus-env) root# python gen_result.py processed
+(pegasus-env) root# python gen_result.py
 ```
 
-When finished, you'll find the figures generated in ``/output``, and CSV files containing markers in the current folder.
+When finished, you'll find the figures generated in ``/output``, and CSV files containing markers in the current folder. Besides, lists of markers convered by different highly variable feature selection methods are in the following files under folder ``/experiment/highly_variable_features``:
+
+| File | Description |
+|------|-------------|
+| ``immune_genes.txt`` | Total list of marker genes for comparison. |
+| ``pegasus_markers.txt`` | Marker genes covered by Pegasus HVF selection method. |
+| ``pegasus_specific.txt`` | Marker genes covered ONLY by Pegasus HVF selection method. |
+| ``seurat_markers.txt`` | Marker genes covered by Seurat HVF selection method. |
+| ``seurat_specific.txt`` | Marker genes covered ONLY by Seurat HVF selection method. |
+| ``common_markers.txt`` | Marker genes covered by both methods. |
 
 ### Experiment on Batch Correction
 

@@ -17,10 +17,12 @@ fig_index = {
 	'net_fle'  : 'Figure_S6B_right'
 }
 
+palettes_str = "#c5b0d5,#ff7f0e,#8c564b,#ff9896,#1f77b4,#dbdb8d,#e377c2,#2ca02c,#9edae5,#aec7e8,#ffbb78,#98df8a,#d62728,#9467bd,#c49c94,#f7b6d2,#bcbd22,#17becf,#ad494a,#8c6d31,#000000"
+
 def calc_and_plot(in_file):
 
 	for basis in basis_list:
-		if os.system("pegasus plot scatter --basis {basis} --attributes anno_louvain {src}.h5ad /output/{dst}.pdf".format(basis = basis, src = in_file, dst = fig_index[basis])):
+		if os.system('pegasus plot scatter --basis {basis} --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad /output/{dst}.pdf'.format(basis = basis, palettes = palettes_str, src = in_file, dst = fig_index[basis])):
 			sys.exit(1)
 
 

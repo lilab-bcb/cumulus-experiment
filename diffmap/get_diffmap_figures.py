@@ -71,8 +71,9 @@ def gen_fig_s4a():
     ndc_list = [(15, 'left'), (50, 'center'), (100, 'right')]
     
     for ndc, position in ndc_list:
+        cprint("Processing Diffusion Map with nDC = {}...".format(ndc), "green")
         outname = "MantonBM_nonmix_ndc_{}_t_neg_one".format(ndc)
-        if not os.path.exists(outname):
+        if not os.path.exists(outname + '.h5ad'):
             adata = pg.read_input(pegasus_src + '.h5ad')
             pg.diffmap(adata, n_components = ndc, max_t = -1)
             pg.fle(adata)

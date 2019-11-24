@@ -53,5 +53,5 @@ if __name__ == '__main__':
 	adata = pg.read_input(data_dst + '.h5ad')
 	cprint("Calculating AMI...", "green")
 	ami_spectral_vs_louvain = adjusted_mutual_info_score(adata.obs[spectral_label], adata.obs['louvain_labels'], average_method = 'arithmetic')
-	cprint("AMI between {label} and louvain_labels: {ami:.2f}.".format(label = spectral_label, ami = ami_louvain), "yellow")
+	cprint("AMI between {label} and louvain_labels: {ami:.2f}.".format(label = spectral_label, ami = ami_spectral_vs_louvain), "yellow")
 	

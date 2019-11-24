@@ -71,7 +71,7 @@ def gen_fig_s4a():
     ndc_list = [(15, 'left'), (50, 'center'), (100, 'right')]
     
     for ndc, position in ndc_list:
-        adata = pg.read_input(pegasus_src)
+        adata = pg.read_input(pegasus_src + '.h5ad')
         pg.diffmap(adata, n_components = ndc, max_t = -1)
         pg.fle(adata)
         pg.write_output(adata, "MantonBM_nonmix_ndc_{}_t_neg_one".format(ndc))

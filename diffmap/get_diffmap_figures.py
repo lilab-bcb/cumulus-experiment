@@ -80,7 +80,7 @@ def gen_fig_s4a():
         pg.annotate(adata, 'anno_louvain', 'louvain_labels', anno_dict)
         pg.write_output(adata, "MantonBM_nonmix_ndc_{}_t_neg_one".format(ndc))
 
-        if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" MantonBM_nonmix_ndc_{num}_t_neg_one.h5ad /output/Figure_S4A_{pos}.pdf'.format(palettes = palette_diffmap, pos = position)):
+        if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" MantonBM_nonmix_ndc_{num}_t_neg_one.h5ad /output/Figure_S4A_{pos}.pdf'.format(palettes = palette_diffmap, num = ndc, pos = position)):
             sys.exit(1)
 
 

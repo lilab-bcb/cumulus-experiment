@@ -71,12 +71,14 @@ def gen_fig_s4a():
     ndc_list = [(15, 'left'), (50, 'center'), (100, 'right')]
     
     for ndc, position in ndc_list:
-        adata = pg.read_input(pegasus_src + '.h5ad')
-        pg.diffmap(adata, n_components = ndc, max_t = -1)
-        pg.fle(adata)
-        pg.write_output(adata, "MantonBM_nonmix_ndc_{}_t_neg_one".format(ndc))
+        outname = "MantonBM_nonmix_ndc_{}_t_neg_one".format(ndc)
+        if not os.path.exists(outname):
+            adata = pg.read_input(pegasus_src + '.h5ad')
+            pg.diffmap(adata, n_components = ndc, max_t = -1)
+            pg.fle(adata)
+            pg.write_output(adata, outname)
 
-        if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" MantonBM_nonmix_ndc_{num}_t_neg_one.h5ad /output/Figure_S4A_{pos}.pdf'.format(palettes = palette_diffmap, num = ndc, pos = position)):
+        if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad /output/Figure_S4A_{pos}.pdf'.format(palettes = palette_diffmap, src = outname, pos = position)):
             sys.exit(1)
 
 
@@ -87,7 +89,7 @@ def gen_fig_s4b():
     plot_curve(t_arr, entropy_arr, knee_pt)
 
 def gen_fig_2b():
-    if os.system("cp Figure_S4A_right.pdf /output/Figure_2B_left.pdf"):
+    if os.system("cp /output/Figure_S4A_right.pdf /output/Figure_2B_left.pdf"):
         sys.exit(1)
 
     if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad /output/Figure_2B_right.pdf'.format(palettes = palette_diffmap, src = pegasus_src)):

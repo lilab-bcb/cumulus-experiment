@@ -20,7 +20,6 @@ outname = "MantonBM_pegasus_output"
 n_cores = os.cpu_count()
 
 palette_diffmap = "#c5b0d5,#ff7f0e,#8c564b,#ff9896,#1f77b4,#dbdb8d,#e377c2,#2ca02c,#9edae5,#aec7e8,#ffbb78,#98df8a,#d62728,#9467bd,#c49c94,#f7b6d2,#bcbd22,#17becf,#ad494a,#8c6d31,#000000"
-anno_str = "1. CD4+ Naive T cells;2. CD14+ Monocytes;3. T helper cells;4. Naive B cells;5. Cytotoxic T cells;6. CD8+ Naive T cells;7. NK cells;8. Cytotoxic T cells;9. Erythrocytes;10. Memory B cells;11. CD14+ Monocytes;12. Pre B cells;13. HSCs;14. cDCs;15. CD16+ Monocytes;16. Pro B cells;17. pDCs;18. Plasma cells;19. Erythrocytes;20. Megakaryocytes;21. MSCs"
 
 def get_entropy(W: "csr_matrix", n_components: int = 100, solver: str = 'eigsh', random_state: int = 0, max_t: int = 5000):
     cprint("Calculate coordinates:", "yellow")
@@ -72,12 +71,9 @@ def gen_fig_s4a():
     ndc_list = [(15, 'left'), (50, 'center'), (100, 'right')]
     
     for ndc, position in ndc_list:
-        if os.system("pegasus cluster -p {jobs} --correct-batch-effect --diffmap-ndc {num} --diffmap-maxt -1 --louvain --fle {src} MantonBM_nonmix_ndc_{num}_t_neg_one".format(jobs = n_cores, num = ndc, src = src_file)):
-            sys.exit(1)
-
-        adata = pg.read_input("MantonBM_nonmix_ndc_{}_t_neg_one.h5ad".format(ndc))
-        anno_dict = {str(i + 1): x for i, x in enumerate(anno_str.split(";"))}
-        pg.annotate(adata, 'anno_louvain', 'louvain_labels', anno_dict)
+        adata = pg.read_input(pegasus_src)
+        pg.diffmap(adata, n_components = ndc, max_t = -1)
+        pg.fle(adata)
         pg.write_output(adata, "MantonBM_nonmix_ndc_{}_t_neg_one".format(ndc))
 
         if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" MantonBM_nonmix_ndc_{num}_t_neg_one.h5ad /output/Figure_S4A_{pos}.pdf'.format(palettes = palette_diffmap, num = ndc, pos = position)):

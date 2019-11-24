@@ -1,5 +1,6 @@
 import os, sys
 import pegasus as pg
+from termcolor import cprint
 
 n_cores = os.cpu_count()
 

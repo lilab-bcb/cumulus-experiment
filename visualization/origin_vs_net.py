@@ -31,7 +31,7 @@ def measure_algorithms(adata):
 
 	for basis in basis_list:
 		ksim, ac_rate = pg.calc_kSIM(adata, attr = 'louvain_labels', rep = basis, n_jobs = n_cores)
-		print("For {basis}, kSIM is {ksim:.4f}, accept rate is {ac_rate:.4f}.".format(basis = basis, ksim = ksim, ac_rate = ac_rate))
+		cprint("For {basis}, kSIM is {ksim:.4f}, accept rate is {ac_rate:.4f}.".format(basis = basis, ksim = ksim, ac_rate = ac_rate), "yellow")
 
 def net_umap_phase_plots(adata):
 	cprint("Generate phase plots for Net UMAP...", "green")
@@ -41,11 +41,11 @@ def net_umap_phase_plots(adata):
 	bdata.obsm['X_net_umap_init'] = bdata.uns['X_net_umap_small']
 	pg.write_output(bdata, "net_umap_init")
 
-	if os.system("pegasus plot scatter --basis net_umap_init --attributes louvain_labels net_umap_init.h5ad /output/Figure_2C_left.pdf"):
+	if os.system('pegasus plot scatter --basis net_umap_init --attributes louvain_labels --set-palettes "{palettes}" net_umap_init.h5ad /output/Figure_2C_left.pdf'.format(palettes = palettes_str)):
 		sys.exit(1)
 
 	# Predict plot
-	if os.system("pegasus plot scatter --basis net_umap_pred --attributes louvain_labels {src}.h5ad /output/Figure_2C_center.pdf".format(src = data_src)):
+	if os.system('pegasus plot scatter --basis net_umap_pred --attributes louvain_labels --set-palettes "{palettes}" {src}.h5ad /output/Figure_2C_center.pdf'.format(src = data_src, palettes = palettes_str)):
 		sys.exit(1)
 
 

@@ -256,16 +256,11 @@ Enter the folder for generating ground truth information, and execute the script
 
 This will generate a file containing ground truth of cell types (``ground_cell_types.txt``) in folder ``/experiment/batch_correction``.
 
+Notice that we use PCA coordinates precalculated on our server, so that the clustering result and ground truth are consistent with those shown in the paper.
+
 #### Benchmark on Baseline Method
 
-The baseline is running Pegasus clustering without batch correction. In Pegasus environment, run the following commands:
-
-```
-(pegasus-env) root# cd /experiment/batch_correction/baseline
-(pegasus-env) root# python run_baseline.py
-```
-
-When finished, you'll have a result file ``baseline_result.h5ad`` in the current folder.
+The baseline is running Pegasus clustering without batch correction. It's already done above, and result is stored as ``/experiment/batch_correction/ground/ground.h5ad``.
 
 #### Benchmark on Pegasus Batch Correction Method
 

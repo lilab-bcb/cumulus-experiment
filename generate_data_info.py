@@ -11,7 +11,7 @@ neuron_data_source = "/data/1M_neurons.h5"
 
 bm_full_out_name = "MantonBM_nonmix_pegasus"
 
-def extract_hvf(input_file):
+def extract_hvf(input_file, get_pca_knn):
 
 	fname_prefix = os.path.splitext(input_file)[0]
 
@@ -30,12 +30,13 @@ def extract_hvf(input_file):
 	df_hvf.to_csv(fname_prefix + "_hvf.txt", index_label = "index")
 
 	# PCA and KNN
-	pg.pca(adata)
-	pg.neighbors(adata)
-	pg.write_output(adata, fname_prefix + "_corrected")
+	if get_pca_knn:
+		pg.pca(adata)
+		pg.neighbors(adata)
+		pg.write_output(adata, fname_prefix + "_corrected")
 
-	bdata = adata[:, adata.var['highly_variable_features']].copy()
-	pg.write_output(bdata, fname_prefix + "_corrected_hvf")
+		bdata = adata[:, adata.var['highly_variable_features']].copy()
+		pg.write_output(bdata, fname_prefix + "_corrected_hvf")
 
 def preprocess_data(in_file, has_pca):
 
@@ -175,15 +176,13 @@ if __name__ == '__main__':
 	assert dataset in ['MantonBM', '1M_neurons']
 
 	if dataset == 'MantonBM':
-		extract_hvf(bm_full_data_source)
+		extract_hvf(bm_full_data_source, get_pca_knn = True)
 		preprocess_data(bm_full_data_source, has_pca = True)
 
-		if os.system("cp {src}_hvf.txt {dst}_hvf.txt".format(src = os.path.splitext(bm_full_data_source)[0], dst = os.path.splitext(bm_tiny_data_source)[0])):
-			sys.exit(1)
-
+		extract_hvf(bm_tiny_data_source, get_pca_knn = False)
 		preprocess_data(bm_tiny_data_source, has_pca = True)
 
 		run_pegasus_process()
 	else:
-		extract_hvf(neuron_data_source)
+		extract_hvf(neuron_data_source, get_pca_knn = True)
 		preprocess_data(neuron_data_source, has_pca = False)

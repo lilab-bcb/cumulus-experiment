@@ -14,7 +14,6 @@ from termcolor import cprint
 from pegasus.tools import update_rep, W_from_rep
 from pegasus.tools.diffusion_map import calculate_normalized_affinity, calc_von_neumann_entropy, find_knee_point
 
-src_file = "/data/MantonBM_nonmix.h5sc"
 pegasus_src = "../MantonBM_nonmix_pegasus"
 outname = "MantonBM_pegasus_output"
 n_cores = os.cpu_count()

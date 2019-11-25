@@ -78,6 +78,7 @@ def gen_fig_s4a():
             pg.diffmap(adata, n_components = ndc, max_t = -1)
             pg.fle(adata)
             pg.write_output(adata, outname)
+            del adata
 
         if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad /output/Figure_S4A_{pos}.pdf'.format(palettes = palette_diffmap, src = outname, pos = position)):
             sys.exit(1)

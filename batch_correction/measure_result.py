@@ -34,24 +34,20 @@ palettes_cluster = "#1d6cab,#ff7410,#279627,#d02324,#875bb2,#814c42,#df6cba,#b4b
 
 def process_baseline():
 	cprint("For pegasus with no batch correction:", "red")
-	f_list = [f for f in os.listdir("./baseline") if f in ["baseline_result.h5ad"]]
-	if len(f_list) != 1:
-		cprint("No processed data are found! Processing data using pegasus without batch correction...", "green")
-		if os.system("cd ./baseline/ && python run_baseline.py && cd .."):
-			sys.exit(1)
+	if not os.path.exists("./ground/ground.h5ad"):
+		cprint("No processed data are found! Please first process data using pegasus without batch correction.", "red")
+		sys.exit(1)
 
 	cprint("Loading processed data...", "green")
-	adata = pg.read_input('./baseline/baseline_result.h5ad')
+	adata = pg.read_input('./ground/ground.h5ad')
 
 	process_data(adata, method = 'baseline', processed = True)
 
 def process_pegasus():
 	cprint("For pegasus:", "red")
-	f_list = [f for f in os.listdir("./pegasus") if f in ["tiny_pegasus_corrected.h5ad"]]
-	if len(f_list) != 1:
-		cprint("No corrected data are found! Correcting data using pegasus...", "green")
-		if os.system("cd ./pegasus/ && python run_pegasus_batch_correct.py && cd .."):
-			sys.exit(1)
+	if not os.path.exists("./pegasus/pegasus_corrected.h5ad"):
+		cprint("No corrected data are found! Please first correct data using pegasus.", "red")
+		sys.exit(1)
 
 	cprint("Loading corrected data...", "green")
 	adata = pg.read_input('./pegasus/pegasus_corrected.h5ad')
@@ -60,9 +56,8 @@ def process_pegasus():
 
 def process_mnn():
 	cprint("For MNN:", "red")
-	f_list = [f for f in os.listdir("./mnn") if f in ["scanpy_mnn_corrected.h5ad"]]
-	if len(f_list) != 1:
-		cprint("No corrected data are found!", "red")
+	if not os.path.exists("./mnn/scanpy_mnn_corrected.h5ad"):
+		cprint("No corrected data are found! Please first correct data using MNN.", "red")
 		sys.exit(1)
 
 	cprint("Loading corrected data...", "green")
@@ -78,7 +73,8 @@ def process_seurat():
 	cprint("For Seurat:", "red")
 	f_list = [f for f in os.listdir("./seurat") if f in ["matrix.mtx", "genes.txt", "barcodes.txt"]]
 	if len(f_list) != 3:
-		cprint("No corrected data are found!", "red")
+		cprint("No corrected data are found! Please first correct data using Seurat CCA.", "red")
+		sys.exit(1)
 
 	cprint("Loading gene expression...", "green")
 	adata = read_mtx("./seurat/matrix.mtx")
@@ -99,9 +95,9 @@ def process_seurat():
 
 def process_combat():
 	cprint("For ComBat:", "red")
-	f_list = [f for f in os.listdir("./combat") if f in ["scanpy_combat_corrected.h5ad"]]
-	if len(f_list) != 1:
-		cprint("No corrected data are found!", "red")
+	if not os.path.exists("./combat/scanpy_combat_corrected.h5ad"):
+		cprint("No corrected data are found! Please first correct data using ComBat.", "red")
+		sys.exit(1)
 
 	cprint("Loading corrected data...", "green")
 	adata = pg.read_input('./combat/scanpy_combat_corrected.h5ad')
@@ -110,9 +106,9 @@ def process_combat():
 
 def process_bbknn():
 	cprint("For BBKNN:", "red")
-	f_list = [f for f in os.listdir("./bbknn") if f in ["scanpy_bbknn_corrected.h5ad"]]
-	if len(f_list) != 1:
-		cprint("No corredted data are found!", "red")
+	if not os.path.exists("./bbknn/scanpy_bbknn_corrected.h5ad"):
+		cprint("No corredted data are found! Please first correct data using BBKNN.", "red")
+		sys.exit(1)
 
 	cprint("loading corrected data...", "green")
 	adata = pg.read_input("./bbknn/scanpy_bbknn_corrected.h5ad")

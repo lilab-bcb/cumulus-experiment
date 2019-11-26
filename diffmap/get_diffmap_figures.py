@@ -15,6 +15,7 @@ from pegasus.tools import update_rep, W_from_rep
 from pegasus.tools.diffusion_map import calculate_normalized_affinity, calc_von_neumann_entropy, find_knee_point
 
 pegasus_src = "/data/MantonBM_nonmix.h5sc"
+pegasus_result = "../MantonBM_nonmix_pegasus.h5ad"
 outname = "MantonBM_pegasus_output"
 n_cores = os.cpu_count()
 
@@ -107,7 +108,7 @@ def gen_fig_s4a():
 
 def gen_fig_s4b():
     rep = update_rep("pca")
-    adata = pg.read_input("{}.h5ad".format(pegasus_src))
+    adata = pg.read_input(pegasus_result)
     t_arr, entropy_arr, knee_pt = get_entropy(W_from_rep(adata, rep))
     plot_curve(t_arr, entropy_arr, knee_pt)
 
@@ -115,7 +116,7 @@ def gen_fig_2b():
     if os.system("cp /output/Figure_S4A_right.pdf /output/Figure_2B_left.pdf"):
         sys.exit(1)
 
-    if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" {src}.h5ad /output/Figure_2B_right.pdf'.format(palettes = palette_diffmap, src = pegasus_src)):
+    if os.system('pegasus plot scatter --basis fle --attributes anno_louvain --wspace 1.2 --set-palettes "{palettes}" {src} /output/Figure_2B_right.pdf'.format(palettes = palette_diffmap, src = pegasus_result)):
         sys.exit(1)
 
 if __name__ == '__main__':

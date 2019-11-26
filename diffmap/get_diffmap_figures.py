@@ -14,10 +14,11 @@ from termcolor import cprint
 from pegasus.tools import update_rep, W_from_rep
 from pegasus.tools.diffusion_map import calculate_normalized_affinity, calc_von_neumann_entropy, find_knee_point
 
-pegasus_src = "../MantonBM_nonmix_pegasus"
+pegasus_src = "/data/MantonBM_nonmix.h5sc"
 outname = "MantonBM_pegasus_output"
 n_cores = os.cpu_count()
 
+anno_str_louvain = "1. CD4+ Naive T cells;2. CD14+ Monocytes;3. T helper cells;4. Naive B cells;5. Cytotoxic T cells;6. CD8+ Naive T cells;7. NK cells;8. Cytotoxic T cells;9. Erythrocytes;10. Memory B cells;11. CD14+ Monocytes;12. Pre B cells;13. HSCs;14. cDCs;15. CD16+ Monocytes;16. Pro B cells;17. pDCs;18. Plasma cells;19. Erythrocytes;20. Megakaryocytes;21. MSCs"
 palette_diffmap = "#c5b0d5,#ff7f0e,#8c564b,#ff9896,#1f77b4,#dbdb8d,#e377c2,#2ca02c,#9edae5,#aec7e8,#ffbb78,#98df8a,#d62728,#9467bd,#c49c94,#f7b6d2,#bcbd22,#17becf,#ad494a,#8c6d31,#000000"
 
 def get_entropy(W: "csr_matrix", n_components: int = 100, solver: str = 'eigsh', random_state: int = 0, max_t: int = 5000):
@@ -73,9 +74,30 @@ def gen_fig_s4a():
         cprint("Processing Diffusion Map with nDC = {}...".format(ndc), "green")
         outname = "MantonBM_nonmix_ndc_{}_t_neg_one".format(ndc)
         if not os.path.exists(outname + '.h5ad'):
-            adata = pg.read_input(pegasus_src + '.h5ad')
+            adata = pg.read_input(pegasus_src)
+            pg.qc_metrics(adata)
+            pg.filter_data(adata)
+            pg.log_norm(adata)
+            pg.highly_variable_features(adata, consider_batch = True)
+            pg.correct_batch(adata, features = "highly_variable_features")
+
+            # Load precalculated PCA
+            cprint("Set precalculated PCA info...", "green")
+            adata.obsm['X_pca'] = np.load("/data/precalculated/pegasus/pca.npy")
+            adata.uns['PCs'] = np.load("/data/precalculated/pegasus/PCs.npy")
+            adata.uns['pca'] = {}
+            adata.uns['pca']['variance'] = np.load("/data/precalculated/pegasus/pca_variance.npy")
+            adata.uns['pca']['variance_ratio'] = np.load("/data/precalculated/pegasus/pca_variance_ratio.npy")
+
+            pg.neighbors(adata)
+
             pg.diffmap(adata, n_components = ndc, max_t = -1)
+            pg.louvain(adata)
             pg.fle(adata)
+
+            anno_dict = {str(i + 1): x for i, x in enumerate(anno_str_louvain.split(";"))}
+            pg.annotate(adata, 'anno_louvain', 'louvain_labels', anno_dict)
+
             pg.write_output(adata, outname)
             del adata
 

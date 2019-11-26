@@ -103,7 +103,7 @@ def annotate_cell_types(label_list):
 		anno_dict = {str(i + 1): x for i, x in enumerate(anno_str.split(";"))}
 		pg.annotate(adata, 'anno_{}'.format(label), '{}_labels'.format(label), anno_dict)
 
-	pg.write_output(adata, bm_full_out_name + "_anno.h5ad")
+	pg.write_output(adata, bm_full_out_name)
 
 def run_pegasus_process():
 	cprint("Run Pegasus on Bone Marrow dataset with precalculated PCA and Diffusion Map...", "green")

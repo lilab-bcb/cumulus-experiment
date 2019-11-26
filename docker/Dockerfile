@@ -42,15 +42,7 @@ ADD install.R /opt/software/install.R
 RUN Rscript /opt/software/install.R
 
 ## INSTALL FAST_TSNE for Seurat ##
-RUN wget http://www.fftw.org/fftw-3.3.8.tar.gz && \
-	tar -zxvf fftw-3.3.8.tar.gz && \
-	mv fftw-3.3.8/ /opt/software/fftw-3.3.8 && \
-	rm fftw-3.3.8.tar.gz && \
-	cd /opt/software/fftw-3.3.8 && \
-	./configure && \
-	make && \
-	make install && \
-	git clone https://github.com/KlugerLab/FIt-SNE.git /opt/software/FIt-SNE && \
+RUN git clone https://github.com/KlugerLab/FIt-SNE.git /opt/software/FIt-SNE && \
 	cd /opt/software/FIt-SNE && \
 	g++ -std=c++11 -O3  src/sptree.cpp src/tsne.cpp src/nbodyfft.cpp  -o bin/fast_tsne -pthread -lfftw3 -lm
 

@@ -35,10 +35,18 @@ def extract_hvf(input_file, get_pca_knn, batch_correct = True):
 	if get_pca_knn:
 		pg.pca(adata)
 		pg.neighbors(adata)
-		pg.write_output(adata, fname_prefix + "_corrected")
+		if batch_correct:
+			out_name = fname_prefix + "_corrected"
+		else:
+			out_name = fname_prefix + "_pca_knn"
+		pg.write_output(adata, out_name)
 
 		bdata = adata[:, adata.var['highly_variable_features']].copy()
-		pg.write_output(bdata, fname_prefix + "_corrected_hvf")
+		if batch_correct:
+			out_name_hvf = fname_prefix + "_corrected_hvf"
+		else:
+			out_name_hvf = fname_prefix + "_pca_knn_hvf"
+		pg.write_output(bdata, out_name_hvf)
 
 def preprocess_data(in_file, has_pca):
 
@@ -189,5 +197,5 @@ if __name__ == '__main__':
 		extract_hvf(neuron_data_source, get_pca_knn = True)
 		preprocess_data(neuron_data_source, has_pca = False)
 	else:
-		extract_hvf(pbmc_data_source, get_pca_knn = False, batch_correct = False)
+		extract_hvf(pbmc_data_source, get_pca_knn = True, batch_correct = False)
 		preprocess_data(pbmc_data_source, has_pca = False)

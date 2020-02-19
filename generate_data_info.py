@@ -189,5 +189,5 @@ if __name__ == '__main__':
 		extract_hvf(neuron_data_source, get_pca_knn = True)
 		preprocess_data(neuron_data_source, has_pca = False)
 	else:
-		extract_hvf(pbmc_data_source, get_pca_knn = True, batch_correct = False)
+		extract_hvf(pbmc_data_source, get_pca_knn = False, batch_correct = False)
 		preprocess_data(pbmc_data_source, has_pca = False)

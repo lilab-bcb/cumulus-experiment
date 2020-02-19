@@ -8,10 +8,11 @@ from termcolor import cprint
 bm_full_data_source = "/data/MantonBM_nonmix.h5sc"
 bm_tiny_data_source = "/data/MantonBM_nonmix_tiny.h5sc"
 neuron_data_source = "/data/1M_neurons.h5"
+pbmc_data_source = '/data/5k_pbmc_v3.h5'
 
 bm_full_out_name = "MantonBM_nonmix_pegasus"
 
-def extract_hvf(input_file, get_pca_knn):
+def extract_hvf(input_file, get_pca_knn, batch_correct = True):
 
 	fname_prefix = os.path.splitext(input_file)[0]
 
@@ -21,8 +22,9 @@ def extract_hvf(input_file, get_pca_knn):
 	pg.qc_metrics(adata)
 	pg.filter_data(adata)
 	pg.log_norm(adata)
-	pg.highly_variable_features(adata, consider_batch = True)
-	pg.correct_batch(adata, features = "highly_variable_features")
+	pg.highly_variable_features(adata, consider_batch = batch_correct)
+	if batch_correct:
+		pg.correct_batch(adata, features = "highly_variable_features")
 
 	# Extract highly variable gene set to file.
 	cprint("Extracting highly variable features to file...", "green")
@@ -173,7 +175,7 @@ def run_pegasus_process():
 
 if __name__ == '__main__':
 	dataset = sys.argv[1]
-	assert dataset in ['MantonBM', '1M_neurons']
+	assert dataset in ['MantonBM', '1M_neurons', '5k_pbmc']
 
 	if dataset == 'MantonBM':
 		extract_hvf(bm_full_data_source, get_pca_knn = True)
@@ -183,6 +185,9 @@ if __name__ == '__main__':
 		preprocess_data(bm_tiny_data_source, has_pca = True)
 
 		run_pegasus_process()
-	else:
+	elif dataset == '1M_neurons':
 		extract_hvf(neuron_data_source, get_pca_knn = True)
 		preprocess_data(neuron_data_source, has_pca = False)
+	else:
+		extract_hvf(pbmc_data_source, get_pca_knn = True, batch_correct = False)
+		preprocess_data(pbmc_data_source, has_pca = False)

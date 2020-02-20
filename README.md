@@ -24,7 +24,7 @@ Non-standard hardware is not required.
 
 ## Software Installation
 
-**Cumulus** is a cloud-based framework for single-cell/single-nucleus RNA-Seq data analysis. It accounts for processing from sequencing output extraction down to mining biological knowledge from gene-count matrix. It's used as [Terra](https://app.terra.bio/) workflows. Its open-source GitHub repository is [here](https://github.com/klarman-cell-observatory/cumulus), and its documentation can be found [here](https://cumulus-doc.readthedocs.io).
+**Cumulus** is a cloud-based framework for single-cell/single-nucleus RNA-Seq data analysis. It accounts for processing from sequencing output extraction down to mining biological knowledge from gene-count matrix. It's used as [Terra](https://app.terra.bio/) workflows. Its open-source GitHub repository is [here](https://github.com/klarman-cell-observatory/cumulus), and its documentation can be found [here](https://cumulus.readthedocs.io).
 
 **Pegasus** is the analysis module of Cumulus, which is written in Python. Its GitHub repository is [here](https://github.com/klarman-cell-observatory/pegasus), with documentation [here](https://pegasus.readthedocs.io). Pegasus is avalabile on PyPI with package name [pegasuspy](https://pypi.org/project/pegasuspy/).
 
@@ -628,7 +628,7 @@ Notice that Cumulus is the only one providing **Count matrix aggregation** featu
 
 Benchmark on Cumulus is done by running jobs on Terra via Cumulus WDL workflows. And its overall execution time includes all Terra or Google Cloud specific preprocessing and postprocessing phases.
 
-To run it on Terra, please following [cumulus documentation](https://cumulus-doc.readthedocs.io/en/latest/cumulus.html) and [our tutorial video](https://www.youtube.com/watch?v=zKgo3mf4uRk&t=2s) for this benchmark.
+To run it on Terra, please following [cumulus documentation](https://cumulus.readthedocs.io/en/latest/cumulus.html) and [our tutorial video](https://www.youtube.com/watch?v=zKgo3mf4uRk&t=2s) for this benchmark.
 
 Notice that you need to upload ``/data/MantonBM_nonmix.h5sc`` to the Google bucket of your workspace via [gsutil](https://cloud.google.com/storage/docs/gsutil), change parameters ``"cumulus.input_file"`` and ``"cumulus.output_name"`` in ``/experiment/cloud/inputs_32.cpu.json`` to your own, and upload this JSON file in **cumulus** workflow page in your workspace.
 

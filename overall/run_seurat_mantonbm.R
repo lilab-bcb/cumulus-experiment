@@ -30,7 +30,6 @@ now <- Sys.time()
 adata <- ScaleData(adata, scale.max = 10, verbose = debug.mode)
 adata <- RunPCA(adata, verbose = debug.mode, seed.use = seed, features = GetAssayData(adata, slot = "data")@Dimnames[[1]])
 logstr.pca <- Sys.time() - now
-print(logstr.pca)
 write(paste("PCA time:", logstr.pca, attr(logstr.pca, "units")), file = logfile, append = TRUE)
 rm(adata)
 
@@ -66,7 +65,6 @@ print("Computing FIt-SNE embedding:")
 now <- Sys.time()
 adata <- RunTSNE(adata, reduction = "pca", seed.use = seed, tsne.method = "FIt-SNE", dims = 1:n.pc)
 logstr.tsne <- Sys.time() - now
-print(logstr.tsne)
 write(paste("TSNE time:", logstr.tsne, attr(logstr.tsne, "units")), file = logfile, append = TRUE)
 
 save(adata, file = "mantonbm_seurat_visualization.RData")

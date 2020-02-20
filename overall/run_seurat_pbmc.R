@@ -29,7 +29,6 @@ now <- Sys.time()
 adata <- ScaleData(adata, scale.max = 10, verbose = debug.mode)
 adata <- RunPCA(adata, verbose = debug.mode, seed.use = seed, features = GetAssayData(adata, slot = "data")@Dimnames[[1]])
 logstr.pca <- Sys.time() - now
-print(logstr.pca)
 write(paste("PCA time:", logstr.pca, attr(logstr.pca, "units")), file = logfile, append = TRUE)
 rm(adata)
 
@@ -55,6 +54,18 @@ rm(adata)
 
 load("5k_pbmc_v3.RData")
 n.pc <- dim(adata[["pca"]])[2]
+adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy", compute.SNN = TRUE, verbose = debug.mode)
+
+print("Finding Clusters using Leiden:")
+now <- Sys.time()
+adata <- FindClusters(adata, resolution = 1.3, random.seed = seed, algorithm = "leiden", verbose = debug.mode)
+logstr.leiden <- Sys.time() - now
+write(paste("Leiden time:", logstr.leiden, attr(logstr.leiden, "units")), file = logfile, append = TRUE)
+save(adata, file = "pbmc_seurat_leiden.RData")
+rm(adata)
+
+load("5k_pbmc_v3.RData")
+n.pc <- dim(adata[["pca"]])[2]
 print("Computing UMAP embedding:")
 now <- Sys.time()
 adata <- RunUMAP(adata, reduction = "pca", umap.method = "umap-learn", metric = "correlation", n.neighbors = 15, min.dist = 0.5, seed.use = seed, dims = 1:n.pc, verbose = debug.mode)
@@ -65,7 +76,6 @@ print("Computing FIt-SNE embedding:")
 now <- Sys.time()
 adata <- RunTSNE(adata, reduction = "pca", seed.use = seed, tsne.method = "FIt-SNE", dims = 1:n.pc)
 logstr.tsne <- Sys.time() - now
-print(logstr.tsne)
 write(paste("TSNE time:", logstr.tsne, attr(logstr.tsne, "units")), file = logfile, append = TRUE)
 
 save(adata, file = "pbmc_seurat_visualization.RData")

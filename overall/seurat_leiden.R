@@ -4,7 +4,7 @@ library(future)
 
 seed <- 0
 n.cores <- detectCores()
-logfile <- "seurat_leiden.log"
+logfile <- "pbmc_seurat_leiden.log"
 debug.mode <- FALSE
 
 options(future.globals.maxSize = 10 * 1024^3)  # 10 GB

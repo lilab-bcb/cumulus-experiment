@@ -18,7 +18,13 @@ RUN apt-get update -qq && \
 
 ## Install Oracle JDK 12.0.1 ##
 ADD jdk-12.0.1_linux-x64_bin.tar.gz /opt/software
-ENV PATH=/opt/software/jdk-12.0.1/bin:$PATH
+
+## Add script to track resource usage ##
+RUN mkdir -p /opt/software/scripts
+ADD monitor_script.sh /opt/software/scripts
+RUN chmod a+rx /opt/software/scripts/monitor_script.sh
+
+ENV PATH=/opt/software/jdk-12.0.1/bin:/opt/software/scripts:$PATH
 
 # Install R 3.6
 RUN wget http://security.ubuntu.com/ubuntu/pool/main/t/tzdata/tzdata_2019c-0ubuntu0.18.04_all.deb && \

@@ -1,0 +1,5 @@
+source("https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/h5ad2seurat.R")
+ad <- import("anndata", convert = FALSE)
+test_ad <- ad$read_h5ad("MantonBM_nonmix.seurat.h5ad")
+adata <- convert_h5ad_to_seurat(test_ad)
+save(adata, file = "MantonBM_nonmix.RData")

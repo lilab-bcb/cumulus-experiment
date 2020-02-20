@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 
 # Install ssl, curl, ssh, and git
 RUN apt-get update -qq && \
-	apt-get install -y libssl-dev libcurl4-openssl-dev libssh2-1-dev libhdf5-dev gfortran vim emacs && \
+	apt-get install -y libssl-dev libcurl4-openssl-dev libssh2-1-dev libhdf5-dev gfortran emacs && \
 	apt-get install --no-install-recommends -y \
 		build-essential \
 		automake \
@@ -13,8 +13,7 @@ RUN apt-get update -qq && \
 		gnupg \
 		wget \
 		lsb-release \
-		libfftw3-dev \
-		libboost-iostreams-dev && \
+		libfftw3-dev && \
 	apt-get clean
 
 ## Install Oracle JDK 12.0.1 ##

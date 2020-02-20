@@ -1,0 +1,1 @@
+pegasus cluster -p 8 --output-seurat-compatible /data/5k_pbmc_v3.h5 5k_pbmc_v3

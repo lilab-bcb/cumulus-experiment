@@ -45,7 +45,7 @@ docker login
 4. Pull our docker image public on Docker Hub to your computer:
 
 ```
-docker pull cumulusprod/cumulus-experiment:19.11
+docker pull cumulusprod/cumulus-experiment:20.02
 ```
 
 Then see Section [Run as a Docker Container](#run-as-a-docker-container) for how to run it as a docker container on your computer.
@@ -97,6 +97,16 @@ For the experiments, we've provided its **10X h5** and **h5sc** (Cumulus h5) for
 | ``/data/MantonBM_nonmix_10x.h5`` | Bone Marrow dataset in **10X h5** format. Used for SCANPY and Seurat. |
 | ``/data/MantonBM_nonmix.h5sc`` | Bone Marrow dataset in **h5sc** format. Used for Pegasus. |
 | ``/data/MantonBM_nonmix_tiny.h5sc`` | A subset of ``MantonBM_nonmix.h5sc`` of 8 samples, each from one donor. Used for batch correction benchmark. |
+
+### PBMC Dataset
+
+This data set has 5,025 cells and 33,538 genes after filtering, which come from 1 channel. It can be downloaded in command line after running this docker as container:
+
+```
+wget http://cf.10xgenomics.com/samples/cell-exp/3.0.2/5k_pbmc_v3/5k_pbmc_v3_filtered_feature_bc_matrix.h5 -O /data/5k_pbmc_v3.h5
+```
+
+When finished, the data file is ``/data/5k_pbmc_v3.h5``. It will be used for several benchmark on analysis tasks.
 
 ### Mouse Brain Dataset
 
@@ -194,12 +204,20 @@ to get all the necessary data for experiment on Manton Bone Marrow dataset.
 Execute
 
 ```
+(pegasus-env) root# python generate_data_info.py 5k_pbmc
+```
+
+to get all the necessary data for experiment on PBMC dataset.
+
+Execute
+
+```
 (pegasus-env) root# python generate_data_info.py 1M_neurons
 ```
 
 to get all the necessary data for experiment on Mouse Neuron dataset. 
 
-Notice that Mouse Neuron dataset was only used for runtime benchmark. And since it's a huge dataset, and its processing is memory-consuming, if your computer doesn't have a memory large enough (e.g. 16GB is not enough to hold it due to our test), please consider to only try Bone Marrow dataset. All the figures are based on Bone Marrow dataset.
+Notice that Mouse Neuron dataset was only used for runtime benchmark. And since it's a huge dataset, and its processing is memory-consuming, if your computer doesn't have a memory large enough (e.g. 16GB is not enough to hold it due to our test), please consider to only try Bone Marrow and PBMC datasets. All the figures are based on Bone Marrow dataset.
 
 ### Experiment on Highly Variable Feature Selection
 
@@ -457,10 +475,10 @@ To benchmark Pegasus, in Pegasus environment, run the following command:
 
 ```
 (pegasus-env) root# cd /experiment/overall
-(pegasus-env) root# python run_pegasus.py
+(pegasus-env) root# python run_pegasus_mantonbm.py
 ```
 
-When finished, you'll find execution time for each step in its log file ``/experiment/overall/pegasus.log``.
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/mantonbm_pegasus.log``.
 
 ##### SCANPY
 
@@ -468,10 +486,10 @@ To benchmark SCANPY, in SCANPY environment, run the following command:
 
 ```
 (scanpy-env) root# cd /experiment/overall
-(scanpy-env) root# python run_scanpy.py > scanpy.log
+(scanpy-env) root# python run_scanpy_mantonbm.py > mantonbm_scanpy.log
 ```
 
-When finished, you'll find execution time for each step in its log file ``/experiment/overall/scanpy.log``.
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/mantonbm_scanpy.log``.
 
 ##### Seurat
 
@@ -481,7 +499,7 @@ First, in Pegasus environment, run the following commands to generate a Seurat-c
 
 ```
 (pegasus-env) root# cd /experiment/overall
-(pegasus-env) root# ./get_seurat_compatible.sh
+(pegasus-env) root# ./get_seurat_compatible_mantonbm.sh
 (pegasus-env) root# Rscript convert_mantonbm_pegasus.R
 ```
 
@@ -490,10 +508,10 @@ When finished, you'll have a Seurat object in ``/experiment/overall/MantonBM_non
 Now in SCANPY environment, run the following command:
 
 ```
-(scanpy-env) root# Rscript run_seurat3.R
+(scanpy-env) root# Rscript run_seurat_mantonbm.R
 ```
 
-When finished, you'll find execution time for each step in its log file ``/experiment/overall/seurat.log``.
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/mantombm_seurat.log``.
 
 As Seurat fails in the Batch correction and Leiden clustering steps, I make them as two separate R scripts for users to try themselves.
 
@@ -511,8 +529,51 @@ In SCANPY environment, run the following command to benchmark on Leiden clustere
 (scanpy-env) root# Rscript seurat_leiden.R
 ```
 
-When terminated with failure, you may find information in its log file ``/experiment/overall/seurat_leidenl.log`` and screen output.
+When terminated with failure, you may find information in its log file ``/experiment/overall/seurat_leiden.log`` and screen output.
 
+#### PBMC Dataset
+
+##### Pegasus
+
+In Pegasus environment, run the following commands:
+
+```
+(pegasus-env) root# cd /experiment/overall
+(pegasus-env) root# python run_pegasus_pbmc.py
+```
+
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/pegasus_pbmc.log``.
+
+##### SCANPY
+
+In SCANPY environment, run the following command:
+
+```
+(scanpy-env) root# cd /experiment/overall
+(scanpy-env) root# python run_scanpy_pbmc.py > pbmc_scanpy.log
+```
+
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/pbmc_scanpy.log``.
+
+##### Seurat
+
+Similarly as for Bone Marrow dataset benchmark, first, in Pegasus environment, run the following commands to generate a Seurat-compatible h5ad file on the dataset, and convert it into Seurat object format:
+
+```
+(pegasus-env) root# cd /experiment/overall
+(pegasus-env) root# ./get_seurat_compatible_pbmc.sh
+(pegasus-env) root# Rscript convert_pbmc_pegasus.R
+```
+
+When finished, you'll have a Seurat object in ``/experiment/overall/MantonBM_nonmix.RData`` for benchmarking steps starting from kNN. 
+
+Now in SCANPY environment, run the following command:
+
+```
+(scanpy-env) root# Rscript run_seurat_pbmc.R
+```
+
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/pbmc_seurat.log``.
 
 #### Mouse Neuron Dataset
 

@@ -1,0 +1,49 @@
+\documentclass[10pt]{article}
+\usepackage[hmargin=1in, top=0.5in, bottom = 0.85in, centering]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage[labelformat=simple]{subcaption}
+\usepackage{parskip}
+\usepackage{mathtools}
+\usepackage{color}
+
+
+\begin{document}
+
+\section{5k PBMC Dataset}
+
+\paragraph{}
+Seurat 3.1.0 \qquad vs \qquad SCANPY 1.4.4.post1 \qquad vs \qquad Pegasus 0.15.0
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		Analysis & Seurat v3 & SCANPY & Pegasus\\
+		\hline \hline
+		HVG selection & 2.78 sec & 1.83 sec  & \textbf{0.16 sec}  \\
+		\hline
+		PCA & 5.32 sec & 0.19 sec & \textbf{0.14 sec}  \\
+		\hline
+		Find K nearest neighbors & 1.09 sec  & 5.34 sec & \textbf{0.13 sec} \\
+		\hline
+		Diffusion map & N/A & \textbf{0.68 sec} & 0.97 sec  \\
+		\hline
+		Louvain-like Clustering & 2.00 sec & \textbf{1.73 sec} & 7.49 sec \\
+		\hline 
+		Leiden-like Clustering & 13.90 sec & 3.65 sec & \textbf{2.15 sec} \\
+		\hline
+		tSNE-like visualization & 48.50 sec & \textbf{17.08 sec} & 36.79 sec  \\
+		\hline
+		UMAP-like visualization & 14.11 sec & 9.63 sec & \textbf{7.20 sec} \\
+		\hline
+		FLE-like visualization & N/A & 5 min 5 sec & \textbf{15.72 sec} \\
+		\hline
+	\end{tabular}
+\end{table}
+
+
+
+\end{document}

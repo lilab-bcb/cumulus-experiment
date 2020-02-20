@@ -116,7 +116,7 @@ function main() {
         # this is b/c cpu usage values are time dependent
         # to calculate cpu usage, values must be determined from 2 diff time stamps
        	if [ -z "$MONITOR_SCRIPT_SLEEP" ]; then
-			MONITOR_SCRIPT_SLEEP=30
+			MONITOR_SCRIPT_SLEEP=5
 		fi
         # get usage of disk, cpu and mem every MONITOR_SCRIPT_SLEEP sec
         echo

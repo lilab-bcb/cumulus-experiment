@@ -3,8 +3,7 @@ import pegasus as pg
 import numpy as np
 
 n_cpu = os.cpu_count()
-#data_src = "/data/MantonBM_nonmix.h5sc"
-data_src = "MantonBM_nonmix.h5sc"
+data_src = "/data/MantonBM_nonmix.h5sc"
 
 size_list = [5000, 10000, 25000, 50000, 100000, 200000]
 
@@ -35,5 +34,5 @@ if __name__ == '__main__':
 
         if os.system("pegasus cluster -p {jobs} --correct-batch-effect --knn-full-speed --diffmap --spectral-louvain --spectral-leiden --fitsne --net-umap --net-fle {src_name} {out_name} > ds_{size}.log".format(jobs = n_cpu, src_name = "MantonBM_{}_ds.h5ad".format(size), out_name = "MantonBM_{}_ds_result.h5ad".format(size), size = size)):
             sys.exit(1)
-        
+
         cnt += 1

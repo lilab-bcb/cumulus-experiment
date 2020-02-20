@@ -106,10 +106,6 @@ end_df = time.time()
 logstr_df = "Time spent for diffmap: {}.".format(timedelta(seconds = end_df - start_df))
 print(logstr_df)
 
-adata.write("scanpy_5k_pbmc_result_no_fle.h5ad", compression = 'gzip')
-
-
-adata = sc.read_h5ad("scanpy_5k_pbmc_result_no_fle.h5ad")
 print("Computing FLE embedding")
 start_fle = time.time()
 sc.tl.draw_graph(adata, random_state = rand_seed, iterations = 5000)

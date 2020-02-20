@@ -24,7 +24,7 @@ write(paste("HVG time:", logstr.hvgsif, attr(logstr.hvgsif, "units")), file = lo
 
 ## Benchmark PCA.
 adata <- ReadH5AD("/data/5k_pbmc_v3_filter_norm_hvf.h5ad")
-print("PCA time:")
+print("PCA:")
 now <- Sys.time()
 adata <- ScaleData(adata, scale.max = 10, verbose = debug.mode)
 adata <- RunPCA(adata, verbose = debug.mode, seed.use = seed, features = GetAssayData(adata, slot = "data")@Dimnames[[1]])

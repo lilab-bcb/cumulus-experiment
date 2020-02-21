@@ -1,7 +1,6 @@
 import os, sys
 
 n_cores = sys.argv[1]
-print("Pegasus experiment using {} cores:".format(n_cores))
 out_name = "MantonBM_nonmix_{}_cores".format(n_cores)
 data_src = "/data/MantonBM_nonmix.h5sc"
 

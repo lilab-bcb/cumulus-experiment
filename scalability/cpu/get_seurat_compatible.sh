@@ -1,1 +1,0 @@
-pegasus cluster -p 8 --output-seurat-compatible --correct-batch-effect /data/MantonBM_nonmix.h5sc MantonBM_nonmix

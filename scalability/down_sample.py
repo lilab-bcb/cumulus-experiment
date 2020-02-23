@@ -44,17 +44,17 @@ if __name__ == '__main__':
             size_str = num_to_k(size)
 
             for cpu in cpu_list:
-                print("{idx}. Experiment on subsample of MantonBM dataset of size {size} with {cpu}:".format(idx = cnt, size = size_str, cpu = cpu))
+                print("{idx}. Experiment on subsample of MantonBM dataset of size {size} with {cpu} cores:".format(idx = cnt, size = size_str, cpu = cpu))
 
-                if os.system("pegasus cluster -p {jobs} --correct-batch-effect --knn-full-speed --louvain --spectral-louvain --leiden --spectral-leiden --fitsne --tsne --umap --net-umap --fle --net-fle {src_name} {out_name} > /output/ds_{size}_cpu_{jobs}.log".format(jobs = cpu, src_name = "MantonBM_{}_ds.h5ad".format(size_str), out_name = "pegasus_{size}_ds_cpu_{cpu}_result.h5ad".format(size = size_str, cpu = cpu), size = size_str)):
+                if os.system("pegasus cluster -p {jobs} --correct-batch-effect --knn-full-speed --louvain --spectral-louvain --leiden --spectral-leiden --fitsne --tsne --umap --net-umap --fle --net-fle {src_name} {out_name} > ds_{size}_cpu_{jobs}.log".format(jobs = cpu, src_name = "MantonBM_{}_ds.h5ad".format(size_str), out_name = "pegasus_{size}_ds_cpu_{cpu}_result.h5ad".format(size = size_str, cpu = cpu), size = size_str)):
                     sys.exit(1)
 
                 cnt += 1
 
         for cpu in cpu_list:
-            print("{idx}. Experiment on the full MantonBM dataset with {cpu}:".format(idx = cnt, cpu = cpu))
+            print("{idx}. Experiment on the full MantonBM dataset with {cpu} cores:".format(idx = cnt, cpu = cpu))
 
-            if os.system("pegasus cluster -p {jobs} --correct-batch-effect --knn-full-speed --louvain --spectral-louvain --leiden --spectral-leiden --fitsne --tsne --umap --net-umnap --fle --net-fle {src_name} {out_name} > /output/ds_fullsize_cpu_{jobs}.log".format(jobs = cpu, src_name = "/data/MantonBM_nonmix.h5sc", out_name = "pegasus_fullsize_cpu_{}_result.h5ad".format(cpu))):
+            if os.system("pegasus cluster -p {jobs} --correct-batch-effect --knn-full-speed --louvain --spectral-louvain --leiden --spectral-leiden --fitsne --tsne --umap --net-umnap --fle --net-fle {src_name} {out_name} > ds_fullsize_cpu_{jobs}.log".format(jobs = cpu, src_name = "/data/MantonBM_nonmix.h5sc", out_name = "pegasus_fullsize_cpu_{}_result.h5ad".format(cpu))):
                 sys.exit(1)
 
             cnt += 1

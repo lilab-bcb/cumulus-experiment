@@ -18,53 +18,68 @@ plan()
 src.obj <- ReadH5AD("/data/MantonBM_nonmix_filter_norm.h5ad")
 obj.list <- SplitObject(src.obj, split.by = "Channel")
 print("Finding Highly Variable Genes:")
-now <- Sys.time()
+start.hvg <- Sys.time()
 features <- SelectIntegrationFeatures(obj.list, verbose = debug.mode, nfeatures = 2000, fvf.nfeatures = 2000, selection.method = "vst", mean.cutoff = c(0.0125, 7), dispersion.cutoff = c(0.5, Inf))
-logstr.hvgsif <- Sys.time() - now
-write(paste("HVG time:", logstr.hvgsif, attr(logstr.hvgsif, "units")), file = logfile)
+end.hvg <- Sys.time()
+duration.hvg <- end.hvg - start.hvg
+write(paste("HVG starts at:", start.hvg), file = logfile)
+write(paste("HVG ends at:", end.hvg), file = logfile, append = TRUE)
+write(paste("HVG time:", duration.hvg, attr(duration.hvg, "units")), file = logfile, append = TRUE)
 
 ## Benchmark PCA.
 adata <- ReadH5AD("/data/MantonBM_nonmix_corrected_hvf.h5ad")
 print("PCA:")
-now <- Sys.time()
+start.pca <- Sys.time()
 adata <- ScaleData(adata, scale.max = 10, verbose = debug.mode)
 adata <- RunPCA(adata, verbose = debug.mode, seed.use = seed, features = GetAssayData(adata, slot = "data")@Dimnames[[1]])
-logstr.pca <- Sys.time() - now
-write(paste("PCA time:", logstr.pca, attr(logstr.pca, "units")), file = logfile, append = TRUE)
+end.pca <- Sys.time()
+duration.pca <- end.pca - start.pca
+write(paste("PCA starts at:", start.pca), file = logfile, append = TRUE)
+write(paste("PCA ends at:", end.pca), file = logfile, append = TRUE)
+write(paste("PCA time:", duration.pca, attr(duration.pca, "units")), file = logfile, append = TRUE)
 rm(adata)
 
 ## Benchmark KNN.
 load("MantonBM_nonmix.RData")
 print("Computing neighborhood graph:")
 n.pc <- dim(adata[["pca"]])[2]
-now <- Sys.time()
+start.knn <- Sys.time()
 bdata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy", compute.SNN = FALSE, verbose = debug.mode)
-logstr.knn <- Sys.time() - now
-write(paste("KNN time:", logstr.knn, attr(logstr.knn, "units")), file = logfile, append = TRUE)
+end.knn <- Sys.time()
+duration.knn <- end.knn - start.knn
+write(paste("KNN starts at:", start.knn), file = logfile, append = TRUE)
+write(paste("KNN ends at:", end.knn), file = logfile, append = TRUE)
+write(paste("KNN time:", duration.knn, attr(duration.knn, "units")), file = logfile, append = TRUE)
+rm(bdata)
 
 adata <- FindNeighbors(adata, k.param = 100, dims = 1:n.pc, nn.method = "annoy", compute.SNN = TRUE, verbose = debug.mode)
-save(adata, file = "mantonbm_seurat_knn.RData")
 
 print("Finding Clusters using Louvain:")
-now <- Sys.time()
+start.louvain <- Sys.time()
 adata <- FindClusters(adata, resolution = 1.3, random.seed = seed, algorithm = "louvain", verbose = debug.mode)
-logstr.louvain <- Sys.time() - now
-write(paste("Louvain time:", logstr.louvain, attr(logstr.louvain, "units")), file = logfile, append = TRUE)
-save(adata, file = "mantonbm_seurat_louvain.RData")
+end.louvain <- Sys.time()
+duration.louvain <- end.louvain - start.louvain
+write(paste("Louvain starts at:", start.louvain), file = logfile, append = TRUE)
+write(paste("Louvain ends at:", end.louvain), file = logfile, append = TRUE)
+write(paste("Louvain time:", duration.louvain, attr(duration.louvain, "units")), file = logfile, append = TRUE)
 rm(adata)
 
 load("MantonBM_nonmix.RData")
 n.pc <- dim(adata[["pca"]])[2]
 print("Computing UMAP embedding:")
-now <- Sys.time()
+start.umap <- Sys.time()
 adata <- RunUMAP(adata, reduction = "pca", umap.method = "umap-learn", metric = "correlation", n.neighbors = 15, min.dist = 0.5, seed.use = seed, dims = 1:n.pc, verbose = debug.mode)
-logstr.umap <- Sys.time() - now
-write(paste("UMAP time:", logstr.umap, attr(logstr.umap, "units")), file = logfile, append = TRUE)
+end.umap <- Sys.time()
+duration.umap <- end.umap - start.umap
+write(paste("UMAP starts at:", start.umap), file = logfile, append = TRUE)
+write(paste("UMAP ends at:", end.umap), file = logfile, append = TRUE)
+write(paste("UMAP time:", duration.umap, attr(duration.umap, "units")), file = logfile, append = TRUE)
 
 print("Computing FIt-SNE embedding:")
-now <- Sys.time()
+start.tsne <- Sys.time()
 adata <- RunTSNE(adata, reduction = "pca", seed.use = seed, tsne.method = "FIt-SNE", dims = 1:n.pc)
-logstr.tsne <- Sys.time() - now
-write(paste("TSNE time:", logstr.tsne, attr(logstr.tsne, "units")), file = logfile, append = TRUE)
-
-save(adata, file = "mantonbm_seurat_visualization.RData")
+end.tsne <- Sys.time()
+duration.tsne <- end.tsne - start.tsne
+write(paste("TSNE starts at:", start.tsne), file = logfile, append = TRUE)
+write(paste("TSNE ends at:", end.tsne), file = logfile, append = TRUE)
+write(paste("TSNE time:", duration.tsne, attr(duration.tsne, "units")), file = logfile, append = TRUE)

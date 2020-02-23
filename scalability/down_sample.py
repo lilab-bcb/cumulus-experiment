@@ -54,7 +54,7 @@ if __name__ == '__main__':
         for cpu in cpu_list:
             print("{idx}. Experiment on the full MantonBM dataset with {cpu} cores:".format(idx = cnt, cpu = cpu))
 
-            if os.system("pegasus cluster -p {jobs} --correct-batch-effect --knn-full-speed --louvain --spectral-louvain --leiden --spectral-leiden --fitsne --tsne --umap --net-umnap --fle --net-fle {src_name} {out_name} > ds_fullsize_cpu_{jobs}.log".format(jobs = cpu, src_name = "/data/MantonBM_nonmix.h5sc", out_name = "pegasus_fullsize_cpu_{}_result.h5ad".format(cpu))):
+            if os.system("pegasus cluster -p {jobs} --correct-batch-effect --knn-full-speed --louvain --spectral-louvain --leiden --spectral-leiden --fitsne --tsne --umap --net-umap --fle --net-fle {src_name} {out_name} > ds_fullsize_cpu_{jobs}.log".format(jobs = cpu, src_name = "/data/MantonBM_nonmix.h5sc", out_name = "pegasus_fullsize_cpu_{}_result.h5ad".format(cpu))):
                 sys.exit(1)
 
             cnt += 1

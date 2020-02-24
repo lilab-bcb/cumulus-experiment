@@ -4,7 +4,7 @@ import scanpy as sc
 from datetime import timedelta, datetime
 
 sc.settings.n_jobs = os.cpu_count()
-sc.settings.verbosity = 4
+sc.settings.verbosity = 3
 rand_seed = 0
 
 src_data = "/data/MantonBM_nonmix_10x.h5"

@@ -7,7 +7,7 @@ sc.settings.n_jobs = os.cpu_count()
 sc.settings.verbosity = 4
 rand_seed = 0
 
-src_data = "/data/MantonBM_10x.h5"
+src_data = "/data/MantonBM_nonmix_10x.h5"
 log_file = "mantonbm_scanpy.log"
 
 fp = open(log_file, 'w')

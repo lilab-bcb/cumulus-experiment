@@ -100,7 +100,7 @@ For the experiments, we've provided its **10X h5** and **h5sc** (Cumulus h5) for
 
 ### PBMC Dataset
 
-This data set has 5,025 cells and 33,538 genes after filtering, which come from 1 channel. It can be downloaded in command line after running this docker as container:
+This data set has 5,025 cells and 33,538 genes, which come from 1 channel. It can be downloaded in command line after running this docker as container:
 
 ```
 wget http://cf.10xgenomics.com/samples/cell-exp/3.0.2/5k_pbmc_v3/5k_pbmc_v3_filtered_feature_bc_matrix.h5 -O /data/5k_pbmc_v3.h5

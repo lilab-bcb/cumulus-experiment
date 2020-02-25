@@ -12,8 +12,10 @@ record.time <- function(start.time, end.time, title, filename) {
 
 args <- commandArgs(trailingOnly = TRUE)
 
-src.data <- args[1]
-out.name <- args[2]
+src.data <- args[2]
+print(src.data)
+out.name <- args[3]
+print(out.name)
 
 seed <- 0
 n.cores <- detectCores()

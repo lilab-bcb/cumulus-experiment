@@ -14,7 +14,7 @@ rand_seed = 0
 
 src_data = sys.argv[1]
 out_name = sys.argv[2]
-correct_batch = True if sys.argv[3] == '--batch' else False
+correct_batch = True if len(sys.argv) == 4 and sys.argv[3] == '--batch' else False
 log_file = "{}_scanpy.log".format(out_name)
 
 fp = open(log_file, 'w')

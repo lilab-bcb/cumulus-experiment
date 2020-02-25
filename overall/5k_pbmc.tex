@@ -17,6 +17,11 @@
 \paragraph{}
 Seurat 3.1.0 \qquad vs \qquad SCANPY 1.4.4.post1 \qquad vs \qquad Pegasus 0.15.0
 
+\subsection{Server Setting}
+
+\paragraph{}
+28 CPUs, 264GB Memory
+
 \begin{table}[H]
 	\centering
 	\begin{tabular}{|c|c|c|c|}
@@ -44,6 +49,36 @@ Seurat 3.1.0 \qquad vs \qquad SCANPY 1.4.4.post1 \qquad vs \qquad Pegasus 0.15.0
 	\end{tabular}
 \end{table}
 
+\subsection{Laptop Setting}
 
+\paragraph{}
+8 CPUs, 264GB Memory
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		Analysis & Seurat v3 & SCANPY & Pegasus\\
+		\hline \hline
+		HVG selection & 2.83 sec  & 1.79 sec & 0.17 sec  \\
+		\hline
+		PCA & 5.62 sec & 0.19 sec & 0.14 sec  \\
+		\hline
+		Find K nearest neighbors & 0.84 sec & 5.06 sec & 0.21 sec  \\
+		\hline
+		Diffusion map & N/A & 0.61 sec & 0.97 sec  \\
+		\hline
+		Louvain-like Clustering & 2.01 sec & 1.69 sec & 1.08 sec \\
+		\hline 
+		Leiden-like Clustering & 13.72 sec & 3.59 sec & 2.95 sec \\
+		\hline
+		tSNE-like visualization & 30.53 sec & 9.99 sec & 22.40 sec  \\
+		\hline
+		UMAP-like visualization & 14.12 sec & 10.23 sec & 7.11 sec \\
+		\hline
+		FLE-like visualization & N/A & 5 min 6 sec & 12.30 sec \\
+		\hline
+	\end{tabular}
+\end{table}
 
 \end{document}

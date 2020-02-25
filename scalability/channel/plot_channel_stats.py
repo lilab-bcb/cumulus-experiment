@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
 
 def hms_to_hour(s):
@@ -31,16 +30,17 @@ def generate_plots(df):
     fig, axes = plt.subplots(1, 2, figsize = (10, 6))
 
     # Plot runtime against number of channels.
-    sns.lineplot(x = 'Channels', y = 'Runtime', data = df, ax = axes[0])
+    axes[0].plot('Channels', 'Runtime', 'b', data = df)
+    axes[0].plot('Channels', 'Runtime', 'k.', data = df, markersize = 5)
     axes[0].set_ylim(1, 9)
-    axes[0].set(xlabel = "Number of channels", ylabel = "Runtime in hours")
+    axes[0].set(xlabel = "Number of channels", ylabel = "Maximum runtime in hours")
 
     # Plot cost against number of channels.
-    sns.lineplot(x = 'Channels', y = 'Cost', data = df, ax = axes[1])
-    axes[1].set(xlabel = "Number of channels", ylabel = "Amortized Cost in US Dollars")
-
+    axes[1].plot('Channels', 'Cost', 'b', data = df)
+    axes[1].plot('Channels', 'Cost', 'k.', data = df, markersize = 5)
+    axes[1].set(xlabel = "Number of channels", ylabel = "Amortized total cost in US dollars")
+    
     fig.tight_layout(pad = 5.0)
-    fig.suptitle("Total time and cost of Cumulus Cell Ranger Workflow regarding Number of 10X Channels")
     fig.savefig("channel_stats.pdf")
 
 if __name__ == '__main__':
@@ -52,5 +52,6 @@ if __name__ == '__main__':
     runtime_list = get_runtime(runtime_each_channel)
 
     df_plot = pd.DataFrame({'Channels': np.arange(n_channels) + 1, 'Runtime': runtime_list, 'Cost': cost_list})
+    df_plot['Style'] = 'same'
 
     generate_plots(df_plot)

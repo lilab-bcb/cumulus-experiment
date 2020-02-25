@@ -18,7 +18,7 @@ logfile <- paste0("pbmc_seurat_cpu_", n.cores, ".log")
 debug.mode <- FALSE
 setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores for tSNE."))
-write(paste("Use", n.cores, "cores for tSNE."), file = filename)
+write(paste("Use", n.cores, "cores for tSNE."), file = logfile)
 
 options(future.globals.maxSize = 10 * 1024^3)  # 10 GB
 plan("multiprocess", workers = n.cores)

@@ -2,7 +2,7 @@ library(Seurat)
 library(future)
 library(parallel)
 
-n.cores <- detectCores()
+n.cores <- 28
 logfile <- "seurat_batch_correction.log"
 
 options(future.globals.maxSize = 50 * 1024^3)  # 50 GB

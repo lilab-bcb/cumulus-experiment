@@ -3,7 +3,7 @@ library(parallel)
 library(future)
 
 seed <- 0
-n.cores <- detectCores()
+n.cores <- 28
 logfile <- "pbmc_seurat_leiden.log"
 debug.mode <- FALSE
 

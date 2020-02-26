@@ -9,7 +9,7 @@ record.time <- function(duration.time, title, filename) {
 
 seed <- 0
 n.cores <- 28
-logfile <- "mantonbm_seurat.log"
+logfile <- paste0("mantonbm_seurat_cpu_", n.cores, ".log")
 debug.mode <- FALSE
 setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores for tSNE."))

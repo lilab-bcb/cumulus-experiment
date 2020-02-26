@@ -15,7 +15,7 @@ sc.settings.n_jobs = 28
 sc.settings.verbosity = 4
 rand_seed = 0
 
-log_file = "1M_neurons_scanpy.log".format(sc.settings.n_jobs)
+log_file = "1m_scanpy_cpu_{}.log".format(sc.settings.n_jobs)
 fp = open(log_file, 'w')
 
 filter_norm_data = "/data/1M_neurons_filter_norm.h5ad"

@@ -65,7 +65,7 @@ if __name__ == '__main__':
     runtime_list = df['Time'].apply(lambda s: hms_to_time(s, unit = 'hour')).values
 
     seconds_per_channel = df['Time'].apply(lambda s: hms_to_time(s, unit = 'second')).values
-    df['Cost'] = get_amortized_cost(seconds_per_channel, total_cost = 1.61 * 63)
+    df['Cost'] = get_amortized_cost(seconds_per_channel, total_cost = 101.43)
     cost_list = get_total_cost(df['Cost'].values)
 
     df['Cost'] = np.round(df['Cost'].values, decimals = 2)

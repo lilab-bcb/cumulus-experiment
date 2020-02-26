@@ -12,14 +12,14 @@ pbmc_data_source = '/data/5k_pbmc_v3.h5'
 
 bm_full_out_name = "MantonBM_nonmix_pegasus"
 
-def extract_hvf(input_file, get_pca_knn, batch_correct = True):
+def extract_hvf(input_file, get_pca_knn, batch_correct = True, percent_mito = 10.0):
 
 	fname_prefix = os.path.splitext(input_file)[0]
 
 	# Run correction.
 	cprint("Extracting HVGs from {}...".format(input_file), "green")
 	adata = pg.read_input(input_file)
-	pg.qc_metrics(adata)
+	pg.qc_metrics(adata, percent_mito = percent_mito)
 	pg.filter_data(adata)
 	pg.log_norm(adata)
 	pg.highly_variable_features(adata, consider_batch = batch_correct)
@@ -48,7 +48,7 @@ def extract_hvf(input_file, get_pca_knn, batch_correct = True):
 			out_name_hvf = fname_prefix + "_pca_knn_hvf"
 		pg.write_output(bdata, out_name_hvf)
 
-def preprocess_data(in_file, has_pca):
+def preprocess_data(in_file, has_pca, percent_mito = 10.0):
 
 	cprint("Preprocessing {}...".format(in_file), "green")
 
@@ -59,7 +59,7 @@ def preprocess_data(in_file, has_pca):
 	output_hvf_name1 = output_name1 + "_hvf"
 
 	adata = pg.read_input(in_file)
-	pg.qc_metrics(adata)
+	pg.qc_metrics(adata, percent_mito = percent_mito)
 	pg.filter_data(adata)
 	pg.log_norm(adata)
 
@@ -197,5 +197,5 @@ if __name__ == '__main__':
 		extract_hvf(neuron_data_source, get_pca_knn = True)
 		preprocess_data(neuron_data_source, has_pca = False)
 	else:
-		extract_hvf(pbmc_data_source, get_pca_knn = True, batch_correct = False)
-		preprocess_data(pbmc_data_source, has_pca = False)
+		extract_hvf(pbmc_data_source, get_pca_knn = True, batch_correct = False, percent_mito = 20)
+		preprocess_data(pbmc_data_source, has_pca = False, percent_mito = 20)

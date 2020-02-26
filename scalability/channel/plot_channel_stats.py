@@ -6,16 +6,16 @@ def hms_to_time(s, unit):
     assert unit in ['hour', 'second']
 
     time_list = list(map(lambda a: a.strip(), s.split(' ')))
-    assert len(time_list) == 3
+    assert len(time_list) == 2
 
-    secs = 0.0
+    minutes = 0.0
     for t in time_list:
-        secs = 60 * secs + float(t[:-1])
+        minutes = 60 * minutes + float(t[:-1])
 
     if unit == 'hour':
-        return secs / 3600
+        return minutes / 60
     else:
-        return secs
+        return minutes * 60
 
 def get_runtime(runtime_stat):
     n_channels = runtime_stat.size
@@ -47,10 +47,9 @@ def generate_plots(df):
     fig, axes = plt.subplots(1, 2, figsize = (10, 6))
 
     # Plot runtime against number of channels.
-    axes[0].plot('Channels', 'Runtime', 'b', data = df)
     axes[0].plot('Channels', 'Runtime', 'k.', data = df, markersize = 5)
-    axes[0].set_ylim(1, 9)
-    axes[0].set(xlabel = "Number of channels", ylabel = "Maximum runtime in hours")
+    axes[0].set_ylim(0.5, 12.5)
+    axes[0].set(xlabel = "10X channel", ylabel = "Runtime in hours")
 
     # Plot cost against number of channels.
     axes[1].plot('Channels', 'Cost', 'b', data = df)
@@ -63,8 +62,7 @@ def generate_plots(df):
 if __name__ == '__main__':
     df = pd.read_csv("channel_stats.csv")
     n_channels = df.shape[0]
-    hours_per_channel = df['Time'].apply(lambda s: hms_to_time(s, unit = 'hour')).values
-    runtime_list = get_runtime(hours_per_channel)
+    runtime_list = df['Time'].apply(lambda s: hms_to_time(s, unit = 'hour')).values
 
     seconds_per_channel = df['Time'].apply(lambda s: hms_to_time(s, unit = 'second')).values
     df['Cost'] = get_amortized_cost(seconds_per_channel, total_cost = 1.61 * 63)

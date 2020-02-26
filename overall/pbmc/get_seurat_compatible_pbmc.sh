@@ -1,1 +1,1 @@
-pegasus cluster -p 8 --output-seurat-compatible /data/5k_pbmc_v3.h5 5k_pbmc_v3
+pegasus cluster -p 8 --output-seurat-compatible --percent-mito 20 /data/5k_pbmc_v3.h5 5k_pbmc_v3

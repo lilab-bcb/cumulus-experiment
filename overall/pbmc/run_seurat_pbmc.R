@@ -7,13 +7,8 @@ record.time <- function(duration.time, title, filename) {
     write(paste(title, "time:", duration.time, attr(duration.time, "units")), file = filename, append = TRUE)
 }
 
-args <- commandArgs(trailingOnly = TRUE)
-
 seed <- 0
 n.cores <- detectCores()
-if (length(args) == 2) {
-    n.cores <- as.numeric(args[2])
-}
 logfile <- paste0("pbmc_seurat_cpu_", n.cores, ".log")
 debug.mode <- FALSE
 setOption('mc.cores', n.cores)

@@ -11,7 +11,7 @@ from datetime import timedelta, datetime
 def record_time(duration_time, step_name, fp):
     fp.write("Time spent for {step}: {time}.\n\n".format(step = step_name, time = timedelta(seconds = duration_time)))
 
-sc.settings.n_jobs = os.cpu_count() if len(sys.argv) == 1 else int(sys.argv[1])
+sc.settings.n_jobs = 8
 sc.settings.verbosity = 4
 rand_seed = 0
 

@@ -12,5 +12,5 @@ def get_max_mem(filename, memory_limit):
 
 if __name__ == '__main__':
     filename = sys.argv[1]
-    max_mem, max_percent = get_max_mem(filename, memory_limit = 264.021)
+    max_mem, max_percent = get_max_mem(filename, memory_limit = 256)
     print("Maximum memory usage is {size:.4f} GB ({percent}%).".format(size = max_mem, percent = max_percent))

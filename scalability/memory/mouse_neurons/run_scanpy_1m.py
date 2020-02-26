@@ -8,18 +8,19 @@ def record_time(start_time, end_time, step_name, fp):
     fp.write("{step} ends at: {time}\n".format(step = step_name, time = datetime.fromtimestamp(end_time)))
     fp.write("Time spent for {step}: {time}.\n\n".format(step = step_name, time = timedelta(seconds = end_time - start_time)))
 
-sc.settings.n_jobs = 8
+sc.settings.n_jobs = os.cpu_count()
 sc.settings.verbosity = 3
 rand_seed = 0
 
-src_data = "/data/5k_pbmc_v3.h5"
-log_file = "pbmc_scanpy.log"
+src_data = "/data/1M_neurons.h5"
+log_file = "1M_scanpy.log"
 
 fp = open(log_file, 'w')
 
 start_read = time.time()
 adata = sc.read_10x_h5(src_data, genome = "GRCh38")
 adata.var_names_make_unique()
+adata.obs['Channel'] = adata.obs.index.map(lambda s: s.split('-')[0]).values
 end_read = time.time()
 record_time(start_read, end_read, "Read", fp)
 
@@ -32,7 +33,7 @@ sc.pp.filter_cells(adata, max_genes = 6000)
 sc.pp.filter_genes(adata, min_cells = n_cells * 0.0005)
 mito_genes = adata.var_names.str.startswith('MT-')
 adata.obs['percent_mito'] = np.sum(adata[:, mito_genes].X, axis = 1).A1 / np.sum(adata.X, axis = 1).A1
-adata = adata[adata.obs.percent_mito < 0.2, :]
+adata = adata[adata.obs.percent_mito < 0.1, :]
 end_filter = time.time()
 record_time(start_filter, end_filter, "Filter", fp)
 
@@ -43,7 +44,7 @@ end_norm = time.time()
 record_time(start_norm, end_norm, "LogNorm", fp)
 
 start_hvg = time.time()
-sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=7, min_disp=0.5, n_top_genes = 2000)
+sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=7, min_disp=0.5, n_top_genes = 2000, batch_key = 'Channel' if correct_batch else None)
 end_hvg = time.time()
 record_time(start_hvg, end_hvg, "HVG", fp)
 

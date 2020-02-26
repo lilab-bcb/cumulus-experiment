@@ -12,18 +12,15 @@ sc.settings.n_jobs = os.cpu_count()
 sc.settings.verbosity = 3
 rand_seed = 0
 
-src_data = sys.argv[1]
-out_name = sys.argv[2]
-correct_batch = True if len(sys.argv) == 4 and sys.argv[3] == '--batch' else False
-log_file = "{}_scanpy.log".format(out_name)
+src_data = "/data/MantonBM_nonmix_10x.h5"
+log_file = "mantonbm_scanpy.log"
 
 fp = open(log_file, 'w')
 
 start_read = time.time()
 adata = sc.read_10x_h5(src_data, genome = "GRCh38")
 adata.var_names_make_unique()
-if correct_batch:
-    adata.obs['Channel'] = adata.obs.index.map(lambda s: s.split('-')[0]).values
+adata.obs['Channel'] = adata.obs.index.map(lambda s: s.split('-')[0]).values
 end_read = time.time()
 record_time(start_read, end_read, "Read", fp)
 
@@ -47,7 +44,7 @@ end_norm = time.time()
 record_time(start_norm, end_norm, "LogNorm", fp)
 
 start_hvg = time.time()
-sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=7, min_disp=0.5, n_top_genes = 2000, batch_key = 'Channel' if correct_batch else None)
+sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=7, min_disp=0.5, n_top_genes = 2000, batch_key = 'Channel')
 end_hvg = time.time()
 record_time(start_hvg, end_hvg, "HVG", fp)
 

@@ -10,16 +10,10 @@ record.time <- function(start.time, end.time, title, filename) {
     write(paste(title, "time:", duration.time, attr(duration.time, "units")), file = filename, append = TRUE)
 }
 
-args <- commandArgs(trailingOnly = TRUE)
-
-src.data <- args[2]
-print(src.data)
-out.name <- args[3]
-print(out.name)
-
+src.data <- "/data/1M_neurons.h5"
 seed <- 0
 n.cores <- detectCores()
-logfile <- paste0(out.name, "_seurat.log")
+logfile <- "1M_seurat.log"
 debug.mode <- FALSE
 setOption('mc.cores', n.cores)
 print(paste("Use", n.cores, "cores for tSNE."))
@@ -78,4 +72,4 @@ bm <- RunUMAP(bm, reduction = "pca", umap.method = "umap-learn", metric = "corre
 end.umap <- Sys.time()
 record.time(start.umap, end.umap, "UMAP", logfile)
 
-save(bm, file = paste0(out.name, "_seurat_result.RData"))
+save(bm, file = "1M_seurat_result.RData")

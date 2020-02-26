@@ -22,6 +22,26 @@ For versions of software dependencies, please refer to information in our [Docke
 
 Non-standard hardware is not required.
 
+## Overview
+
+This benchmark repository consists of the following main parts:
+
+1. **Software usage:** Instructions on both [software installation](#software-installation) and [docker execution](#run-as-a-docker-container) are provided.
+2. [Dataset description](#raw-data): Introduce the 3 datasets used in benchmark, and how to retrieve them.
+3. [Software demo](#demo): A demo on running Pegasus for downstream analysis.
+4. **Reproducing paper results:** Reproduce results on paper.
+    * [Precalculation](#precalculation-for-reproducibility): Pegasu PCA and Diffusion map results are compter-dependent. So they need to be loaded in order to generate the same figures in the paper. 
+    * [Highly variable feature selection](#experiment-on-highly-variable-feature-selection)
+    * [Batch correction](#experiment-on-batch-correction)
+    * [Nearest neighbors](#experiment-on-k-nearest-neighbor)
+    * **Other steps:** [Diffusion maps](#experiment-on-diffusion-maps), [clustering](#experiment-on-clustering-algorithms), and [visualization](#experiment-on-visualization-methods).
+    * [Analysis tasks](#benchmark-on-analysis-tasks): Benchmark on Pegasus, Seurat, and SCANPY over main analysis tasks.
+5. **Scalability benchmark**
+    * [10X channel](#number-of-10x-channels)
+    * [CPU and Data Size](#cpu-and-data-size)
+    * [Memory usage](#memory)
+6. [Workflow](#benchmark-on-workflows): Benchmark cumulus workflow.
+
 ## Software Installation
 
 **Cumulus** is a cloud-based framework for single-cell/single-nucleus RNA-Seq data analysis. It accounts for processing from sequencing output extraction down to mining biological knowledge from gene-count matrix. It's used as [Terra](https://app.terra.bio/) workflows. Its open-source GitHub repository is [here](https://github.com/klarman-cell-observatory/cumulus), and its documentation can be found [here](https://cumulus.readthedocs.io).
@@ -465,42 +485,79 @@ When finished, you'll find the figures generated in ``/output``, and for each vi
 
 ### Benchmark on Analysis Tasks
 
-All 3 packages are benchmarked on Bone Marrow dataset, while only Pegasus and SCANPY are benchmarked on Mouse Neuron, because Seurat fails at loading the count matrix step for this big dataset.
+All 3 packages are benchmarked on PBMC and Bone Marrow datasets, while only Pegasus and SCANPY are benchmarked on Mouse Neuron, because Seurat fails at loading the count matrix step for this big dataset.
 
-#### Manton Bone Marrow Dataset
+#### PBMC Dataset
+
+Only 8 CPUs are used for benchmark this small dataset.
 
 ##### Pegasus
 
+In Pegasus environment, run the following commands:
+
+```
+(pegasus-env) root# cd /experiment/overall/pbmc
+(pegasus-env) root# python run_pegasus_pbmc.py
+```
+
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/pbmc/pbmc_pegasus_cpu_8.log``.
+
+##### SCANPY
+
+In SCANPY environment, run the following command:
+
+```
+(scanpy-env) root# cd /experiment/overall/pbmc
+(scanpy-env) root# python run_scanpy_pbmc.py
+```
+
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/pbmc/pbmc_scanpy_cpu_8.log``.
+
+##### Seurat
+
+First, in Pegasus environment, run the following commands to generate a Seurat-compatible h5ad file on the dataset, and convert it into Seurat object format:
+
+```
+(pegasus-env) root# cd /experiment/overall/pbmc
+(pegasus-env) root# ./get_seurat_compatible_pbmc.sh
+(pegasus-env) root# Rscript convert_pbmc_pegasus.R
+```
+
+When finished, you'll have a Seurat object in ``/experiment/overall/pbmc/5k_pbmc_v3.RData`` for benchmarking steps starting from kNN. 
+
+Now in SCANPY environment, run the following command:
+
+```
+(scanpy-env) root# Rscript run_seurat_pbmc.R
+```
+
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/pbmc/pbmc_seurat_cpu_8.log``.
+
+#### Manton Bone Marrow Dataset
+
+All 28 CPUs are used for benchmark on this dataset.
+
+##### Pegasus
 
 To benchmark Pegasus, in Pegasus environment, run the following command:
 
 ```
-(pegasus-env) root# cd /experiment/overall
-(pegasus-env) root# monitor_script.sh > monitor_mantonbm_pegasus.log &
+(pegasus-env) root# cd /experiment/overall/MantonBM
 (pegasus-env) root# python run_pegasus_mantonbm.py
 ```
 
-When finished, you'll find execution time for each step in its log file ``/experiment/overall/mantonbm_pegasus.log``, and the system resource (especially memory) usage during the execution in ``/experiment/overall/monitor_mantonbm_pegasus.log``.
-
-To stop logging the system resource usage, simply run the following command in your terminal:
-
-```
-kill <number>
-```
-
-where ``<number>`` is the process ID shown after running ``monitor_script.sh > monitor_mantonbm_pegasus.log &`` command. Similarly as below.
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/MantonBM/mantonbm_pegasus_cpu_28.log``.
 
 ##### SCANPY
 
 To benchmark SCANPY, in SCANPY environment, run the following command:
 
 ```
-(scanpy-env) root# cd /experiment/overall
-(scanpy-env) root# monitor_script.sh > monitor_mantonbm_scanpy.log &
-(scanpy-env) root# python run_scanpy_mantonbm.py > mantonbm_scanpy.log
+(scanpy-env) root# cd /experiment/overall/MantonBM
+(scanpy-env) root# python run_scanpy_mantonbm.py
 ```
 
-When finished, you'll find execution time for each step in its log file ``/experiment/overall/mantonbm_scanpy.log``, and the system resource (especially memory) usage during the execution in ``/experiment/overall/monitor_mantonbm_scanpy.log``.
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/MantonBM/mantonbm_scanpy_cpu_28.log``.
 
 ##### Seurat
 
@@ -509,21 +566,20 @@ The benchmark on Seurat is a little bit complicated, as it's written in R.
 First, in Pegasus environment, run the following commands to generate a Seurat-compatible h5ad file on the dataset, and convert it into Seurat object format:
 
 ```
-(pegasus-env) root# cd /experiment/overall
+(pegasus-env) root# cd /experiment/overall/MantonBM
 (pegasus-env) root# ./get_seurat_compatible_mantonbm.sh
 (pegasus-env) root# Rscript convert_mantonbm_pegasus.R
 ```
 
-When finished, you'll have a Seurat object in ``/experiment/overall/MantonBM_nonmix.RData`` for benchmarking steps starting from kNN. 
+When finished, you'll have a Seurat object in ``/experiment/overall/MantonBM/MantonBM_nonmix.RData`` for benchmarking steps starting from kNN. 
 
 Now in SCANPY environment, run the following command:
 
 ```
-(scanpy-env) root# monitor_script.sh > monitor_mantonbm_seurat.log &
 (scanpy-env) root# Rscript run_seurat_mantonbm.R
 ```
 
-When finished, you'll find execution time for each step in its log file ``/experiment/overall/mantombm_seurat.log``, and the system resource (especially memory) usage during the execution in ``/experiment/overall/monitor_mantonbm_seurat.log``.
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/MantonBM/mantombm_seurat_cpu_28.log``.
 
 As Seurat fails in the Batch correction and Leiden clustering steps, I make them as two separate R scripts for users to try themselves.
 
@@ -533,7 +589,7 @@ Run the following command to benchmark on Batch correction using Seurat:
 root# Rscript seurat_batch_correction.R
 ```
 
-When terminated with failure, you'll find the time information in its log file ``/experiment/overall/seurat_batch_correction.log``, and error message from screen output.
+When terminated with failure, you'll find the time information in its log file ``/experiment/overall/MantonBM/seurat_batch_correction.log``, and error message from screen output.
 
 In SCANPY environment, run the following command to benchmark on Leiden clustereing using Seurat:
 
@@ -541,86 +597,41 @@ In SCANPY environment, run the following command to benchmark on Leiden clustere
 (scanpy-env) root# Rscript seurat_leiden.R
 ```
 
-When terminated with failure, you may find information in its log file ``/experiment/overall/seurat_leiden.log`` and screen output.
-
-#### PBMC Dataset
-
-##### Pegasus
-
-In Pegasus environment, run the following commands:
-
-```
-(pegasus-env) root# cd /experiment/overall
-(pegasus-env) root# monitor_script.sh > monitor_pbmc.log &
-(pegasus-env) root# python run_pegasus_pbmc.py
-```
-
-When finished, you'll find execution time for each step in its log file ``/experiment/overall/pegasus_pbmc.log``, and the system resource (especially memory) usage during the execution in ``/experiment/overall/monitor_pbmc.log``.
-
-To stop logging the system resource usage, simply run the following command in your terminal:
-
-```
-kill <number>
-```
-
-where ``<number>`` is the process ID shown after running ``monitor_script.sh > monitor_pbmc.log &`` command.
-
-##### SCANPY
-
-In SCANPY environment, run the following command:
-
-```
-(scanpy-env) root# cd /experiment/overall
-(scanpy-env) root# monitor_script.sh > monitor_pbmc_scanpy.log &
-(scanpy-env) root# python run_scanpy_pbmc.py > pbmc_scanpy.log
-```
-
-When finished, you'll find execution time for each step in its log file ``/experiment/overall/pbmc_scanpy.log``, and the system resource (especially memory) usage during the execution in ``/experiment/overall/monitor_pbmc_scanpy.log``.
-
-##### Seurat
-
-Similarly as for Bone Marrow dataset benchmark, first, in Pegasus environment, run the following commands to generate a Seurat-compatible h5ad file on the dataset, and convert it into Seurat object format:
-
-```
-(pegasus-env) root# cd /experiment/overall
-(pegasus-env) root# ./get_seurat_compatible_pbmc.sh
-(pegasus-env) root# Rscript convert_pbmc_pegasus.R
-```
-
-When finished, you'll have a Seurat object in ``/experiment/overall/MantonBM_nonmix.RData`` for benchmarking steps starting from kNN. 
-
-Now in SCANPY environment, run the following command:
-
-```
-(scanpy-env) root# monitor_script.sh > monitor_pbmc_seurat.log &
-(scanpy-env) root# Rscript run_seurat_pbmc.R
-```
-
-When finished, you'll find execution time for each step in its log file ``/experiment/overall/pbmc_seurat.log``, and the system resource (especially memory) usage during the execution in ``/experiment/overall/monitor_pbmc_seurat.log``.
+When terminated with failure, you may find information in its log file ``/experiment/overall/MantonBM/seurat_leiden.log`` and screen output.
 
 #### Mouse Neuron Dataset
 
+All 28 CPUs are used for benchmark on this dataset.
+
 ##### Pegasus
 
 In Pegasus environment, run the following commands:
 
 ```
-(pegasus-env) root# cd /experiment/overall
+(pegasus-env) root# cd /experiment/overall/mouse_neuron
 (pegasus-env) root# python run_pegasus_1m.py
 ```
 
-When finished, you'll find execution time for each step in its log file ``/experiment/overall/1m_pegasus.log``.
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/mouse_neuron/1m_pegasus_cpu_28.log``.
 
 ##### SCANPY
 
 In SCANPY environment, run the following command:
 
 ```
-(scanpy-env) root# cd /experiment/overall
-(scanpy-env) root# python run_scanpy_1m.py > 1m_scanpy.log
+(scanpy-env) root# cd /experiment/overall/mouse_neuron
+(scanpy-env) root# python run_scanpy_1m.py
 ```
 
-When finished, you'll find execution time for each step in its log file ``/experiment/overall/1m_scanpy.log``.
+When finished, you'll find execution time for each step in its log file ``/experiment/overall/mouse_neuron/1m_scanpy_cpu_28.log``.
+
+Specifically, as the last step, FLE embedding calculation, takes a significantly long time, we put it into a seperate script, and should be run after done with steps above:
+
+```
+(scanpy-env) root# python run_scanpy_1m_fle.py
+```
+
+When finished, execution time for FLE step will be appended into the same log file above.
 
 ##### Seurat
 
@@ -631,21 +642,35 @@ Seurat fails at loading data step. Users can try the following commands in R env
 > adata <- Read10X("/data/1M_neurons.h5")
 ```
 
-### Scalability
+## Scalability
 
-The scalability experiment on Pegasus is performed with respect to:
+### Number of 10X channels
 
-* Number of threads;
-* Dataset size.
+The scalability benchmark on cumulus *mkfastq* and *count* steps over Bone Marrow dataset's 63 channels was run on Terra + Google Cloud platform. Runtime per channel is recorded in ``/experiment/scalability/channel/channel_stats.csv``, and total cost is $101.43.
 
-The Bone Marrow dataset is used. In Pegasus environment, run the following commands
+Then in Pegasus environment, running
 
 ```
-(pegasus-env) root# cd /experiment/scalability
+(pegasus-env) root# python plot_channel_stats.py
+```
+
+will generate amortized cost per channel in a new CSV file: ``/experiment/scalability/channel/channel_stats_updated.csv``, and 2 plots.
+
+### CPU and Data Size
+
+The scalability on runtime of Pegasus is performed with respect to:
+
+* **Number of threads:** We use 8 CPUs to simulate a normal laptop, and 28 CPUs to simulate a server.
+* **Dataset size:** We down-sample Bone Marrow datasets into subsets of sizes 5k, 10k, 25k, 50k, 100k, and 200k cells, along with the whole dataset of 274k cells.
+
+In Pegasus environment, run the following commands
+
+```
+(pegasus-env) root# cd /experiment/scalability/runtime
 (pegasus-env) root# python down_sample.py sampling
 ```
 
-to generate a number of subsamples of Bone Marrow dataset of different number of cells.
+to generate subsamples of Bone Marrow dataset of different number of cells.
 
 Then run
 
@@ -657,7 +682,117 @@ to start the benchmark on Pegasus over all these subsamples with different numbe
 
 When finished, all the ``.log`` files in this folder record the runtime of each step of analysis using Pegasus. The subsample size is inferred from filename.
 
-In our experiment, we use 8 threads to represent a normal laptop setting, then 28 threads which equals to all available CPUs on our server. We down-sample the 270k Bone Marrow dataset to 5k, 10k, 25k, 50k, 100k, and 200k sizes.
+### Memory
+
+The scalability on memory usage is performed on Pegasus, Seurat, and SCANPY. Only PBMC and Bone Marrow datasets are used, as Seurat fails on loading Mouse Neuron dataset. 
+
+Moreover, since Seurat doesn't have Diffusion maps and FLE features, and it fails at batch correction and Leiden clustering steps on Bone Marrow dataset, we only benchmark 6 analysis tasks here: Highly variable feature selection, PCA, kNN, Louvain clustering, tSNE, and UMAP.
+
+#### PBMC Dataset
+
+Only 8 CPUs are used for this small dataset.
+
+##### Pegasus
+
+In Pegasus environment, run the following commands:
+
+```
+(pegasus-env) root# cd /experiment/scalability/memory/pbmc
+(pegasus-env) root# mem_monitor.sh > monitor_pegasus_pbmc.log &
+(pegasus-env) root# python run_pegasus_pbmc.py
+```
+
+When finished, in the same folder, you'll find execution time for each step in its log file ``pbmc_pegasus.log``, and the memory usage during the execution in ``monitor_pegasus_pbmc.log``.
+
+When you are done, you also need to stop logging the memory usage. simply run the following command in your terminal:
+
+```
+kill <number>
+```
+
+where ``<number>`` is the process ID shown after running ``mem_monitor.sh > monitor_pegasus_pbmc.log &`` command. Similarly as below.
+
+##### SCANPY
+
+In SCANPY environment, run the following command:
+
+```
+(scanpy-env) root# cd /experiment/scalability/memory/pbmc
+(scanpy-env) root# mem_monitor.sh > monitor_scanpy_pbmc.log &
+(scanpy-env) root# python run_scanpy_pbmc.py
+```
+
+When finished, in the same folder, you'll find execution time for each step in its log file ``pbmc_scanpy.log``, and the memory usage during the execution in ``monitor_scanpy_pbmc.log``.
+
+Don't forget to kill the process on logging the memory usage when you are done.
+
+##### Seurat
+
+In SCANPY environment, run the following command:
+
+```
+(scanpy-env) root# cd /experiment/scalability/memory/pbmc
+(scanpy-env) root# mem_monitor.sh > monitor_seurat_pbmc.log &
+(scanpy-env) root# Rscript run_pegasus_pbmc.py
+```
+
+When finished, in the same folder, you'll find execution time for each step in its log file ``pbmc_seurat.log``, and the memory usage during the execution in ``monitor_seurat_pbmc.log``.
+
+Don't forget to kill the process on logging the memory usage when you are done.
+
+#### Bone Marrow Dataset
+
+All 28 CPUs are used for memory benchmark on this dataset.
+
+##### Pegasus
+
+In Pegasus environment, run the following command:
+
+```
+(pegasus-env) root# cd /experiment/scalability/memory/MantonBM
+(pegasus-env) root# mem_monitor.sh > monitor_pegasus_mantonbm.log &
+(pegasus-env) root# python run_pegasus_mantonbm.py
+```
+
+When finished, in the same folder, you'll find execution time for each step in its log file ``pbmc_pegasus.log``, and the memory usage during the execution in ``monitor_pegasus_mantonbm.log``.
+
+When you are done, you also need to stop logging the memory usage. simply run the following command in your terminal:
+
+```
+kill <number>
+```
+
+where ``<number>`` is the process ID shown after running ``mem_monitor.sh > monitor_pegasus_mantonbm.log &`` command. Similarly as below.
+
+##### SCANPY
+
+In SCANPY environment, run the follow commands:
+
+In SCANPY environment, run the following command:
+
+```
+(scanpy-env) root# cd /experiment/scalability/memory/MantonBM
+(scanpy-env) root# mem_monitor.sh > monitor_scanpy_mantonbm.log &
+(scanpy-env) root# python run_scanpy_mantonbm.py
+```
+
+When finished, in the same folder, you'll find execution time for each step in its log file ``mantonbm_scanpy.log``, and the memory usage during the execution in ``monitor_scanpy_mantonbm.log``.
+
+Don't forget to kill the process on logging the memory usage when you are done.
+
+##### Seurat
+
+In SCANPY environment, run the following command:
+
+```
+(scanpy-env) root# cd /experiment/scalability/memory/MantonBM
+(scanpy-env) root# mem_monitor.sh > monitor_seurat_mantonbm.log &
+(scanpy-env) root# Rscript run_pegasus_mantonbm.py
+```
+
+When finished, in the same folder, you'll find execution time for each step in its log file ``mantonbm_seurat.log``, and the memory usage during the execution in ``monitor_seurat_mantonbm.log``.
+
+Don't forget to kill the process on logging the memory usage when you are done.
 
 ### Benchmark on Workflows
 

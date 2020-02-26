@@ -8,7 +8,7 @@ record.time <- function(duration.time, title, filename) {
 }
 
 seed <- 0
-n.cores <- detectCores()
+n.cores <- 8
 logfile <- paste0("pbmc_seurat_cpu_", n.cores, ".log")
 debug.mode <- FALSE
 setOption('mc.cores', n.cores)

@@ -1,6 +1,6 @@
 import os, sys
 
-n_cores = os.cpu_count()
+n_cores = 28
 out_name = "1M_neurons_pegasus_benchmark"
 data_src = "/data/1M_neurons.h5"
 

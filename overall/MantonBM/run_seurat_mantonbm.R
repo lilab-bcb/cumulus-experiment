@@ -8,7 +8,7 @@ record.time <- function(duration.time, title, filename) {
 }
 
 seed <- 0
-n.cores <- detectCores()
+n.cores <- 28
 logfile <- "mantonbm_seurat.log"
 debug.mode <- FALSE
 setOption('mc.cores', n.cores)

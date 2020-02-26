@@ -13,7 +13,7 @@ record.time <- function(start.time, end.time, title, filename) {
 src.data <- "/data/MantonBM_nonmix_10x.h5"
 
 seed <- 0
-n.cores <- detectCores()
+n.cores <- 28
 logfile <- "mantonbm_seurat.log"
 debug.mode <- FALSE
 setOption('mc.cores', n.cores)

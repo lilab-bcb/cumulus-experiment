@@ -4,7 +4,7 @@ import numpy as np
 data_src = "/data/MantonBM_nonmix.h5sc"
 
 size_list = [5000, 10000, 25000, 50000, 100000, 200000]
-cpu_list = [8, os.cpu_count()]
+cpu_list = [8, 28]
 
 def down_sample(data, size):
     n_obs = data.shape[0]

@@ -1,6 +1,6 @@
 import os, sys
 
-n_cores = os.cpu_count()
+n_cores = 28
 out_name = "mantonbm_pegasus_benchmark"
 data_src = "/data/MantonBM_nonmix.h5sc"
 

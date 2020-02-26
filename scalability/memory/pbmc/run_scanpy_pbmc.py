@@ -76,7 +76,7 @@ end_umap = time.time()
 record_time(start_umap, end_umap, "UMAP", fp)
 
 start_write = time.time()
-adata.write("mantonbm_scanpy_result.h5ad")
+adata.write("pbmc_scanpy_result.h5ad")
 end_write = time.time()
 record_time(start_write, end_write, "Write", fp)
 

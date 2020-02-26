@@ -1,4 +1,4 @@
-import os, sys, time
+import time
 import numpy as np
 import pandas as pd
 import scanpy as sc
@@ -11,7 +11,7 @@ from datetime import timedelta, datetime
 def record_time(duration_time, step_name, fp):
     fp.write("Time spent for {step}: {time}.\n\n".format(step = step_name, time = timedelta(seconds = duration_time)))
 
-sc.settings.n_jobs = os.cpu_count()
+sc.settings.n_jobs = 28
 sc.settings.verbosity = 4
 rand_seed = 0
 

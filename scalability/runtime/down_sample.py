@@ -26,7 +26,7 @@ def k_to_num(s):
 
 if __name__ == '__main__':
     cmd = sys.argv[1]
-    assert cmd in ['sampling', 'benchmark', 'plot']
+    assert cmd in ['sampling', 'benchmark']
 
     if cmd == 'sampling':
         import pegasus as pg

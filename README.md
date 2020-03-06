@@ -16,7 +16,7 @@ We benchmark Pegasus, SCANPY, and Seurat with the following versions:
 |:---------|:-----------:|:------------:|:------------------|
 | Pegasus  | 0.15.0      | 10/02/2019   | Python 3.7.3 |
 | SCANPY   | 1.4.4.post1 | 07/29/2019   | Python 3.7.3 |
-| Seurat   | 3.1.0       | 08/20/2019   | R 3.6.2 |
+| Seurat   | 3.1.0       | 08/20/2019   | R 3.6.3 |
 
 For versions of software dependencies, please refer to information in our [Dockerfile](https://raw.githubusercontent.com/lilab-bcb/cumulus-experiment/master/docker/Dockerfile).
 

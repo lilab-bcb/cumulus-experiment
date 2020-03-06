@@ -94,5 +94,3 @@ devtools::install_version("viridisLite", version = "0.3.0", repos = pkg.repo, up
 devtools::install_version("tibble", version = "2.1.3", repos = pkg.repo, upgrade = "never")
 devtools::install_version("cluster", version = "2.1.0", repos = pkg.repo, upgrade = "never")
 devtools::install_version("globals", version = "0.12.4", repos = pkg.repo, upgrade = "never")
-
-devtools::install("/opt/software/seurat-3.1.0", upgrade = "never")

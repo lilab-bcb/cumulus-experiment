@@ -21,8 +21,8 @@ ADD jdk-12.0.1_linux-x64_bin.tar.gz /opt/software
 
 ## Add script to track resource usage ##
 RUN mkdir -p /opt/software/scripts
-ADD monitor_script.sh /opt/software/scripts
-RUN chmod a+rx /opt/software/scripts/monitor_script.sh
+ADD mem_monitor.sh /opt/software/scripts
+RUN chmod a+rx /opt/software/scripts/mem_monitor.sh
 
 ENV PATH=/opt/software/jdk-12.0.1/bin:/opt/software/scripts:$PATH
 
@@ -36,6 +36,9 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD5
 	apt-get update && \
 	apt-get -y install r-base
 
+ADD install_dependencies.R /opt/software/install_dependencies.R
+RUN Rscript /opt/software/install_dependencies.R
+
 ## Get Seurat 3.1.0 source code ##
 RUN wget https://cran.r-project.org/src/contrib/Archive/Seurat/Seurat_3.1.0.tar.gz && \
 	tar -zxvf Seurat_3.1.0.tar.gz && \ 
@@ -43,8 +46,8 @@ RUN wget https://cran.r-project.org/src/contrib/Archive/Seurat/Seurat_3.1.0.tar.
 	rm Seurat_3.1.0.tar.gz
 
 ## INSTALL SEURAT ##
-ADD install.R /opt/software/install.R
-RUN Rscript /opt/software/install.R
+ADD install_seurat.R /opt/software/install_seurat.R
+RUN Rscript /opt/software/install_seurat.R
 
 ## INSTALL FAST_TSNE for Seurat ##
 RUN git clone https://github.com/KlugerLab/FIt-SNE.git /opt/software/FIt-SNE && \

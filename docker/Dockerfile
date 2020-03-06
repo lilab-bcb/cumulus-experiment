@@ -151,10 +151,10 @@ RUN pip install Cython==0.29.13 && \
 
 ENV PATH=$old_path
 
-WORKDIR /experiment
-
 # Add Data
 ADD data /data
 
 # Add experiment scripts
 RUN git clone https://github.com/lilab-bcb/cumulus-experiment.git /experiment
+
+WORKDIR /experiment

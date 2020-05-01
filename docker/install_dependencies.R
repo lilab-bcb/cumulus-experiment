@@ -84,6 +84,4 @@ devtools::install_version("vctrs", version = "0.2.0", repos = pkg.repo, upgrade 
 devtools::install_version("Rdpack", version = "0.11-0", repos = pkg.repo, upgrade = "never")
 devtools::install_version("gtable", version = "0.3.0", repos = pkg.repo, upgrade = "never")
 devtools::install_version("purrr", version = "0.3.3", repos = pkg.repo, upgrade = "never")
-devtools::install_version("ggplot2", version = "3.2.1", repos = pkg.repo, upgrade = "never")
-devtools::install_version("survival", version = "2.44-1.1", repos = pkg.repo, upgrade = "never")
 devtools::install_version("cluster", version = "2.1.0", repos = pkg.repo, upgrade = "never")

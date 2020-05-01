@@ -34,7 +34,7 @@ RUN wget http://security.ubuntu.com/ubuntu/pool/main/t/tzdata/tzdata_2019c-0ubun
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 && \
 	echo "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/" > /etc/apt/sources.list.d/cran.list && \
 	apt-get update && \
-	apt-get -y install r-base
+	apt-get -y install r-base=3.6.3-1bionic
 
 ADD install_dependencies.R /opt/software/install_dependencies.R
 RUN Rscript /opt/software/install_dependencies.R
